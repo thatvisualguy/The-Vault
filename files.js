@@ -2,5 +2,25 @@
 const FILES = [
   "ai_failure_carousel.html",
   "ai_time_savings_roadmap.html",
-  "pictionary-2.html"
+  "app-ideas-ranked-analysis.html",
+  "carousel_claude_code_skills.html",
+  "carousel_claude_design-1.html",
+  "carousel_weekly_ai_news.html",
+  "carousel-slides.html",
+  "claude-skills-card.html",
+  "Dashboard Wireframes (1).html",
+  "design-system-warm-editorial.html",
+  "dev-checklist-1.html",
+  "framescore.html",
+  "informium_brand_guidelines_carousel.html",
+  "informium_gemma4_carousel.html",
+  "lightroom-preset-generator-1.html",
+  "linkinbio (1).html",
+  "meghanify-card.html",
+  "pictionary-2.html",
+  "scansafe-2.html",
+  "screen-recorder.html",
+  "social-generator.html",
+  "top50-faceless-niches-2026-sourced-1.html",
+  "video-clipper-4.html"
 ];
