@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1080">
+<title>AI Time Savings Roadmap Carousel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --orange:   #F05A00;
+    --orange2:  #E8A020;
+    --cream:    #F0EDE6;
+    --black:    #1A1A1A;
+    --mid:      #6B6257;
+    --white:    #FFFFFF;
+    --road:     #1A1A1A;
+    --border-w: 28px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #C0B8AD;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0px;
+    padding: 24px;
+    font-family: 'Figtree', sans-serif;
+  }
+
+  /* ── SLIDE BASE ── */
+  .slide {
+    width: 1080px;
+    height: 1440px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── FRAMED SLIDES (orange border) ── */
+  .slide-inner {
+    position: absolute;
+    inset: var(--border-w);
+    background: var(--cream);
+    display: flex;
+    flex-direction: column;
+    padding: 72px 80px 80px;
+    z-index: 2;
+  }
+
+  /* orange top/bottom bars */
+  .frame-top {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: var(--border-w);
+    background: var(--orange);
+    z-index: 5;
+  }
+  .frame-bottom {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: var(--border-w);
+    background: var(--orange);
+    z-index: 5;
+  }
+  .frame-left {
+    position: absolute;
+    top: 0; bottom: 0; left: 0;
+    width: var(--border-w);
+    background: var(--orange);
+    z-index: 5;
+  }
+  .frame-right {
+    position: absolute;
+    top: 0; bottom: 0; right: 0;
+    width: var(--border-w);
+    background: var(--orange);
+    z-index: 5;
+  }
+
+  /* ── STOP PILL ── */
+  .stop-pill {
+    display: inline-flex;
+    align-items: center;
+    background: var(--orange);
+    color: var(--white);
+    padding: 14px 32px;
+    border-radius: 12px;
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: 0px;
+    margin-bottom: 32px;
+    width: fit-content;
+  }
+
+  /* ── HEADLINE ── */
+  .headline {
+    font-size: 88px;
+    font-weight: 900;
+    line-height: 1.0;
+    letter-spacing: -2px;
+    color: var(--black);
+    margin-bottom: 36px;
+  }
+
+  /* ── BODY TEXT ── */
+  .body-text {
+    font-size: 38px;
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--black);
+  }
+
+  /* ── ROAD SVG container ── */
+  .road-zone {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    pointer-events: none;
+    z-index: 3;
+  }
+  .road-zone svg {
+    display: block;
+    width: 100%;
+  }
+
+  /* ── ICON CIRCLE on road ── */
+  .road-icon {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: var(--orange);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 44px;
+    z-index: 10;
+    border: 4px solid var(--cream);
+  }
+
+  /* ── STAT BOX ── */
+  .stat-box {
+    background: var(--orange);
+    border-radius: 20px;
+    padding: 36px 44px;
+    margin-bottom: 24px;
+  }
+  .stat-num {
+    font-size: 96px;
+    font-weight: 900;
+    letter-spacing: -3px;
+    line-height: 1;
+    color: var(--white);
+    margin-bottom: 8px;
+  }
+  .stat-label {
+    font-size: 32px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.85);
+    line-height: 1.35;
+  }
+
+  .stat-box-white {
+    background: var(--white);
+    border-radius: 20px;
+    padding: 32px 40px;
+    margin-bottom: 20px;
+    border: 2px solid #DDD8CF;
+  }
+  .stat-box-white .num {
+    font-size: 72px;
+    font-weight: 900;
+    letter-spacing: -2px;
+    line-height: 1;
+    color: var(--black);
+  }
+  .stat-box-white .num span { color: var(--orange); }
+  .stat-box-white .lbl {
+    font-size: 28px;
+    font-weight: 400;
+    color: var(--mid);
+    margin-top: 6px;
+  }
+
+  /* ── TASK ROW ── */
+  .task-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 28px;
+    padding: 30px 0;
+    border-bottom: 2px solid #DDD8CF;
+  }
+  .task-row:last-child { border-bottom: none; }
+  .task-num {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--orange);
+    min-width: 50px;
+    padding-top: 6px;
+  }
+  .task-content h3 {
+    font-size: 38px;
+    font-weight: 800;
+    color: var(--black);
+    margin-bottom: 6px;
+    letter-spacing: -0.3px;
+  }
+  .task-content p {
+    font-size: 28px;
+    font-weight: 400;
+    color: var(--mid);
+    line-height: 1.4;
+  }
+
+  /* ── MATH ROW ── */
+  .math-row {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 28px 0;
+    border-bottom: 2px solid #DDD8CF;
+  }
+  .math-row:last-child { border-bottom: none; }
+  .math-icon {
+    font-size: 36px;
+    min-width: 52px;
+  }
+  .math-text {
+    font-size: 32px;
+    font-weight: 500;
+    color: var(--black);
+    line-height: 1.35;
+  }
+  .math-text strong { font-weight: 900; color: var(--orange); }
+
+  /* ── GRADIENT SLIDE (CTA) ── */
+  .slide-grad {
+    background: linear-gradient(180deg, #F05A00 0%, #F0A020 40%, #F0E0B0 75%, #EDE8DF 100%);
+  }
+
+  /* ── LOGO MARK ── */
+  .logo-mark {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    justify-content: center;
+  }
+  .logo-bar {
+    border-radius: 50px;
+  }
+
+  /* ── HERO BOOK ── */
+  .hero-book {
+    background: linear-gradient(160deg, #F05A00 0%, #F0A020 50%, #F0D080 100%);
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .book-card {
+    width: 660px;
+    background: var(--cream);
+    border-radius: 12px;
+    box-shadow: 12px 12px 0 rgba(0,0,0,0.25);
+    overflow: hidden;
+    transform: rotate(-2deg);
+  }
+  .book-top {
+    padding: 52px 52px 36px;
+  }
+  .book-top .starburst {
+    position: absolute;
+    top: 40px;
+    right: 40px;
+    width: 120px;
+    height: 120px;
+  }
+  .book-bottom {
+    background: var(--orange);
+    padding: 52px 40px 40px;
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    min-height: 260px;
+  }
+  .book-pill {
+    border-radius: 50px;
+    flex: 1;
+  }
+
+  /* ── CHECKLIST ── */
+  .check-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+    padding: 24px 0;
+    border-bottom: 2px solid #DDD8CF;
+  }
+  .check-item:last-child { border-bottom: none; }
+  .check-dot {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--orange);
+    flex-shrink: 0;
+    margin-top: 8px;
+  }
+  .check-text {
+    font-size: 34px;
+    font-weight: 500;
+    color: var(--black);
+    line-height: 1.4;
+  }
+  .check-text strong { font-weight: 900; }
+
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     SLIDE 01 — HERO (book cover style)
+══════════════════════════════════════ -->
+<div class="slide">
+  <div class="hero-book">
+    <!-- stacked book pages -->
+    <div style="position:relative;">
+      <!-- page stack shadows -->
+      <div style="position:absolute;top:8px;left:8px;width:660px;background:#DDD;border-radius:12px;height:800px;"></div>
+      <div style="position:absolute;top:4px;left:4px;width:660px;background:#E8E5DF;border-radius:12px;height:800px;"></div>
+
+      <!-- main book card -->
+      <div style="width:660px;background:var(--cream);border-radius:12px;overflow:hidden;position:relative;box-shadow:0 8px 32px rgba(0,0,0,0.3);">
+        <!-- starburst -->
+        <div style="position:absolute;top:36px;right:36px;z-index:10;">
+          <svg width="130" height="130" viewBox="0 0 130 130">
+            <polygon points="65,0 72,48 110,20 84,55 130,58 92,75 120,108 80,90 78,130 65,95 52,130 50,90 10,108 38,75 0,58 46,55 20,20 56,48" fill="#1A1A1A"/>
+            <text x="65" y="62" text-anchor="middle" font-family="Figtree,sans-serif" font-weight="800" font-size="16" fill="white">The</text>
+            <text x="65" y="80" text-anchor="middle" font-family="Figtree,sans-serif" font-weight="800" font-size="14" fill="white">Numbers</text>
+          </svg>
+        </div>
+
+        <!-- book top section -->
+        <div style="padding:52px 52px 28px;">
+          <div style="font-size:40px;font-weight:500;color:var(--black);margin-bottom:8px;">The only</div>
+          <div style="font-size:80px;font-weight:900;line-height:0.95;letter-spacing:-2px;color:var(--black);margin-bottom:16px;">AI TIME<br>SAVINGS<br>PLAYBOOK</div>
+          <div style="font-size:38px;font-weight:400;color:var(--mid);">you'll ever need</div>
+        </div>
+
+        <!-- book bottom section (orange) -->
+        <div style="background:var(--orange);padding:44px 44px 48px;display:flex;align-items:flex-end;gap:14px;min-height:220px;">
+          <div style="width:80px;height:170px;background:rgba(255,220,100,0.7);border-radius:50px;"></div>
+          <div style="width:80px;height:200px;background:rgba(255,255,255,0.35);border-radius:50px;"></div>
+          <div style="width:80px;height:160px;background:rgba(180,40,40,0.7);border-radius:50px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     SLIDE 02 — THE MATH (framed + road enters from bottom)
+══════════════════════════════════════ -->
+<div class="slide" style="background:var(--orange);">
+  <!-- orange frame bars -->
+  <div class="frame-top"></div>
+  <div class="frame-bottom"></div>
+  <div class="frame-left"></div>
+  <div class="frame-right"></div>
+
+  <div class="slide-inner">
+    <div class="stop-pill">THE MATH</div>
+
+    <div class="headline" style="font-size:80px;margin-bottom:28px;">
+      1 hour saved/day.<br>
+      Here's what<br>
+      that's <em>actually</em> worth.
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:0;">
+      <div class="stat-box-white">
+        <div class="num"><span>260</span></div>
+        <div class="lbl">hours saved per year, per employee</div>
+      </div>
+      <div class="stat-box-white">
+        <div class="num"><span>1,300</span></div>
+        <div class="lbl">hours over 5 years, per employee</div>
+      </div>
+      <div class="stat-box-white" style="grid-column:1/-1;">
+        <div class="num"><span>3,120</span> <span style="font-size:40px;color:var(--mid);">hrs</span></div>
+        <div class="lbl">over 5 years for a team of just 3 people</div>
+      </div>
+    </div>
+
+    <!-- road enters from bottom-right -->
+    <div class="road-zone" style="height:280px;bottom:28px;">
+      <svg viewBox="0 0 1024 280" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- road shape -->
+        <path d="M1024,280 C900,280 820,200 720,160 C600,110 480,130 380,90 C280,50 200,0 100,0 L60,0 L60,40 C160,40 240,90 340,130 C440,170 560,150 680,200 C780,240 860,310 1024,320 Z"
+              fill="var(--road)"/>
+        <!-- dashed center line -->
+        <path d="M1024,300 C900,300 820,218 718,178 C600,130 478,150 378,110 C278,70 196,20 96,20"
+              fill="none" stroke="white" stroke-width="5" stroke-dasharray="28,18" stroke-linecap="round"/>
+      </svg>
+      <!-- icon on road -->
+      <div class="road-icon" style="bottom:40px;right:140px;font-size:42px;">🧮</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     SLIDE 03 — IN DOLLARS (road continues)
+══════════════════════════════════════ -->
+<div class="slide" style="background:var(--orange);">
+  <div class="frame-top"></div>
+  <div class="frame-bottom"></div>
+  <div class="frame-left"></div>
+  <div class="frame-right"></div>
+
+  <div class="slide-inner">
+    <!-- road exits from top-left (continuing from previous slide) -->
+    <div style="position:absolute;top:0;left:0;right:0;height:260px;z-index:3;pointer-events:none;">
+      <svg viewBox="0 0 1024 260" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0,0 C100,0 180,60 280,100 C400,148 520,128 620,168 C720,208 800,260 1024,260 L1024,300 L0,300 Z"
+              fill="var(--road)"/>
+        <path d="M0,20 C100,20 178,78 278,118 C398,168 518,148 618,188 C718,228 798,278 1024,278"
+              fill="none" stroke="white" stroke-width="5" stroke-dasharray="28,18" stroke-linecap="round"/>
+      </svg>
+      <div class="road-icon" style="top:80px;left:100px;">💰</div>
+    </div>
+
+    <div style="margin-top:240px;">
+      <div class="stop-pill">IN DOLLARS</div>
+      <div class="headline" style="font-size:76px;margin-bottom:24px;">
+        Now put a<br>
+        price tag on it.
+      </div>
+
+      <div class="math-row">
+        <div class="math-icon">👤</div>
+        <div class="math-text">$50k salary = <strong>$24/hr</strong></div>
+      </div>
+      <div class="math-row">
+        <div class="math-icon">⏱️</div>
+        <div class="math-text">260 hrs/yr × $24 = <strong>$6,240/yr</strong></div>
+      </div>
+      <div class="math-row">
+        <div class="math-icon">👥</div>
+        <div class="math-text">Team of 10 = <strong>$62,400/yr</strong> back</div>
+      </div>
+      <div class="math-row" style="border-bottom:none;background:var(--orange);margin:0 -40px;padding:28px 40px;border-radius:16px;">
+        <div class="math-icon">🚀</div>
+        <div class="math-text" style="color:white;"><strong style="color:white;font-size:38px;">$312,000 over 5 years.</strong><br><span style="font-size:28px;font-weight:400;">Just from 1 hour per day.</span></div>
+      </div>
+    </div>
+
+    <!-- road exits bottom-right -->
+    <div class="road-zone" style="height:180px;bottom:28px;">
+      <svg viewBox="0 0 1024 180" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M1024,0 C900,0 800,80 680,100 C540,124 400,90 260,120 C160,140 80,180 0,180 L0,220 L1024,220 Z"
+              fill="var(--road)"/>
+        <path d="M1024,18 C902,18 800,98 680,118 C540,142 400,108 258,138 C158,158 78,198 0,198"
+              fill="none" stroke="white" stroke-width="5" stroke-dasharray="28,18" stroke-linecap="round"/>
+      </svg>
+      <div class="road-icon" style="bottom:20px;right:200px;">📊</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     SLIDE 04 — STOP 1 (road continues from top-right)
+══════════════════════════════════════ -->
+<div class="slide" style="background:var(--orange);">
+  <div class="frame-top"></div>
+  <div class="frame-bottom"></div>
+  <div class="frame-left"></div>
+  <div class="frame-right"></div>
+
+  <div class="slide-inner">
+    <!-- road entering top-right -->
+    <div style="position:absolute;top:0;right:0;left:0;height:220px;z-index:3;pointer-events:none;">
+      <svg viewBox="0 0 1024 220" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M1024,0 C924,0 840,60 720,90 C580,124 440,100 300,130 C180,155 80,220 0,220 L0,260 L1024,260 Z"
+              fill="var(--road)"/>
+        <path d="M1024,20 C922,20 838,80 718,110 C578,144 438,120 298,150 C178,175 78,238 0,238"
+              fill="none" stroke="white" stroke-width="5" stroke-dasharray="28,18" stroke-linecap="round"/>
+      </svg>
+      <div class="road-icon" style="top:60px;right:120px;">⚙️</div>
+    </div>
+
+    <div style="margin-top:200px;">
+      <div class="stop-pill">STOP 1</div>
+      <div class="headline" style="font-size:82px;margin-bottom:24px;">
+        Manual<br>
+        Reporting
+      </div>
+      <div class="body-text">
+        Your team spends <strong>4–6 hours a week</strong> copy-pasting numbers into spreadsheets. Automated reporting runs in the background. Dashboard is always live. Nobody touches it.
+      </div>
+    </div>
+
+    <!-- road exits bottom -->
+    <div class="road-zone" style="height:220px;bottom:28px;">
+      <svg viewBox="0 0 1024 220" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0,0 C120,0 220,80 360,120 C500,160 640,140 780,180 C880,208 960,220 1024,220 L1024,260 L0,260 Z"
+              fill="var(--road)"/>
+        <path d="M0,20 C120,20 220,98 360,138 C500,178 640,158 780,198 C880,226 960,238 1024,238"
+              fill="none" stroke="white" stroke-width="5" stroke-dasharray="28,18" stroke-linecap="round"/>
+      </svg>
+      <div class="road-icon" style="bottom:30px;left:160px;">📋</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     SLIDE 05 — STOP 2 (road enters top-left, exits bottom-right)
+══════════════════════════════════════ -->
+<div class="slide" style="background:var(--orange);">
+  <div class="frame-top"></div>
+  <div class="frame-bottom"></div>
+  <div class="frame-left"></div>
+  <div class="frame-right"></div>
+
+  <div class="slide-inner">
+    <!-- road enters top-left -->
+    <div style="position:absolute;top:0;left:0;right:0;height:220px;z-index:3;pointer-events:none;">
+      <svg viewBox="0 0 1024 220" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0,0 C120,0 220,80 360,120 C500,160 640,140 780,180 C880,208 960,220 1024,220 L1024,260 L0,260 Z"
+              fill="var(--road)"/>
+        <path d="M0,20 C120,20 218,98 358,138 C498,178 638,158 778,198 C878,226 958,238 1024,238"
+              fill="none" stroke="white" stroke-width="5" stroke-dasharray="28,18" stroke-linecap="round"/>
+      </svg>
+      <div class="road-icon" style="top:56px;left:80px;">💬</div>
+    </div>
+
+    <div style="margin-top:200px;">
+      <div class="stop-pill">STOP 2</div>
+      <div class="headline" style="font-size:82px;margin-bottom:24px;">
+        Customer<br>
+        Query Triage
+      </div>
+      <div class="body-text">
+        <strong>60–70% of inbound queries</strong> are the same 10 questions. An AI triage layer handles them instantly — 24/7, zero wait time. Your team only touches the conversations that actually need them.
+      </div>
+    </div>
+
+    <!-- road exits bottom-right -->
+    <div class="road-zone" style="height:200px;bottom:28px;">
+      <svg viewBox="0 0 1024 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M1024,0 C900,20 780,60 640,100 C500,140 360,120 220,160 C120,188 40,200 0,200 L0,240 L1024,240 Z"
+              fill="var(--road)"/>
+        <path d="M1024,20 C898,40 778,78 638,118 C498,158 358,138 218,178 C118,206 38,218 0,218"
+              fill="none" stroke="white" stroke-width="5" stroke-dasharray="28,18" stroke-linecap="round"/>
+      </svg>
+      <div class="road-icon" style="bottom:20px;right:160px;">🤖</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     SLIDE 06 — STOP 3
+══════════════════════════════════════ -->
+<div class="slide" style="background:var(--orange);">
+  <div class="frame-top"></div>
+  <div class="frame-bottom"></div>
+  <div class="frame-left"></div>
+  <div class="frame-right"></div>
+
+  <div class="slide-inner">
+    <!-- road enters from top-right -->
+    <div style="position:absolute;top:0;left:0;right:0;height:220px;z-index:3;pointer-events:none;">
+      <svg viewBox="0 0 1024 220" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M1024,0 C900,20 780,60 640,100 C500,140 360,120 220,160 C120,188 40,200 0,200 L0,240 L1024,240 Z"
+              fill="var(--road)"/>
+        <path d="M1024,20 C898,40 778,78 638,118 C498,158 358,138 218,178 C118,206 38,218 0,218"
+              fill="none" stroke="white" stroke-width="5" stroke-dasharray="28,18" stroke-linecap="round"/>
+      </svg>
+      <div class="road-icon" style="top:60px;right:100px;">📂</div>
+    </div>
+
+    <div style="margin-top:200px;">
+      <div class="stop-pill">STOP 3</div>
+      <div class="headline" style="font-size:82px;margin-bottom:24px;">
+        Data Entry &amp;<br>
+        Processing
+      </div>
+      <div class="body-text">
+        Invoices. Forms. Intake sheets. People manually re-keying data that already exists somewhere else. AI extracts, validates, and routes it — without a human in the loop.
+      </div>
+    </div>
+
+    <!-- road exits bottom-left -->
+    <div class="road-zone" style="height:220px;bottom:28px;">
+      <svg viewBox="0 0 1024 220" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0,0 C140,20 280,80 420,110 C580,145 720,130 880,170 C960,190 1000,220 1024,220 L1024,260 L0,260 Z"
+              fill="var(--road)"/>
+        <path d="M0,20 C140,40 278,98 418,128 C578,163 718,148 878,188 C958,208 998,238 1024,238"
+              fill="none" stroke="white" stroke-width="5" stroke-dasharray="28,18" stroke-linecap="round"/>
+      </svg>
+      <div class="road-icon" style="bottom:28px;left:200px;">🗂️</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     SLIDE 07 — STOP 4
+══════════════════════════════════════ -->
+<div class="slide" style="background:var(--orange);">
+  <div class="frame-top"></div>
+  <div class="frame-bottom"></div>
+  <div class="frame-left"></div>
+  <div class="frame-right"></div>
+
+  <div class="slide-inner">
+    <!-- road enters bottom-left continuation -->
+    <div style="position:absolute;top:0;left:0;right:0;height:220px;z-index:3;pointer-events:none;">
+      <svg viewBox="0 0 1024 220" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0,0 C140,20 280,80 420,110 C580,145 720,130 880,170 C960,190 1000,220 1024,220 L1024,260 L0,260 Z"
+              fill="var(--road)"/>
+        <path d="M0,20 C140,40 278,98 418,128 C578,163 718,148 878,188 C958,208 998,238 1024,238"
+              fill="none" stroke="white" stroke-width="5" stroke-dasharray="28,18" stroke-linecap="round"/>
+      </svg>
+      <div class="road-icon" style="top:60px;left:80px;">📅</div>
+    </div>
+
+    <div style="margin-top:200px;">
+      <div class="stop-pill">STOP 4</div>
+      <div class="headline" style="font-size:82px;margin-bottom:24px;">
+        Scheduling &amp;<br>
+        Follow-ups
+      </div>
+      <div class="body-text">
+        Back-and-forth booking. Chase emails. "Just checking in" messages. AI handles the entire follow-up sequence — from initial outreach to booked meeting — while your team focuses on the conversation that matters.
+      </div>
+    </div>
+
+    <!-- road exits bottom right wave -->
+    <div class="road-zone" style="height:200px;bottom:28px;">
+      <svg viewBox="0 0 1024 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M1024,0 C880,0 760,80 620,110 C480,140 340,120 200,160 C100,188 40,200 0,200 L0,240 L1024,240 Z"
+              fill="var(--road)"/>
+        <path d="M1024,20 C878,20 758,98 618,128 C478,158 338,138 198,178 C98,206 38,218 0,218"
+              fill="none" stroke="white" stroke-width="5" stroke-dasharray="28,18" stroke-linecap="round"/>
+      </svg>
+      <div class="road-icon" style="bottom:20px;right:180px;">📧</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     SLIDE 08 — STOP 5
+══════════════════════════════════════ -->
+<div class="slide" style="background:var(--orange);">
+  <div class="frame-top"></div>
+  <div class="frame-bottom"></div>
+  <div class="frame-left"></div>
+  <div class="frame-right"></div>
+
+  <div class="slide-inner">
+    <!-- road enters from top-right wave -->
+    <div style="position:absolute;top:0;left:0;right:0;height:220px;z-index:3;pointer-events:none;">
+      <svg viewBox="0 0 1024 220" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M1024,0 C880,0 760,80 620,110 C480,140 340,120 200,160 C100,188 40,200 0,200 L0,240 L1024,240 Z"
+              fill="var(--road)"/>
+        <path d="M1024,20 C878,20 758,98 618,128 C478,158 338,138 198,178 C98,206 38,218 0,218"
+              fill="none" stroke="white" stroke-width="5" stroke-dasharray="28,18" stroke-linecap="round"/>
+      </svg>
+      <div class="road-icon" style="top:58px;right:100px;">📣</div>
+    </div>
+
+    <div style="margin-top:200px;">
+      <div class="stop-pill">STOP 5</div>
+      <div class="headline" style="font-size:82px;margin-bottom:24px;">
+        Content &amp;<br>
+        Comms Ops
+      </div>
+      <div class="body-text">
+        Newsletters. Social captions. Internal updates. Meeting summaries. Teams spend <strong>3–5 hours a week</strong> on content that AI can draft in minutes — leaving humans to review, not create from scratch.
+      </div>
+    </div>
+
+    <!-- road exits bottom-center heading down -->
+    <div class="road-zone" style="height:200px;bottom:28px;">
+      <svg viewBox="0 0 1024 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0,200 C180,180 340,120 500,100 C660,80 800,100 1024,200 L1024,240 L0,240 Z"
+              fill="var(--road)"/>
+        <path d="M0,218 C180,198 340,138 500,118 C660,98 800,118 1024,218"
+              fill="none" stroke="white" stroke-width="5" stroke-dasharray="28,18" stroke-linecap="round"/>
+      </svg>
+      <div class="road-icon" style="bottom:24px;left:50%;transform:translateX(-50%);">✍️</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     SLIDE 09 — THE AUDIT (no road, just content)
+══════════════════════════════════════ -->
+<div class="slide" style="background:var(--orange);">
+  <div class="frame-top"></div>
+  <div class="frame-bottom"></div>
+  <div class="frame-left"></div>
+  <div class="frame-right"></div>
+
+  <div class="slide-inner">
+    <div class="stop-pill">BEFORE YOU AUTOMATE</div>
+
+    <div class="headline" style="font-size:76px;margin-bottom:32px;">
+      Your 5-minute<br>
+      time audit.
+    </div>
+
+    <div class="check-item">
+      <div class="check-dot"></div>
+      <div class="check-text">List every <strong>recurring task</strong> your team does weekly</div>
+    </div>
+    <div class="check-item">
+      <div class="check-dot"></div>
+      <div class="check-text">Mark anything that follows a <strong>predictable pattern</strong></div>
+    </div>
+    <div class="check-item">
+      <div class="check-dot"></div>
+      <div class="check-text">Estimate <strong>hours per week</strong> on each task</div>
+    </div>
+    <div class="check-item">
+      <div class="check-dot"></div>
+      <div class="check-text">Multiply by <strong>$24/hr</strong> (or your actual rate)</div>
+    </div>
+    <div class="check-item">
+      <div class="check-dot"></div>
+      <div class="check-text">That number is your <strong>automation opportunity.</strong></div>
+    </div>
+
+    <div style="margin-top:36px;background:var(--orange);border-radius:16px;padding:32px 36px;">
+      <div style="font-size:28px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.7);margin-bottom:8px;">The result</div>
+      <div style="font-size:38px;font-weight:800;color:white;line-height:1.3;">Most businesses find $40k–$120k/yr sitting in tasks they assumed were "just part of the job."</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     SLIDE 10 — CTA (gradient, no frame)
+══════════════════════════════════════ -->
+<div class="slide slide-grad" style="align-items:center;justify-content:center;">
+
+  <div style="text-align:center;padding:80px;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;">
+
+    <div style="font-size:56px;font-weight:800;color:var(--black);margin-bottom:48px;">
+      Want our free<br>Time Audit Template?
+    </div>
+
+    <div style="font-size:100px;font-weight:900;letter-spacing:-2px;color:var(--black);line-height:1;margin-bottom:20px;">
+      Comment
+    </div>
+    <div style="font-size:100px;font-weight:900;letter-spacing:-2px;color:var(--orange);line-height:1;margin-bottom:64px;">
+      "AUDIT"
+    </div>
+
+    <!-- logo mark -->
+    <div class="logo-mark" style="margin-bottom:64px;">
+      <div class="logo-bar" style="width:52px;height:108px;background:rgba(255,220,80,0.85);"></div>
+      <div class="logo-bar" style="width:52px;height:138px;background:rgba(240,90,0,0.85);"></div>
+      <div class="logo-bar" style="width:52px;height:98px;background:rgba(200,40,40,0.8);"></div>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;width:100%;background:var(--black);border-radius:20px;padding:36px 48px;">
+      <div>
+        <div style="font-size:26px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--orange);margin-bottom:8px;">Follow for AI build strategy</div>
+        <div style="font-size:52px;font-weight:900;color:white;letter-spacing:-1px;">@yourbrand</div>
+      </div>
+      <div style="font-size:60px;color:var(--orange);font-weight:700;">›</div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
