@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Carousel Genius – 4 Slides</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,900;1,900&family=Barlow+Condensed:wght@700;800;900&family=DM+Sans:wght@400;500;700;800;900&family=Caveat:wght@700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #888;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 40px;
+      padding: 40px 20px;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    /* ─────────────────────────────────────────
+       SHARED SLIDE SHELL
+       Each slide is exactly 1080×1440 px, scaled
+       to 540×720 for display (scale 0.5)
+    ───────────────────────────────────────── */
+    .slide-wrapper {
+      width: 540px;
+      height: 720px;
+      position: relative;
+      /* The inner .slide is 1080×1440; transform scales it down */
+    }
+
+    .slide {
+      width: 1080px;
+      height: 1440px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform: scale(0.5);
+      transform-origin: top left;
+      background: #f8f8fc;
+      overflow: hidden;
+    }
+
+    /* ── Shared grid background ── */
+    .slide::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(#e0e0ea 1px, transparent 1px),
+        linear-gradient(90deg, #e0e0ea 1px, transparent 1px);
+      background-size: 80px 80px;
+      opacity: 0.7;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .slide > * { position: relative; z-index: 1; }
+
+    /* ── Shared "Next Slide" pill button ── */
+    .next-slide-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #e8521a;
+      color: #fff;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800;
+      font-size: 52px;
+      letter-spacing: -0.5px;
+      border-radius: 80px;
+      padding: 24px 60px;
+      white-space: nowrap;
+      box-shadow: 0 8px 32px rgba(232,82,26,0.25);
+    }
+
+    /* ── Selection handle squares (decorative) ── */
+    .handle {
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      background: #111;
+      z-index: 10;
+    }
+
+    /* ═══════════════════════════════════════
+       SLIDE 1 — "I've spent years creating carousels"
+    ═══════════════════════════════════════ */
+    #slide1 {
+      padding: 100px 80px 80px 80px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #slide1 .hero-text {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 900;
+      font-size: 110px;
+      line-height: 1.0;
+      letter-spacing: -3px;
+      color: #111;
+      margin-bottom: 60px;
+    }
+
+    #slide1 .hero-text .orange { color: #e8521a; }
+
+    /* Two overlapping selection rectangles */
+    #slide1 .rect-group {
+      position: relative;
+      width: 480px;
+      height: 320px;
+      margin: 60px auto 80px auto;
+      flex-shrink: 0;
+    }
+
+    #slide1 .rect {
+      position: absolute;
+      border: 3px solid #111;
+      background: transparent;
+    }
+
+    #slide1 .rect-a {
+      width: 320px;
+      height: 240px;
+      top: 0;
+      left: 0;
+    }
+
+    #slide1 .rect-b {
+      width: 340px;
+      height: 230px;
+      top: 90px;
+      left: 140px;
+    }
+
+    /* Handles on rects */
+    #slide1 .h1 { top: -11px; left: 148px; }
+    #slide1 .h2 { top: 108px; left: -11px; }
+    #slide1 .h3 { top: 108px; right: 133px; }
+    #slide1 .h4 { bottom: -11px; left: 148px; }
+    #slide1 .h5 { top: -11px; right: 88px; }
+    #slide1 .h6 { top: 108px; right: -11px; }
+    #slide1 .h7 { bottom: -11px; left: 50%; transform: translateX(-50%); }
+
+    /* Next Slide button */
+    #slide1 .btn-wrap {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 60px;
+    }
+
+    /* Bottom tagline */
+    #slide1 .tagline {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 400;
+      font-size: 56px;
+      line-height: 1.25;
+      color: #111;
+      text-align: center;
+    }
+
+    #slide1 .tagline strong {
+      font-weight: 900;
+    }
+
+    /* ═══════════════════════════════════════
+       SLIDE 2 — "Great carousels have been blowing up in 2026..."
+    ═══════════════════════════════════════ */
+    #slide2 {
+      padding: 70px 60px 60px 60px;
+    }
+
+    #slide2 .headline {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 900;
+      font-size: 80px;
+      line-height: 1.05;
+      letter-spacing: -2px;
+      color: #111;
+      margin-bottom: 40px;
+      max-width: 900px;
+    }
+
+    /* Corner handle decoration top-left */
+    #slide2 .corner-handles {
+      position: absolute;
+      top: 220px;
+      left: 30px;
+      z-index: 10;
+    }
+
+    #slide2 .corner-handles .ch {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: #111;
+    }
+    #slide2 .ch1 { top: 0; left: 0; }
+    #slide2 .ch2 { top: 60px; left: -30px; }
+    #slide2 .ch3 { top: 110px; left: -50px; }
+
+    /* ── Analytics dashboard mockup ── */
+    #slide2 .dashboard {
+      width: 960px;
+      background: #1a1a22;
+      border-radius: 28px;
+      overflow: hidden;
+      margin: 0 auto 50px auto;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.35);
+      padding: 30px;
+      display: grid;
+      grid-template-columns: 1fr 1.3fr 1fr;
+      gap: 16px;
+    }
+
+    .dash-panel {
+      background: #242430;
+      border-radius: 16px;
+      padding: 20px;
+      color: #fff;
+    }
+
+    /* Thumbnail inside panel */
+    .dash-thumb {
+      width: 100%;
+      height: 120px;
+      border-radius: 10px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 28px;
+      color: #fff;
+      text-align: center;
+      line-height: 1.1;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .thumb-left {
+      background: #1a1a22;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .thumb-left .old { font-size: 22px; color: #ffd54f; font-weight: 900; }
+    .thumb-left .vs  { font-size: 18px; color: #aaa; }
+    .thumb-left .new { font-size: 22px; color: #66bb6a; font-weight: 900; }
+
+    .thumb-center {
+      background: #e8521a;
+      font-size: 34px;
+      letter-spacing: -1px;
+    }
+
+    .thumb-right {
+      background: #1a1a22;
+      flex-direction: column;
+      padding: 8px;
+    }
+    .thumb-right .ig-logo {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+      border-radius: 12px;
+      margin: 0 auto 6px auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+    }
+    .thumb-right .ig-text { font-size: 16px; color: #fff; text-align: center; line-height: 1.2; font-weight: 900; }
+
+    /* Stats rows */
+    .dash-stats {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .stat-chip {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .stat-chip .label { font-size: 14px; color: #888; }
+    .stat-chip .val   { font-size: 20px; font-weight: 700; color: #fff; }
+
+    .dash-tabs {
+      display: flex;
+      gap: 18px;
+      border-bottom: 2px solid #333;
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+    }
+
+    .dash-tab {
+      font-size: 18px;
+      color: #888;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .dash-tab.active { color: #fff; border-bottom: 2px solid #fff; padding-bottom: 8px; margin-bottom: -10px; }
+
+    .summary-label { font-size: 17px; color: #aaa; margin-bottom: 10px; font-weight: 600; }
+
+    .big-stat { font-size: 38px; font-weight: 900; color: #fff; line-height: 1; }
+    .big-label { font-size: 15px; color: #888; margin-bottom: 12px; }
+
+    /* ── Blue sticky note ── */
+    #slide2 .sticky {
+      position: absolute;
+      bottom: 160px;
+      left: 30px;
+      width: 420px;
+      background: #4a9eff;
+      border-radius: 18px 0 18px 18px;
+      padding: 40px 36px;
+      transform: rotate(-3deg);
+      z-index: 20;
+    }
+
+    #slide2 .sticky::before {
+      content: '';
+      position: absolute;
+      top: -28px;
+      left: 0;
+      width: 80px;
+      height: 30px;
+      background: #4a9eff;
+      clip-path: polygon(0 100%, 100% 100%, 100% 0);
+    }
+
+    #slide2 .sticky-text {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 62px;
+      line-height: 1.0;
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: -1px;
+    }
+
+    /* CSS cursor icon */
+    #slide2 .cursor {
+      position: absolute;
+      bottom: 100px;
+      left: 390px;
+      z-index: 22;
+      width: 60px;
+      height: 70px;
+    }
+
+    #slide2 .cursor svg {
+      width: 60px;
+      height: 70px;
+      fill: #fff;
+      stroke: #111;
+      stroke-width: 3;
+    }
+
+    /* Next Slide btn */
+    #slide2 .btn-wrap {
+      position: absolute;
+      bottom: 200px;
+      right: 60px;
+      z-index: 20;
+    }
+
+    /* Bottom corner handles */
+    #slide2 .bottom-handles {
+      position: absolute;
+      bottom: 60px;
+      right: 60px;
+      z-index: 10;
+    }
+
+    #slide2 .bottom-handles .bh {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: #111;
+    }
+    #slide2 .bh1 { bottom: 0; right: 0; }
+    #slide2 .bh2 { bottom: 60px; right: 180px; }
+
+    #slide2 .corner-line {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      width: 190px;
+      height: 70px;
+      border-right: 3px solid #111;
+      border-bottom: 3px solid #111;
+    }
+
+    /* ═══════════════════════════════════════
+       SLIDE 3 — "How to Become a Carousel Genius"
+    ═══════════════════════════════════════ */
+    #slide3 {
+      padding: 80px 70px 60px 70px;
+      position: relative;
+    }
+
+    /* Scattered floating words */
+    .float-word {
+      position: absolute;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 50px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #111;
+      z-index: 5;
+    }
+
+    .float-word.blue { color: #4a9eff; }
+
+    #slide3 .w-posts    { top: 80px;  left: 70px;  transform: rotate(-2deg); }
+    #slide3 .w-slides   { top: 160px; left: 180px; transform: rotate(3deg); }
+    #slide3 .w-like     { top: 120px; left: 480px; font-size: 46px; }
+    #slide3 .w-captions { top: 70px;  right: 60px; transform: rotate(1deg); }
+
+    #slide3 .w-engagement { bottom: 260px; left: 70px;  transform: rotate(-4deg); font-size: 46px; }
+    #slide3 .w-comments   { bottom: 200px; left: 440px; transform: rotate(2deg);  font-size: 46px; }
+    #slide3 .w-images     { bottom: 140px; left: 300px; transform: rotate(-2deg); font-size: 46px; font-style: italic; }
+
+    /* Giant display heading */
+    #slide3 .main-heading {
+      position: relative;
+      z-index: 6;
+      margin-top: 260px;
+    }
+
+    #slide3 .display-line {
+      font-family: 'Playfair Display', serif;
+      font-weight: 900;
+      font-size: 200px;
+      line-height: 0.9;
+      color: #111;
+      letter-spacing: -6px;
+      display: block;
+    }
+
+    #slide3 .display-line.italic { font-style: italic; }
+
+    /* "How" line with embedded pill */
+    #slide3 .how-line {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+      margin-bottom: 0;
+    }
+
+    #slide3 .cg-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #4a9eff;
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 800;
+      font-size: 46px;
+      border-radius: 60px;
+      padding: 16px 44px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      margin-top: 10px;
+    }
+
+    /* "Become" line with selection box */
+    #slide3 .become-line {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+    }
+
+    #slide3 .sel-box {
+      width: 130px;
+      height: 120px;
+      border: 4px solid #111;
+      position: relative;
+      flex-shrink: 0;
+      margin-top: 10px;
+    }
+
+    /* Selection handles on box */
+    #slide3 .sel-box .sh {
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      background: #111;
+    }
+    #slide3 .sh-tl { top: -9px;  left: -9px; }
+    #slide3 .sh-tm { top: -9px;  left: 50%; transform: translateX(-50%); }
+    #slide3 .sh-tr { top: -9px;  right: -9px; }
+    #slide3 .sh-ml { top: 50%;   left: -9px;  transform: translateY(-50%); }
+    #slide3 .sh-mr { top: 50%;   right: -9px; transform: translateY(-50%); }
+    #slide3 .sh-bl { bottom: -9px; left: -9px; }
+    #slide3 .sh-bm { bottom: -9px; left: 50%; transform: translateX(-50%); }
+    #slide3 .sh-br { bottom: -9px; right: -9px; }
+
+    /* Pixel cursor */
+    #slide3 .cursor {
+      position: absolute;
+      top: 660px;
+      right: 90px;
+      z-index: 10;
+    }
+
+    /* "Carousel" + orange pill row */
+    #slide3 .carousel-line {
+      display: flex;
+      align-items: flex-end;
+      gap: 30px;
+    }
+
+    #slide3 .orange-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #e8521a;
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 800;
+      font-size: 40px;
+      border-radius: 60px;
+      padding: 16px 40px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      margin-bottom: 30px;
+    }
+
+    /* "Genius" + Next Slide row */
+    #slide3 .genius-line {
+      display: flex;
+      align-items: center;
+      gap: 40px;
+    }
+
+    #slide3 .next-slide-blue {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #4a9eff;
+      color: #fff;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800;
+      font-size: 56px;
+      letter-spacing: -0.5px;
+      border-radius: 80px;
+      padding: 24px 60px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* Bottom corner handles slide 3 */
+    #slide3 .bottom-handles {
+      position: absolute;
+      bottom: 60px;
+      right: 60px;
+      z-index: 10;
+    }
+
+    #slide3 .corner-line {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      width: 180px;
+      height: 80px;
+      border-right: 3px solid #111;
+      border-bottom: 3px solid #111;
+    }
+
+    #slide3 .bh { position: absolute; width: 20px; height: 20px; background: #111; }
+    #slide3 .bh1 { bottom: 0;  right: 0; }
+    #slide3 .bh2 { bottom: 80px; right: 180px; }
+
+    /* ═══════════════════════════════════════
+       SLIDE 4 — "Carousel Size"
+    ═══════════════════════════════════════ */
+    #slide4 {
+      padding: 60px 60px 60px 60px;
+    }
+
+    #slide4 .top-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 40px;
+    }
+
+    #slide4 .page-title {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 900;
+      font-size: 96px;
+      color: #e8521a;
+      letter-spacing: -3px;
+      line-height: 1;
+    }
+
+    /* Top-right handles */
+    #slide4 .tr-handles {
+      position: absolute;
+      top: 50px;
+      right: 60px;
+    }
+
+    #slide4 .tr-line {
+      width: 180px;
+      height: 70px;
+      border-top: 3px solid #111;
+      border-right: 3px solid #111;
+    }
+
+    #slide4 .th { position: absolute; width: 20px; height: 20px; background: #111; }
+    #slide4 .th1 { top: 0;  right: 0; }
+    #slide4 .th2 { top: 70px; right: 180px; }
+
+    /* ── 3-panel aspect ratio comparison ── */
+    #slide4 .ratio-section {
+      background: #e8e8e0;
+      border-radius: 20px;
+      padding: 40px 30px;
+      margin-bottom: 40px;
+    }
+
+    #slide4 .ratio-panels {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 30px;
+      justify-content: center;
+    }
+
+    .ratio-panel-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .ratio-frame {
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+      border: 2px solid #aaa;
+    }
+
+    /* Expand arrows on corners */
+    .ratio-frame::before, .ratio-frame::after {
+      content: '';
+      position: absolute;
+      width: 28px;
+      height: 28px;
+      z-index: 2;
+    }
+
+    .ratio-frame-inner {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      gap: 6px;
+      position: relative;
+    }
+
+    .rf-label-top {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 20px;
+      color: rgba(255,255,255,0.8);
+      position: absolute;
+      top: 14px;
+    }
+
+    .rf-ratio {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 900;
+      font-size: 64px;
+      color: #fff;
+      line-height: 1;
+      letter-spacing: -2px;
+    }
+
+    .rf-dims {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 700;
+      font-size: 24px;
+      color: #fff;
+      line-height: 1;
+    }
+
+    .rf-label-bottom {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 20px;
+      color: rgba(255,255,255,0.8);
+      position: absolute;
+      bottom: 14px;
+      font-style: italic;
+    }
+
+    /* Corner arrow icons */
+    .corner-arrows {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    .ca { position: absolute; font-size: 22px; color: #fff; font-weight: 900; line-height: 1; }
+    .ca-tl { top: 8px;  left: 10px; }
+    .ca-tr { top: 8px;  right: 10px; }
+    .ca-bl { bottom: 8px; left: 10px; }
+    .ca-br { bottom: 8px; right: 10px; }
+
+    /* Arrow + label below each panel */
+    .ratio-arrow {
+      font-size: 44px;
+      color: #111;
+      line-height: 1;
+    }
+
+    .ratio-verdict {
+      font-family: 'Caveat', cursive;
+      font-weight: 700;
+      font-size: 36px;
+      color: #111;
+      text-align: center;
+      text-transform: uppercase;
+      line-height: 1.1;
+      max-width: 230px;
+    }
+
+    /* ── Safe zone diagram ── */
+    #slide4 .safe-zone-section {
+      background: #f0f0ea;
+      border-radius: 20px;
+      padding: 40px 40px;
+      display: flex;
+      gap: 40px;
+      align-items: center;
+    }
+
+    #slide4 .safe-diagram {
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    /* Red border frame */
+    #slide4 .safe-outer {
+      width: 360px;
+      height: 420px;
+      background: #cc2222;
+      border-radius: 12px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #slide4 .safe-inner {
+      background: #fff;
+      width: 220px;
+      height: 290px;
+      border-radius: 4px;
+    }
+
+    /* Dimension labels */
+    .dim-label {
+      position: absolute;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: #fff;
+      white-space: nowrap;
+    }
+
+    .dim-top    { top: 18px;  left: 50%; transform: translateX(-50%); }
+    .dim-bottom { bottom: 18px; left: 50%; transform: translateX(-50%); }
+    .dim-left   { left: 12px; top: 50%; transform: translateY(-50%) rotate(-90deg); }
+    .dim-right  { right: 8px; top: 50%; transform: translateY(-50%) rotate(90deg); }
+
+    #slide4 .safe-note {
+      flex: 1;
+    }
+
+    #slide4 .safe-note h3 {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 900;
+      font-size: 42px;
+      color: #111;
+      margin-bottom: 14px;
+    }
+
+    #slide4 .safe-note p {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 32px;
+      color: #333;
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+
+    #slide4 .safe-note p strong { font-weight: 900; }
+
+    #slide4 .reels-note {
+      font-family: 'Caveat', cursive;
+      font-weight: 700;
+      font-size: 36px;
+      color: #333;
+      line-height: 1.3;
+      text-transform: uppercase;
+    }
+
+    /* Arrow for reels note */
+    #slide4 .reels-arrow {
+      display: inline-block;
+      font-size: 40px;
+      transform: rotate(-20deg);
+      margin-right: 8px;
+    }
+
+    /* ── Pixel cursor SVG shared ── */
+    .pixel-cursor {
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════ SLIDE 1 ═══════════════════════ -->
+<div class="slide-wrapper">
+  <div class="slide" id="slide1">
+
+    <div class="hero-text">
+      I've spent years<br>
+      <span class="orange">creating carousels</span>
+    </div>
+
+    <!-- Two overlapping selection rectangles -->
+    <div class="rect-group">
+      <!-- Rect A -->
+      <div class="rect rect-a">
+        <div class="handle h1"></div>
+        <div class="handle h2"></div>
+        <div class="handle h4" style="position:absolute; bottom:-11px; left:148px;"></div>
+      </div>
+      <!-- Rect B -->
+      <div class="rect rect-b">
+        <div class="handle h5" style="position:absolute; top:-11px; left:148px;"></div>
+        <div class="handle h6" style="position:absolute; top:108px; right:-11px;"></div>
+        <div class="handle h3" style="position:absolute; top:-11px; right:-11px;"></div>
+        <div class="handle h7" style="position:absolute; bottom:-11px; left:50%; transform:translateX(-50%);"></div>
+      </div>
+    </div>
+
+    <!-- Next Slide button -->
+    <div class="btn-wrap">
+      <div class="next-slide-btn">Next Slide</div>
+    </div>
+
+    <!-- Bottom tagline -->
+    <div class="tagline">
+      Here is everything I wish<br>
+      I knew <strong>before I started…</strong>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ═══════════════════════ SLIDE 2 ═══════════════════════ -->
+<div class="slide-wrapper">
+  <div class="slide" id="slide2">
+
+    <div class="headline" style="padding: 70px 60px 0 60px;">
+      Great carousels have been blowing up in 2026…
+    </div>
+
+    <!-- Corner handles top-left decoration -->
+    <div class="corner-handles" style="position:absolute; top:320px; left:30px; z-index:10;">
+      <div style="position:relative; width:80px; height:120px;">
+        <div style="position:absolute; top:0; left:50px; width:3px; height:120px; background:#111;"></div>
+        <div style="position:absolute; top:0;  left:50px; width:20px; height:20px; background:#111; transform:translate(-50%,-50%);"></div>
+        <div style="position:absolute; top:60px; left:20px; width:20px; height:20px; background:#111;"></div>
+        <div style="position:absolute; bottom:0; left:0; width:20px; height:20px; background:#111;"></div>
+      </div>
+    </div>
+
+    <!-- Dashboard mockup -->
+    <div style="padding: 0 60px; position:relative; z-index:5;">
+      <div class="dashboard">
+
+        <!-- Left panel -->
+        <div class="dash-panel">
+          <div class="dash-thumb thumb-left" style="display:flex; flex-direction:column; align-items:flex-start; padding:10px; gap:4px;">
+            <span class="old" style="font-family:'Barlow Condensed',sans-serif; font-size:22px; color:#ffd54f; font-weight:900;">OLD CHATGPT</span>
+            <span class="vs"  style="font-family:'DM Sans',sans-serif; font-size:16px; color:#aaa; font-weight:700;">VS</span>
+            <span class="new" style="font-family:'Barlow Condensed',sans-serif; font-size:22px; color:#66bb6a; font-weight:900;">NEW CHATGPT</span>
+          </div>
+          <div class="dash-stats">
+            <div class="stat-chip"><span class="label" style="font-size:13px; color:#888;">♡</span><span class="val" style="font-size:18px; font-weight:700; color:#fff;">7.9K</span></div>
+            <div class="stat-chip"><span class="label" style="font-size:13px; color:#888;">💬</span><span class="val" style="font-size:18px; font-weight:700; color:#fff;">2.5K</span></div>
+            <div class="stat-chip"><span class="label" style="font-size:13px; color:#888;">↺</span><span class="val" style="font-size:18px; font-weight:700; color:#fff;">4</span></div>
+          </div>
+          <div class="dash-tabs">
+            <span class="dash-tab active" style="font-size:15px; color:#fff; font-weight:700; border-bottom:2px solid #fff; padding-bottom:6px; margin-bottom:-8px;">Overview</span>
+            <span class="dash-tab" style="font-size:15px; color:#666;">Engagement</span>
+          </div>
+          <div class="summary-label" style="font-size:15px; color:#aaa; margin-top:8px; margin-bottom:8px;">Summary ⓘ</div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+            <div><div class="big-label" style="font-size:13px; color:#888;">Views</div><div class="big-stat" style="font-size:28px; font-weight:900; color:#fff;">1,491,549</div></div>
+            <div><div class="big-label" style="font-size:13px; color:#888;">Accounts r…</div><div class="big-stat" style="font-size:28px; font-weight:900; color:#fff;">426,58…</div></div>
+            <div><div class="big-label" style="font-size:13px; color:#888;">Profile visits</div><div class="big-stat" style="font-size:28px; font-weight:900; color:#fff;">2,764</div></div>
+            <div><div class="big-label" style="font-size:13px; color:#888;">Follows</div><div class="big-stat" style="font-size:28px; font-weight:900; color:#fff;">1,309</div></div>
+          </div>
+        </div>
+
+        <!-- Center panel -->
+        <div class="dash-panel">
+          <div class="dash-thumb thumb-center" style="background:#e8521a; font-family:'Barlow Condensed',sans-serif; font-weight:900; font-size:32px; color:#fff; text-align:center; line-height:1.1; display:flex; align-items:center; justify-content:center; border-radius:10px; margin-bottom:14px; height:130px;">
+            NEVER<br>ALIGN<br>TEXT TO<br>CENTER
+          </div>
+          <div class="dash-stats" style="gap:16px; margin-bottom:8px;">
+            <div class="stat-chip"><span style="font-size:13px; color:#888;">♡</span><span style="font-size:16px; font-weight:700; color:#fff; display:block;">10K</span></div>
+            <div class="stat-chip"><span style="font-size:13px; color:#888;">💬</span><span style="font-size:16px; font-weight:700; color:#fff; display:block;">371</span></div>
+            <div class="stat-chip"><span style="font-size:13px; color:#888;">↺</span><span style="font-size:16px; font-weight:700; color:#fff; display:block;">163</span></div>
+            <div class="stat-chip"><span style="font-size:13px; color:#888;">⊳</span><span style="font-size:16px; font-weight:700; color:#fff; display:block;">—</span></div>
+            <div class="stat-chip"><span style="font-size:13px; color:#888;">🔖</span><span style="font-size:16px; font-weight:700; color:#fff; display:block;">6.4K</span></div>
+          </div>
+          <div class="dash-tabs">
+            <span class="dash-tab active" style="font-size:15px; color:#fff; font-weight:700; border-bottom:2px solid #fff; padding-bottom:6px; margin-bottom:-8px;">Overview</span>
+            <span class="dash-tab" style="font-size:15px; color:#666;">Engagement</span>
+            <span class="dash-tab" style="font-size:15px; color:#666;">Audience</span>
+          </div>
+          <div style="margin-top:10px; margin-bottom:6px; font-size:15px; color:#aaa;">Summary ⓘ</div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+            <div><div style="font-size:12px; color:#888;">Views</div><div style="font-size:26px; font-weight:900; color:#fff;">17,513,408</div></div>
+            <div><div style="font-size:12px; color:#888;">Accounts reached</div><div style="font-size:26px; font-weight:900; color:#fff;">712,648</div></div>
+            <div><div style="font-size:12px; color:#888;">Profile visits</div><div style="font-size:26px; font-weight:900; color:#fff;">7,160</div></div>
+            <div><div style="font-size:12px; color:#888;">Follows</div><div style="font-size:26px; font-weight:900; color:#fff;">1,840</div></div>
+          </div>
+        </div>
+
+        <!-- Right panel -->
+        <div class="dash-panel">
+          <div class="dash-thumb" style="background:#1a1a22; display:flex; flex-direction:column; align-items:center; justify-content:center; border-radius:10px; margin-bottom:14px; height:130px; gap:6px;">
+            <div style="font-family:'Barlow Condensed',sans-serif; font-size:18px; color:#fff; font-weight:900; text-align:center; line-height:1.1;">INSTAGRAM<br>SIZES FOR 2026<br><span style="font-size:14px; color:#aaa; font-weight:400;">Ultimate Guide</span></div>
+            <div style="width:44px; height:44px; background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888); border-radius:10px; display:flex; align-items:center; justify-content:center;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" stroke="white" stroke-width="2"/><circle cx="12" cy="12" r="5" stroke="white" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1.5" fill="white"/></svg>
+            </div>
+          </div>
+          <div class="dash-stats" style="gap:14px; margin-bottom:8px;">
+            <div class="stat-chip"><span style="font-size:13px; color:#888;">💬</span><span style="font-size:16px; font-weight:700; color:#fff; display:block;">199</span></div>
+            <div class="stat-chip"><span style="font-size:13px; color:#888;">↺</span><span style="font-size:16px; font-weight:700; color:#fff; display:block;">740</span></div>
+            <div class="stat-chip"><span style="font-size:13px; color:#888;">⊳</span><span style="font-size:16px; font-weight:700; color:#fff; display:block;">—</span></div>
+            <div class="stat-chip"><span style="font-size:13px; color:#888;">🔖</span><span style="font-size:16px; font-weight:700; color:#fff; display:block;">19K</span></div>
+          </div>
+          <div class="dash-tabs">
+            <span class="dash-tab" style="font-size:15px; color:#666;">…w</span>
+            <span class="dash-tab" style="font-size:15px; color:#666;">Engagement</span>
+            <span class="dash-tab" style="font-size:15px; color:#666;">Audience</span>
+          </div>
+          <div style="margin-top:10px; margin-bottom:6px; font-size:15px; color:#aaa;">ⓘ</div>
+          <div style="display:grid; grid-template-columns:1fr; gap:10px;">
+            <div><div style="font-size:12px; color:#888;">Viewers</div><div style="font-size:26px; font-weight:900; color:#fff;">5,532</div></div>
+            <div><div style="font-size:12px; color:#888;">Follows</div><div style="font-size:26px; font-weight:900; color:#fff;">1,579</div></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Blue sticky note -->
+    <div class="sticky">
+      <div class="sticky-text">BUT<span style="margin-left:60px;">GREAT</span><br>CAROUSELS<br>TAKE A TON OF<br>TIME</div>
+    </div>
+
+    <!-- CSS pixel cursor -->
+    <div class="cursor" style="position:absolute; bottom:230px; left:430px; z-index:22;">
+      <svg width="60" height="70" viewBox="0 0 60 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M8 8 L8 52 L20 40 L28 58 L34 55 L26 37 L42 37 Z" fill="white" stroke="#111" stroke-width="3" stroke-linejoin="round"/>
+      </svg>
+    </div>
+
+    <!-- Next Slide button -->
+    <div style="position:absolute; bottom:220px; right:60px; z-index:20;">
+      <div class="next-slide-btn">Next Slide</div>
+    </div>
+
+    <!-- Bottom right corner handles -->
+    <div style="position:absolute; bottom:60px; right:60px; z-index:10;">
+      <div style="width:200px; height:80px; border-right:3px solid #111; border-bottom:3px solid #111; position:relative;">
+        <div style="position:absolute; top:-10px; right:-10px; width:20px; height:20px; background:#111;"></div>
+        <div style="position:absolute; bottom:-10px; left:-10px; width:20px; height:20px; background:#111;"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ═══════════════════════ SLIDE 3 ═══════════════════════ -->
+<div class="slide-wrapper">
+  <div class="slide" id="slide3">
+
+    <!-- Floating scattered words -->
+    <span class="float-word w-posts">POSTS</span>
+    <span class="float-word w-slides">SLIDES</span>
+    <span class="float-word w-like">LIKE</span>
+    <span class="float-word w-captions">CAPTIONS</span>
+    <span class="float-word blue w-engagement">ENGAGEMENT</span>
+    <span class="float-word w-comments">COMMENTS</span>
+    <span class="float-word w-images" style="font-style:italic;">IMAGES</span>
+
+    <!-- Main heading block -->
+    <div class="main-heading">
+
+      <!-- "How [pill] to" -->
+      <div class="how-line">
+        <span class="display-line" style="font-size:190px;">How</span>
+        <div class="cg-pill">Carousel Genius</div>
+        <span class="display-line" style="font-size:190px;">to</span>
+      </div>
+
+      <!-- "Become [box] a [cursor]" -->
+      <div class="become-line">
+        <span class="display-line italic" style="font-size:190px;">Become</span>
+        <div class="sel-box">
+          <div class="sh sh-tl"></div>
+          <div class="sh sh-tm"></div>
+          <div class="sh sh-tr"></div>
+          <div class="sh sh-ml"></div>
+          <div class="sh sh-mr"></div>
+          <div class="sh sh-bl"></div>
+          <div class="sh sh-bm"></div>
+          <div class="sh sh-br"></div>
+        </div>
+        <span class="display-line" style="font-size:190px;">a</span>
+        <!-- Pixel cursor -->
+        <div style="margin-left:10px; margin-top:10px;">
+          <svg width="70" height="80" viewBox="0 0 60 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 8 L8 52 L20 40 L28 58 L34 55 L26 37 L42 37 Z" fill="white" stroke="#111" stroke-width="3" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- "Carousel [orange pill]" -->
+      <div class="carousel-line">
+        <span class="display-line" style="font-size:190px;">Carousel</span>
+        <div class="orange-pill">Turn ideas into impact</div>
+      </div>
+
+      <!-- "Genius [Next Slide]" -->
+      <div class="genius-line">
+        <span class="display-line" style="font-size:190px;">Genius</span>
+        <div class="next-slide-blue">Next Slide</div>
+      </div>
+
+    </div>
+
+    <!-- Bottom right corner handles -->
+    <div style="position:absolute; bottom:60px; right:60px; z-index:10;">
+      <div style="width:200px; height:90px; border-right:3px solid #111; border-bottom:3px solid #111; position:relative;">
+        <div style="position:absolute; top:-10px; right:-10px; width:20px; height:20px; background:#111;"></div>
+        <div style="position:absolute; bottom:-10px; left:-10px; width:20px; height:20px; background:#111;"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ═══════════════════════ SLIDE 4 ═══════════════════════ -->
+<div class="slide-wrapper">
+  <div class="slide" id="slide4">
+
+    <!-- Top row: title + next slide + corner handles -->
+    <div class="top-row">
+      <div class="page-title">Carousel Size</div>
+      <div class="next-slide-btn" style="margin-top:10px;">Next Slide</div>
+    </div>
+
+    <!-- Top-right corner handles -->
+    <div style="position:absolute; top:50px; right:60px; z-index:10;">
+      <div style="width:200px; height:80px; border-top:3px solid #111; border-right:3px solid #111; position:relative;">
+        <div style="position:absolute; top:-10px; right:-10px; width:20px; height:20px; background:#111;"></div>
+        <div style="position:absolute; bottom:-10px; left:-10px; width:20px; height:20px; background:#111;"></div>
+      </div>
+    </div>
+
+    <!-- 3-panel ratio comparison -->
+    <div class="ratio-section">
+      <div class="ratio-panels">
+
+        <!-- 1:1 Red -->
+        <div class="ratio-panel-wrap">
+          <div class="ratio-frame" style="width:270px; height:270px;">
+            <div class="ratio-frame-inner" style="background:#e8302a;">
+              <div class="corner-arrows">
+                <span class="ca ca-tl">↖</span>
+                <span class="ca ca-tr">↗</span>
+                <span class="ca ca-bl">↙</span>
+                <span class="ca ca-br">↘</span>
+              </div>
+              <div class="rf-label-top">this is</div>
+              <div class="rf-ratio">1:1</div>
+              <div class="rf-dims">1080 × 1080</div>
+              <div class="rf-label-bottom">don't post this</div>
+            </div>
+          </div>
+          <div class="ratio-arrow">↓</div>
+          <div class="ratio-verdict">DON'T POST THIS</div>
+        </div>
+
+        <!-- 4:5 Orange -->
+        <div class="ratio-panel-wrap">
+          <div class="ratio-frame" style="width:270px; height:338px;">
+            <div class="ratio-frame-inner" style="background:#e87820; height:100%;">
+              <div class="corner-arrows">
+                <span class="ca ca-tl">↖</span>
+                <span class="ca ca-tr">↗</span>
+                <span class="ca ca-bl">↙</span>
+                <span class="ca ca-br">↘</span>
+              </div>
+              <div class="rf-label-top">this is</div>
+              <div class="rf-ratio">4:5</div>
+              <div class="rf-dims">1080 × 1350</div>
+              <div class="rf-label-bottom" style="font-style:italic;">you could use this but…</div>
+            </div>
+          </div>
+          <div class="ratio-arrow">↓</div>
+          <div class="ratio-verdict">USE IF YOU WILL BOOST</div>
+        </div>
+
+        <!-- 3:4 Green -->
+        <div class="ratio-panel-wrap">
+          <div class="ratio-frame" style="width:270px; height:360px;">
+            <div class="ratio-frame-inner" style="background:#2eb84a; height:100%;">
+              <div class="corner-arrows">
+                <span class="ca ca-tl">↖</span>
+                <span class="ca ca-tr">↗</span>
+                <span class="ca ca-bl">↙</span>
+                <span class="ca ca-br">↘</span>
+              </div>
+              <div class="rf-label-top">this is</div>
+              <div class="rf-ratio">3:4</div>
+              <div class="rf-dims">1080 × 1440</div>
+              <div class="rf-label-bottom" style="font-style:italic;">this is even better</div>
+            </div>
+          </div>
+          <div class="ratio-arrow">↓</div>
+          <div class="ratio-verdict">THIS IS THE BEST</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Safe zone section -->
+    <div class="safe-zone-section">
+
+      <!-- Diagram -->
+      <div class="safe-diagram">
+        <div class="safe-outer">
+          <div class="safe-inner"></div>
+          <span class="dim-label dim-top">180px</span>
+          <span class="dim-label dim-bottom">180px</span>
+          <span class="dim-label dim-left">50px</span>
+          <span class="dim-label dim-right">120px</span>
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div class="safe-note">
+        <h3>The cover<br>safe zone</h3>
+        <p>
+          <strong>180px</strong> top &amp; bottom<br>
+          <strong>50px</strong> left<br>
+          <strong>120px</strong> right
+        </p>
+        <div class="reels-note">
+          <span class="reels-arrow">↙</span>
+          CAROUSELS WITH<br>MUSIC APPEAR IN<br>THE REELS TAB
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

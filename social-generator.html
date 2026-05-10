@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Social Media Mockup Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0f;
+  --surf:#111118;
+  --card:#18181f;
+  --border:#252530;
+  --border2:#2e2e3e;
+  --text:#f0f0f8;
+  --sub:#7070a0;
+  --sub2:#4a4a6a;
+  --accent:#5b5bff;
+  --accent-g:linear-gradient(135deg,#5b5bff,#c45bff);
+  --radius:14px;
+  --shadow:0 20px 60px rgba(0,0,0,0.6);
+}
+html,body{height:100%;font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);overflow:hidden}
+
+/* ── LAYOUT ── */
+.app{display:flex;height:100vh;overflow:hidden}
+
+/* SIDEBAR */
+.sidebar{
+  width:220px;flex-shrink:0;
+  background:var(--surf);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  overflow-y:auto;overflow-x:hidden;
+}
+.sidebar-logo{
+  padding:22px 18px 16px;
+  font-size:1rem;font-weight:800;
+  letter-spacing:-0.5px;
+  background:var(--accent-g);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  border-bottom:1px solid var(--border);
+}
+.sidebar-logo span{display:block;font-size:0.65rem;font-weight:500;color:var(--sub);-webkit-text-fill-color:var(--sub);margin-top:2px;letter-spacing:0.05em;}
+.nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 18px;cursor:pointer;
+  font-size:0.85rem;font-weight:500;color:var(--sub);
+  border-left:3px solid transparent;
+  transition:all 0.15s;white-space:nowrap;
+}
+.nav-item:hover{color:var(--text);background:rgba(91,91,255,0.06);}
+.nav-item.active{color:var(--text);background:rgba(91,91,255,0.1);border-left-color:var(--accent);}
+.nav-icon{font-size:1.1rem;flex-shrink:0;width:22px;text-align:center;}
+
+/* MAIN */
+.main{flex:1;display:flex;overflow:hidden;}
+
+/* FORM PANEL */
+.form-panel{
+  width:320px;flex-shrink:0;
+  background:var(--card);
+  border-right:1px solid var(--border);
+  overflow-y:auto;
+  padding:24px 20px;
+}
+.form-panel::-webkit-scrollbar{width:4px}
+.form-panel::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+.panel-title{
+  font-size:1.05rem;font-weight:700;margin-bottom:18px;
+  display:flex;align-items:center;gap:8px;
+}
+.panel-title .badge{
+  font-size:0.65rem;font-weight:700;
+  background:var(--accent-g);color:#fff;
+  padding:2px 8px;border-radius:20px;letter-spacing:0.05em;text-transform:uppercase;
+}
+.form-group{margin-bottom:14px;}
+.form-label{font-size:0.75rem;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px;display:block;}
+.form-input,.form-textarea,.form-select{
+  width:100%;background:var(--surf);
+  border:1px solid var(--border2);
+  border-radius:8px;
+  padding:9px 12px;
+  font-size:0.85rem;color:var(--text);
+  font-family:'Outfit',sans-serif;
+  outline:none;transition:border-color 0.15s;
+}
+.form-input:focus,.form-textarea:focus,.form-select:focus{border-color:var(--accent);}
+.form-textarea{resize:vertical;min-height:80px;line-height:1.5;}
+.form-select option{background:var(--card);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;}
+.toggle-label{font-size:0.82rem;color:var(--sub);font-weight:500;}
+.toggle{position:relative;width:38px;height:22px;flex-shrink:0;}
+.toggle input{opacity:0;width:0;height:0;}
+.toggle-slider{
+  position:absolute;inset:0;background:var(--border2);border-radius:22px;cursor:pointer;transition:0.2s;
+}
+.toggle-slider::before{
+  content:'';position:absolute;width:16px;height:16px;left:3px;top:3px;
+  background:#fff;border-radius:50%;transition:0.2s;
+}
+.toggle input:checked+.toggle-slider{background:var(--accent);}
+.toggle input:checked+.toggle-slider::before{transform:translateX(16px);}
+.color-row{display:flex;align-items:center;gap:8px;}
+.color-input{width:40px;height:34px;border:1px solid var(--border2);border-radius:6px;background:var(--surf);cursor:pointer;padding:2px;}
+.section-divider{border:none;border-top:1px solid var(--border);margin:18px 0 14px;}
+.sub-section-label{font-size:0.72rem;font-weight:700;color:var(--sub2);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;}
+.msg-item{background:var(--surf);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px;}
+.msg-item-top{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.msg-side-toggle{display:flex;border:1px solid var(--border2);border-radius:6px;overflow:hidden;}
+.msg-side-btn{padding:4px 10px;font-size:0.72rem;font-weight:600;cursor:pointer;border:none;background:transparent;color:var(--sub);font-family:'Outfit',sans-serif;transition:all 0.15s;}
+.msg-side-btn.active{background:var(--accent);color:#fff;}
+.add-msg-btn{
+  width:100%;padding:8px;border:1px dashed var(--border2);border-radius:8px;
+  background:transparent;color:var(--sub);font-size:0.8rem;font-weight:600;
+  cursor:pointer;font-family:'Outfit',sans-serif;transition:all 0.15s;margin-top:4px;
+}
+.add-msg-btn:hover{border-color:var(--accent);color:var(--accent);}
+.remove-btn{margin-left:auto;background:none;border:none;color:var(--sub2);cursor:pointer;font-size:0.9rem;padding:2px 4px;}
+.remove-btn:hover{color:#ff5566;}
+
+/* PREVIEW PANEL */
+.preview-panel{
+  flex:1;display:flex;flex-direction:column;
+  background:var(--bg);overflow:hidden;
+}
+.preview-header{
+  padding:16px 24px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;
+}
+.preview-header-title{font-size:0.85rem;font-weight:600;color:var(--sub);}
+.download-btn{
+  display:flex;align-items:center;gap:8px;
+  background:var(--accent-g);color:#fff;
+  border:none;border-radius:10px;
+  padding:9px 18px;font-size:0.82rem;font-weight:700;
+  cursor:pointer;font-family:'Outfit',sans-serif;
+  transition:opacity 0.15s;
+}
+.download-btn:hover{opacity:0.85;}
+.download-btn:active{opacity:0.7;}
+.preview-body{
+  flex:1;overflow-y:auto;
+  display:flex;align-items:flex-start;justify-content:center;
+  padding:32px 24px;
+}
+.preview-body::-webkit-scrollbar{width:4px}
+.preview-body::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+
+/* ── MOCKUP WRAPPERS ── */
+.mockup-wrapper{
+  background:transparent;
+  display:inline-block;
+}
+.phone-frame{
+  background:#1a1a1a;
+  border-radius:44px;
+  padding:12px;
+  box-shadow:0 0 0 2px #333, 0 40px 80px rgba(0,0,0,0.7);
+  display:inline-block;
+}
+.phone-screen{
+  border-radius:34px;
+  overflow:hidden;
+  width:375px;
+  background:#fff;
+}
+
+/* ═══════════════════════════════
+   INSTAGRAM POST MOCKUP
+═══════════════════════════════ */
+.ig-mock{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#fff;width:375px;}
+.ig-mock.dark{background:#000;color:#fff;}
+.ig-top-bar{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;}
+.ig-top-bar .ig-logo{font-size:1.4rem;font-weight:800;letter-spacing:-1px;font-family:'Billabong',Georgia,serif;}
+.ig-top-bar .ig-icons{display:flex;gap:14px;font-size:1.1rem;}
+.ig-stories{display:flex;gap:10px;padding:8px 14px;overflow:hidden;}
+.ig-story-item{display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;}
+.ig-story-ring{width:58px;height:58px;border-radius:50%;padding:2px;background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);display:flex;align-items:center;justify-content:center;}
+.ig-story-inner{width:52px;height:52px;border-radius:50%;background:ccc;border:2px solid #fff;overflow:hidden;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1rem;}
+.ig-story-name{font-size:0.62rem;color:#333;max-width:58px;text-align:center;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+.ig-mock.dark .ig-story-name{color:#aaa;}
+.ig-divider{height:1px;background:#efefef;}
+.ig-mock.dark .ig-divider{background:#2a2a2a;}
+.ig-post-header{display:flex;align-items:center;gap:10px;padding:10px 14px;}
+.ig-avatar{width:36px;height:36px;border-radius:50%;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;color:#fff;}
+.ig-user-info{flex:1;}
+.ig-username{font-weight:700;font-size:0.85rem;color:#000;}
+.ig-mock.dark .ig-username{color:#fff;}
+.ig-location-text{font-size:0.72rem;color:#555;}
+.ig-more{color:#999;font-size:1.3rem;font-weight:700;letter-spacing:1px;}
+.ig-post-image{width:100%;aspect-ratio:1;object-fit:cover;display:flex;align-items:center;justify-content:center;font-size:3rem;position:relative;}
+.ig-post-image img{width:100%;height:100%;object-fit:cover;}
+.ig-post-image-placeholder{width:100%;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:3rem;font-weight:200;color:#aaa;background:linear-gradient(135deg,#f5f5f5,#e8e8e8);}
+.ig-mock.dark .ig-post-image-placeholder{background:linear-gradient(135deg,#1a1a1a,#2a2a2a);color:#444;}
+.ig-actions-bar{display:flex;align-items:center;padding:10px 14px 6px;gap:14px;}
+.ig-action-icon{font-size:1.3rem;cursor:pointer;}
+.ig-bookmark{margin-left:auto;}
+.ig-likes{padding:0 14px 4px;font-weight:700;font-size:0.85rem;color:#000;}
+.ig-mock.dark .ig-likes{color:#fff;}
+.ig-caption-area{padding:2px 14px 6px;font-size:0.85rem;line-height:1.5;color:#000;}
+.ig-mock.dark .ig-caption-area{color:#fff;}
+.ig-caption-user{font-weight:700;}
+.ig-comments-link{padding:2px 14px 4px;font-size:0.82rem;color:#8e8e8e;cursor:pointer;}
+.ig-timestamp{padding:2px 14px 12px;font-size:0.7rem;color:#8e8e8e;text-transform:uppercase;letter-spacing:0.04em;}
+.ig-bottom-bar{display:flex;align-items:center;padding:10px 16px;border-top:1px solid #efefef;gap:10px;}
+.ig-mock.dark .ig-bottom-bar{border-color:#2a2a2a;}
+.ig-comment-box{flex:1;font-size:0.85rem;color:#8e8e8e;}
+.ig-bottom-emoji{display:flex;gap:8px;font-size:1.1rem;}
+
+/* ═══════════════════════════════
+   X / TWITTER MOCKUP
+═══════════════════════════════ */
+.x-mock{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#fff;width:375px;color:#0f1419;}
+.x-mock.dark{background:#000;color:#e7e9ea;}
+.x-nav{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid #efefef;}
+.x-mock.dark .x-nav{border-color:#2f3336;}
+.x-nav-logo{font-size:1.4rem;font-weight:900;}
+.x-tweet-card{padding:14px 16px;}
+.x-tweet-main{display:flex;gap:10px;}
+.x-tweet-avatar{width:44px;height:44px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1rem;color:#fff;}
+.x-tweet-body{flex:1;min-width:0;}
+.x-tweet-top{display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-bottom:4px;}
+.x-tweet-name{font-weight:700;font-size:0.9rem;}
+.x-badge{display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;background:#1d9bf0;border-radius:50%;color:#fff;font-size:0.6rem;flex-shrink:0;}
+.x-tweet-handle{font-size:0.82rem;color:#536471;}
+.x-mock.dark .x-tweet-handle{color:#71767b;}
+.x-tweet-dot{color:#536471;font-size:0.82rem;}
+.x-tweet-time-inline{font-size:0.82rem;color:#536471;}
+.x-mock.dark .x-tweet-time-inline{color:#71767b;}
+.x-tweet-text{font-size:0.92rem;line-height:1.5;margin-bottom:10px;}
+.x-tweet-link{color:#1d9bf0;text-decoration:none;}
+.x-tweet-img{width:100%;border-radius:14px;aspect-ratio:16/9;object-fit:cover;margin-bottom:10px;display:flex;align-items:center;justify-content:center;font-size:2rem;background:#f0f0f0;}
+.x-mock.dark .x-tweet-img{background:#1a1a1a;}
+.x-tweet-img img{width:100%;height:100%;object-fit:cover;border-radius:14px;}
+.x-time-row{font-size:0.78rem;color:#536471;margin-bottom:10px;padding-top:6px;border-top:1px solid #efefef;}
+.x-mock.dark .x-time-row{color:#71767b;border-color:#2f3336;}
+.x-time-row span{color:#0f1419;font-weight:500;}
+.x-mock.dark .x-time-row span{color:#e7e9ea;}
+.x-stats-row{display:flex;gap:16px;font-size:0.8rem;color:#536471;padding:10px 0;border-top:1px solid #efefef;border-bottom:1px solid #efefef;margin-bottom:6px;}
+.x-mock.dark .x-stats-row{color:#71767b;border-color:#2f3336;}
+.x-stats-row b{color:#0f1419;}
+.x-mock.dark .x-stats-row b{color:#e7e9ea;}
+.x-actions-row{display:flex;justify-content:space-around;}
+.x-act-btn{display:flex;align-items:center;gap:5px;background:none;border:none;color:#536471;font-size:0.78rem;cursor:pointer;padding:8px;border-radius:8px;font-family:inherit;}
+.x-act-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;}
+
+/* ═══════════════════════════════
+   FACEBOOK MOCKUP
+═══════════════════════════════ */
+.fb-mock{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#fff;width:375px;color:#050505;}
+.fb-mock.dark{background:#18191a;color:#e4e6eb;}
+.fb-nav{background:#1877f2;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;}
+.fb-nav-logo{color:#fff;font-size:1.6rem;font-weight:900;}
+.fb-nav-icons{display:flex;gap:8px;}
+.fb-nav-icon{width:34px;height:34px;background:rgba(255,255,255,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.95rem;color:#fff;}
+.fb-post-box{padding:12px 14px;}
+.fb-post-header{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;}
+.fb-post-avatar{width:40px;height:40px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9rem;color:#fff;}
+.fb-post-meta{flex:1;}
+.fb-post-name{font-weight:700;font-size:0.9rem;}
+.fb-post-sub{font-size:0.75rem;color:#65676b;display:flex;align-items:center;gap:4px;}
+.fb-mock.dark .fb-post-sub{color:#b0b3b8;}
+.fb-post-more{color:#65676b;font-size:1.2rem;cursor:pointer;}
+.fb-post-text{font-size:0.9rem;line-height:1.6;margin-bottom:10px;}
+.fb-post-img{width:calc(100% + 28px);margin:0 -14px 10px;aspect-ratio:16/10;object-fit:cover;display:flex;align-items:center;justify-content:center;font-size:2.5rem;background:#f0f2f5;}
+.fb-mock.dark .fb-post-img{background:#3a3b3c;}
+.fb-post-img img{width:100%;height:100%;object-fit:cover;}
+.fb-reactions-row{display:flex;align-items:center;justify-content:space-between;font-size:0.8rem;color:#65676b;padding:6px 0;border-bottom:1px solid #e4e6eb;}
+.fb-mock.dark .fb-reactions-row{color:#b0b3b8;border-color:#3e4042;}
+.fb-react-icons{display:flex;align-items:center;gap:4px;}
+.fb-actions-row{display:flex;justify-content:space-around;padding:4px 0;}
+.fb-act{display:flex;align-items:center;gap:5px;background:none;border:none;color:#65676b;font-size:0.85rem;font-weight:600;cursor:pointer;padding:8px;border-radius:6px;font-family:inherit;}
+.fb-mock.dark .fb-act{color:#b0b3b8;}
+
+/* ═══════════════════════════════
+   THREADS MOCKUP
+═══════════════════════════════ */
+.th-mock{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#fff;width:375px;color:#000;}
+.th-mock.dark{background:#101010;color:#f3f5f7;}
+.th-nav{display:flex;align-items:center;justify-content:center;padding:14px;border-bottom:1px solid #e8e8e8;}
+.th-mock.dark .th-nav{border-color:#1e1e1e;}
+.th-nav-logo{font-size:1.5rem;font-weight:900;}
+.th-post-wrap{padding:14px 16px;}
+.th-post-row{display:flex;gap:10px;}
+.th-post-left{display:flex;flex-direction:column;align-items:center;}
+.th-connector{width:2px;background:#e8e8e8;flex:1;margin-top:4px;border-radius:2px;min-height:20px;}
+.th-mock.dark .th-connector{background:#2a2a2a;}
+.th-post-right{flex:1;padding-bottom:12px;}
+.th-post-top{display:flex;align-items:center;gap:6px;margin-bottom:6px;}
+.th-post-name{font-weight:700;font-size:0.9rem;}
+.th-ver{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;background:#000;border-radius:50%;color:#fff;font-size:0.55rem;}
+.th-mock.dark .th-ver{background:#fff;color:#000;}
+.th-post-time{font-size:0.78rem;color:#999;margin-left:auto;}
+.th-post-more{font-size:1.1rem;color:#999;cursor:pointer;}
+.th-post-text{font-size:0.9rem;line-height:1.6;margin-bottom:10px;}
+.th-post-actions{display:flex;gap:14px;}
+.th-post-act{background:none;border:none;color:#999;font-size:0.8rem;display:flex;align-items:center;gap:5px;cursor:pointer;}
+.th-post-act svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;}
+.th-replies-row{display:flex;align-items:center;gap:8px;padding-left:2px;}
+.th-reply-avs{display:flex;}
+.th-reply-av{width:18px;height:18px;border-radius:50%;border:2px solid #fff;margin-left:-5px;display:flex;align-items:center;justify-content:center;font-size:0.45rem;font-weight:700;color:#fff;}
+.th-mock.dark .th-reply-av{border-color:#101010;}
+.th-reply-av:first-child{margin-left:0;}
+.th-reply-stat{font-size:0.78rem;color:#999;}
+
+/* ═══════════════════════════════
+   LINKEDIN MOCKUP
+═══════════════════════════════ */
+.li-mock{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f3f2ef;width:375px;color:#000;}
+.li-mock.dark{background:#1b1f23;color:#e9e5df;}
+.li-nav{background:#fff;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e0e0e0;}
+.li-mock.dark .li-nav{background:#1b1f23;border-color:#38434f;}
+.li-nav-logo{color:#0a66c2;font-size:1.5rem;font-weight:900;}
+.li-nav-search{flex:1;max-width:180px;margin:0 10px;background:#eef3f8;border:none;border-radius:4px;padding:6px 10px;font-size:0.8rem;color:#333;outline:none;}
+.li-mock.dark .li-nav-search{background:#38434f;color:#e9e5df;}
+.li-post-card{background:#fff;margin:8px 10px;border-radius:8px;border:1px solid #e0e0e0;overflow:hidden;}
+.li-mock.dark .li-post-card{background:#1d2226;border-color:#38434f;}
+.li-post-header{display:flex;align-items:flex-start;gap:10px;padding:12px 14px 10px;}
+.li-post-avatar{width:48px;height:48px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1rem;color:#fff;}
+.li-post-meta{flex:1;}
+.li-post-name{font-weight:700;font-size:0.88rem;}
+.li-post-headline{font-size:0.75rem;color:#666;line-height:1.4;}
+.li-mock.dark .li-post-headline{color:#8a9099;}
+.li-post-time{font-size:0.72rem;color:#888;margin-top:2px;}
+.li-follow-btn{background:none;border:1px solid #0a66c2;color:#0a66c2;border-radius:20px;padding:5px 14px;font-size:0.8rem;font-weight:600;cursor:pointer;font-family:inherit;flex-shrink:0;}
+.li-post-text{padding:0 14px 10px;font-size:0.88rem;line-height:1.65;}
+.li-hashtag{color:#0a66c2;}
+.li-post-img{width:100%;aspect-ratio:16/9;object-fit:cover;display:flex;align-items:center;justify-content:center;font-size:2rem;background:#eef3f8;}
+.li-mock.dark .li-post-img{background:#38434f;}
+.li-post-img img{width:100%;height:100%;object-fit:cover;}
+.li-stats-row{padding:8px 14px 4px;font-size:0.78rem;color:#666;display:flex;justify-content:space-between;border-top:1px solid #e0e0e0;}
+.li-mock.dark .li-stats-row{color:#8a9099;border-color:#38434f;}
+.li-actions-row{display:flex;justify-content:space-around;padding:4px 0;}
+.li-act{display:flex;align-items:center;gap:5px;background:none;border:none;color:#666;font-size:0.82rem;font-weight:600;cursor:pointer;padding:8px 6px;border-radius:6px;font-family:inherit;}
+.li-mock.dark .li-act{color:#8a9099;}
+.li-act svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;}
+
+/* ═══════════════════════════════
+   INSTAGRAM DM MOCKUP
+═══════════════════════════════ */
+.igdm-mock{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#fff;width:375px;color:#000;}
+.igdm-mock.dark{background:#000;color:#fff;}
+.igdm-header{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid #efefef;}
+.igdm-mock.dark .igdm-header{border-color:#2a2a2a;}
+.igdm-back{font-size:1.1rem;color:#000;cursor:pointer;}
+.igdm-mock.dark .igdm-back{color:#fff;}
+.igdm-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.82rem;color:#fff;}
+.igdm-info{flex:1;}
+.igdm-name{font-weight:700;font-size:0.88rem;}
+.igdm-status{font-size:0.72rem;}
+.igdm-icons{display:flex;gap:14px;font-size:1.1rem;}
+.igdm-body{padding:12px 14px;display:flex;flex-direction:column;gap:10px;min-height:280px;}
+.igdm-bubble-row{display:flex;align-items:flex-end;gap:6px;}
+.igdm-bubble-row.sent{flex-direction:row-reverse;}
+.igdm-bubble{max-width:70%;padding:9px 13px;border-radius:20px;font-size:0.85rem;line-height:1.5;}
+.igdm-bubble.recv{background:#efefef;border-bottom-left-radius:4px;}
+.igdm-mock.dark .igdm-bubble.recv{background:#2a2a2a;color:#fff;}
+.igdm-bubble.sent{background:linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045);color:#fff;border-bottom-right-radius:4px;}
+.igdm-btime{font-size:0.65rem;color:#999;margin-top:2px;}
+.igdm-footer{padding:10px 14px;border-top:1px solid #efefef;display:flex;align-items:center;gap:10px;}
+.igdm-mock.dark .igdm-footer{border-color:#2a2a2a;}
+.igdm-input-box{flex:1;background:#efefef;border-radius:22px;padding:9px 14px;font-size:0.85rem;color:#999;}
+.igdm-mock.dark .igdm-input-box{background:#2a2a2a;color:#666;}
+
+/* ═══════════════════════════════
+   WHATSAPP MOCKUP
+═══════════════════════════════ */
+.wa-mock{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#efeae2;width:375px;}
+.wa-mock.dark{background:#0c1317;}
+.wa-header{background:#075e54;padding:12px 14px;display:flex;align-items:center;gap:10px;}
+.wa-mock.dark .wa-header{background:#1f2c34;}
+.wa-back-btn{color:rgba(255,255,255,0.85);font-size:1rem;}
+.wa-contact-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.82rem;color:#fff;}
+.wa-contact-info{flex:1;}
+.wa-contact-name{color:#fff;font-weight:700;font-size:0.88rem;}
+.wa-contact-status{color:rgba(255,255,255,0.7);font-size:0.72rem;}
+.wa-header-acts{display:flex;gap:14px;color:rgba(255,255,255,0.85);font-size:1rem;}
+.wa-body{padding:10px 10px;display:flex;flex-direction:column;gap:6px;min-height:280px;
+  background-image:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+.wa-date-chip{align-self:center;background:rgba(255,255,255,0.85);padding:4px 12px;border-radius:12px;font-size:0.72rem;color:#667781;margin:4px 0;}
+.wa-mock.dark .wa-date-chip{background:rgba(31,44,52,0.9);color:#8696a0;}
+.wa-brow{display:flex;}
+.wa-brow.sent{justify-content:flex-end;}
+.wa-bubble{max-width:75%;padding:7px 10px;border-radius:8px;font-size:0.85rem;line-height:1.5;position:relative;}
+.wa-bubble.recv{background:#fff;border-top-left-radius:0;}
+.wa-mock.dark .wa-bubble.recv{background:#202c33;color:#e9edef;}
+.wa-bubble.sent{background:#dcf8c6;border-top-right-radius:0;}
+.wa-mock.dark .wa-bubble.sent{background:#005c4b;color:#e9edef;}
+.wa-bmeta{display:flex;align-items:center;justify-content:flex-end;gap:4px;margin-top:3px;}
+.wa-btime{font-size:0.65rem;color:#999;}
+.wa-mock.dark .wa-btime{color:#8696a0;}
+.wa-check{font-size:0.72rem;color:#53bdeb;}
+.wa-footer{background:#fff;padding:8px 10px;display:flex;align-items:center;gap:8px;}
+.wa-mock.dark .wa-footer{background:#1f2c34;}
+.wa-input-pill{flex:1;background:#fff;border:none;border-radius:22px;padding:9px 14px;font-size:0.85rem;color:#999;box-shadow:0 1px 3px rgba(0,0,0,0.1);}
+.wa-mock.dark .wa-input-pill{background:#2a3942;color:#8696a0;}
+.wa-send-btn{width:42px;height:42px;border-radius:50%;background:#25d366;border:none;display:flex;align-items:center;justify-content:center;font-size:1.1rem;cursor:pointer;flex-shrink:0;}
+
+/* ═══════════════════════════════
+   X THREAD MOCKUP
+═══════════════════════════════ */
+.xt-mock{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#fff;width:375px;color:#0f1419;}
+.xt-mock.dark{background:#000;color:#e7e9ea;}
+.xt-nav{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid #efefef;}
+.xt-mock.dark .xt-nav{border-color:#2f3336;}
+.xt-nav-back{font-size:1.1rem;color:#0f1419;}
+.xt-mock.dark .xt-nav-back{color:#e7e9ea;}
+.xt-nav-title{font-weight:800;font-size:1rem;}
+.xt-tweet-item{display:flex;gap:10px;padding:12px 14px;border-bottom:1px solid #efefef;position:relative;}
+.xt-mock.dark .xt-tweet-item{border-color:#2f3336;}
+.xt-tweet-item:last-child{border-bottom:none;}
+.xt-tleft{display:flex;flex-direction:column;align-items:center;}
+.xt-tavatar{width:40px;height:40px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9rem;color:#fff;}
+.xt-tconnect{width:2px;background:#cfd9de;flex:1;margin-top:4px;border-radius:2px;min-height:16px;}
+.xt-mock.dark .xt-tconnect{background:#2f3336;}
+.xt-tright{flex:1;min-width:0;}
+.xt-ttop{display:flex;align-items:center;gap:4px;margin-bottom:4px;}
+.xt-tname{font-weight:700;font-size:0.88rem;}
+.xt-thandle{font-size:0.8rem;color:#536471;}
+.xt-mock.dark .xt-thandle{color:#71767b;}
+.xt-ttime{font-size:0.8rem;color:#536471;margin-left:auto;}
+.xt-mock.dark .xt-ttime{color:#71767b;}
+.xt-ttext{font-size:0.88rem;line-height:1.6;margin-bottom:8px;}
+.xt-timg{width:100%;border-radius:12px;aspect-ratio:16/9;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:8px;}
+.xt-mock.dark .xt-timg{background:#1a1a1a;}
+.xt-timg img{width:100%;height:100%;object-fit:cover;border-radius:12px;}
+.xt-tactions{display:flex;gap:14px;}
+.xt-tact{display:flex;align-items:center;gap:4px;background:none;border:none;color:#536471;font-size:0.78rem;cursor:pointer;}
+.xt-tact svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;}
+.xt-thread-num{position:absolute;top:12px;right:14px;font-size:0.7rem;color:#536471;font-weight:700;}
+.xt-mock.dark .xt-thread-num{color:#71767b;}
+
+/* ── MOBILE ── */
+@media(max-width:900px){
+  html,body{overflow:auto;}
+  .app{flex-direction:column;height:auto;min-height:100vh;}
+  .sidebar{
+    width:100%;flex-direction:row;
+    overflow-x:auto;overflow-y:hidden;
+    border-right:none;border-bottom:1px solid var(--border);
+    padding-bottom:0;flex-shrink:0;
+  }
+  .sidebar-logo{display:none;}
+  .nav-item{
+    flex-direction:column;gap:4px;padding:10px 14px;
+    border-left:none;border-bottom:3px solid transparent;
+    font-size:0.72rem;white-space:nowrap;
+  }
+  .nav-item.active{border-bottom-color:var(--accent);border-left-color:transparent;}
+  .nav-icon{font-size:1.3rem;}
+  .main{flex-direction:column;overflow:visible;}
+  .form-panel{width:100%;border-right:none;border-bottom:1px solid var(--border);max-height:none;}
+  .preview-panel{min-height:600px;}
+  .preview-body{padding:20px 12px;}
+  .phone-screen,.ig-mock,.x-mock,.fb-mock,.th-mock,.li-mock,.igdm-mock,.wa-mock,.xt-mock{
+    width:100%;max-width:375px;
+  }
+}
+@media(max-width:480px){
+  .preview-body{padding:16px 8px;}
+  .form-row{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">MockGen <span>Social Media Generator</span></div>
+  <div class="nav-item active" onclick="switchPlatform('instagram')"><span class="nav-icon">📸</span>Instagram Post</div>
+  <div class="nav-item" onclick="switchPlatform('twitter')"><span class="nav-icon">𝕏</span>X / Twitter</div>
+  <div class="nav-item" onclick="switchPlatform('facebook')"><span class="nav-icon">👥</span>Facebook</div>
+  <div class="nav-item" onclick="switchPlatform('threads')"><span class="nav-icon">🧵</span>Threads</div>
+  <div class="nav-item" onclick="switchPlatform('linkedin')"><span class="nav-icon">💼</span>LinkedIn</div>
+  <div class="nav-item" onclick="switchPlatform('igdm')"><span class="nav-icon">💬</span>Instagram DM</div>
+  <div class="nav-item" onclick="switchPlatform('whatsapp')"><span class="nav-icon">📱</span>WhatsApp</div>
+  <div class="nav-item" onclick="switchPlatform('xthread')"><span class="nav-icon">🔗</span>X Thread</div>
+</aside>
+
+<div class="main">
+  <!-- FORM PANEL -->
+  <div class="form-panel" id="form-panel"></div>
+
+  <!-- PREVIEW PANEL -->
+  <div class="preview-panel">
+    <div class="preview-header">
+      <span class="preview-header-title">Live Preview</span>
+      <button class="download-btn" onclick="downloadPNG()">⬇ Download PNG</button>
+    </div>
+    <div class="preview-body">
+      <div id="preview-root"></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────
+let currentPlatform = 'instagram';
+let avatarDataURL = null;
+let postImageDataURL = null;
+let messages = [
+  {side:'recv', text:'Hey! How are you doing?', time:'10:00 AM'},
+  {side:'sent', text:'I\'m great, thanks! How about you?', time:'10:01 AM'},
+  {side:'recv', text:'Doing well! Want to catch up this weekend?', time:'10:02 AM'},
+];
+let threadTweets = [
+  {text:'🧵 Here\'s a thread about something important...', likes:'1.2K', rt:'342', img:false},
+  {text:'First, let\'s talk about the context. This started a while back when...', likes:'892', rt:'210', img:false},
+  {text:'The key insight is this: most people think about it wrong.', likes:'1.1K', rt:'287', img:false},
+];
+
+const state = {
+  instagram:{
+    username:'john.doe', name:'John Doe', location:'New York, USA',
+    verified:false, dark:false,
+    caption:'Golden hour hits different when you slow down ✨ #photography #travel',
+    likes:'12,482', comments:'284', timestamp:'2 HOURS AGO',
+    avatarColor:'#e1306c', showImage:true,
+  },
+  twitter:{
+    name:'Alex Johnson', handle:'alexjohnson', verified:true, dark:false,
+    text:'Just shipped a new feature after 3 weeks of iteration. The first version looked nothing like this. That\'s the process — embrace it. 🚀 #buildinpublic',
+    likes:'5,291', retweets:'832', replies:'148', bookmarks:'214', views:'1.4M',
+    time:'10:42 AM', date:'Apr 18, 2026', avatarColor:'#1d9bf0', showImage:false,
+  },
+  facebook:{
+    name:'Sarah Mitchell', verified:false, dark:false,
+    text:'Spent the weekend redesigning our living room on a budget and honestly couldn\'t be happier 🏡✨',
+    likes:'2,400', comments:'384', shares:'91',
+    privacy:'🌐 Public', timestamp:'3 hrs',
+    avatarColor:'#1877f2', showImage:true,
+  },
+  threads:{
+    name:'maya.reads', handle:'maya.reads', verified:true, dark:false,
+    text:'Controversial take: reading fiction isn\'t escapism. It\'s the most rigorous empathy training available.',
+    likes:'3,100', replies:'218', timestamp:'5h',
+    avatarColor:'#000000',
+  },
+  linkedin:{
+    name:'David Kim', headline:'Product Lead @ TechCorp · Speaker', verified:false, dark:false,
+    text:'I got rejected from 14 companies before landing my dream job.\n\nHere\'s what those rejections actually taught me:\n\n1️⃣ Feedback is a gift\n2️⃣ Your network matters\n3️⃣ Persistence is trust in yourself\n\n#career #growth #leadership',
+    likes:'4,821', comments:'312', reposts:'58', timestamp:'2d',
+    avatarColor:'#0a66c2', showImage:false,
+  },
+  igdm:{
+    myName:'You', myColor:'#833ab4',
+    theirName:'luna.pixel', theirColor:'#e1306c',
+    status:'Active now', statusColor:'#4caf50', dark:false,
+  },
+  whatsapp:{
+    contactName:'Raj Kumar', contactColor:'#25d366',
+    status:'online', dark:false,
+  },
+  xthread:{
+    name:'TechCreator', handle:'techcreator',
+    verified:true, dark:false, avatarColor:'#1d9bf0',
+  },
+};
+
+// ─────────────────────────────────────────────
+// HELPERS
+// ─────────────────────────────────────────────
+function initials(str){return (str||'U').split(' ').map(w=>w[0]||'').join('').toUpperCase().slice(0,2)||'?';}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function nl2br(s){return esc(s).replace(/\n/g,'<br/>');}
+function avatarHTML(name,color,size,id){
+  let style=`width:${size}px;height:${size}px;background:${color};`;
+  if(id==='post-img-area'&&postImageDataURL) return `<img src="${postImageDataURL}" style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;"/>`;
+  if(id&&avatarDataURL) return `<img src="${avatarDataURL}" style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;"/>`;
+  return `<div class="ig-avatar" style="${style}">${initials(name)}</div>`;
+}
+
+// ─────────────────────────────────────────────
+// FORMS
+// ─────────────────────────────────────────────
+function buildForm(platform){
+  const s=state[platform];
+  let h='';
+  if(platform==='instagram'){
+    h=`<div class="panel-title">📸 Instagram Post <span class="badge">Post</span></div>
+    <div class="form-group"><label class="form-label">Username</label><input class="form-input" oninput="state.instagram.username=this.value;render()" value="${esc(s.username)}" placeholder="john.doe"/></div>
+    <div class="form-group"><label class="form-label">Display Name</label><input class="form-input" oninput="state.instagram.name=this.value;render()" value="${esc(s.name)}" placeholder="John Doe"/></div>
+    <div class="form-group"><label class="form-label">Location Tag</label><input class="form-input" oninput="state.instagram.location=this.value;render()" value="${esc(s.location)}" placeholder="New York, USA"/></div>
+    <div class="form-group"><label class="form-label">Caption</label><textarea class="form-textarea" oninput="state.instagram.caption=this.value;render()">${esc(s.caption)}</textarea></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Likes</label><input class="form-input" oninput="state.instagram.likes=this.value;render()" value="${esc(s.likes)}"/></div>
+      <div class="form-group"><label class="form-label">Comments</label><input class="form-input" oninput="state.instagram.comments=this.value;render()" value="${esc(s.comments)}"/></div>
+    </div>
+    <div class="form-group"><label class="form-label">Timestamp</label><input class="form-input" oninput="state.instagram.timestamp=this.value;render()" value="${esc(s.timestamp)}"/></div>
+    <div class="form-group"><label class="form-label">Avatar Color</label><div class="color-row"><input type="color" class="color-input" oninput="state.instagram.avatarColor=this.value;render()" value="${s.avatarColor}"/><span style="font-size:0.8rem;color:var(--sub)">Or upload below</span></div></div>
+    <div class="form-group"><label class="form-label">Upload Avatar</label><input type="file" class="form-input" accept="image/*" onchange="loadAvatar(this)"/></div>
+    <div class="form-group"><label class="form-label">Upload Post Image</label><input type="file" class="form-input" accept="image/*" onchange="loadPostImage(this)"/></div>
+    <div class="toggle-row"><span class="toggle-label">Verified Badge</span><label class="toggle"><input type="checkbox" ${s.verified?'checked':''} onchange="state.instagram.verified=this.checked;render()"/><span class="toggle-slider"></span></label></div>
+    <div class="toggle-row"><span class="toggle-label">Dark Mode Preview</span><label class="toggle"><input type="checkbox" ${s.dark?'checked':''} onchange="state.instagram.dark=this.checked;render()"/><span class="toggle-slider"></span></label></div>`;
+  }
+  else if(platform==='twitter'){
+    h=`<div class="panel-title">𝕏 Twitter / X <span class="badge">Post</span></div>
+    <div class="form-group"><label class="form-label">Display Name</label><input class="form-input" oninput="state.twitter.name=this.value;render()" value="${esc(s.name)}"/></div>
+    <div class="form-group"><label class="form-label">Handle (without @)</label><input class="form-input" oninput="state.twitter.handle=this.value;render()" value="${esc(s.handle)}"/></div>
+    <div class="form-group"><label class="form-label">Tweet Text</label><textarea class="form-textarea" oninput="state.twitter.text=this.value;render()" style="min-height:100px">${esc(s.text)}</textarea></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Likes</label><input class="form-input" oninput="state.twitter.likes=this.value;render()" value="${esc(s.likes)}"/></div>
+      <div class="form-group"><label class="form-label">Retweets</label><input class="form-input" oninput="state.twitter.retweets=this.value;render()" value="${esc(s.retweets)}"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Replies</label><input class="form-input" oninput="state.twitter.replies=this.value;render()" value="${esc(s.replies)}"/></div>
+      <div class="form-group"><label class="form-label">Bookmarks</label><input class="form-input" oninput="state.twitter.bookmarks=this.value;render()" value="${esc(s.bookmarks)}"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Views</label><input class="form-input" oninput="state.twitter.views=this.value;render()" value="${esc(s.views)}"/></div>
+      <div class="form-group"><label class="form-label">Time</label><input class="form-input" oninput="state.twitter.time=this.value;render()" value="${esc(s.time)}"/></div>
+    </div>
+    <div class="form-group"><label class="form-label">Date</label><input class="form-input" oninput="state.twitter.date=this.value;render()" value="${esc(s.date)}"/></div>
+    <div class="form-group"><label class="form-label">Avatar Color</label><input type="color" class="color-input" oninput="state.twitter.avatarColor=this.value;render()" value="${s.avatarColor}"/></div>
+    <div class="form-group"><label class="form-label">Upload Avatar</label><input type="file" class="form-input" accept="image/*" onchange="loadAvatar(this)"/></div>
+    <div class="form-group"><label class="form-label">Upload Tweet Image</label><input type="file" class="form-input" accept="image/*" onchange="loadPostImage(this)"/></div>
+    <div class="toggle-row"><span class="toggle-label">Show Image</span><label class="toggle"><input type="checkbox" ${s.showImage?'checked':''} onchange="state.twitter.showImage=this.checked;render()"/><span class="toggle-slider"></span></label></div>
+    <div class="toggle-row"><span class="toggle-label">Verified Badge</span><label class="toggle"><input type="checkbox" ${s.verified?'checked':''} onchange="state.twitter.verified=this.checked;render()"/><span class="toggle-slider"></span></label></div>
+    <div class="toggle-row"><span class="toggle-label">Dark Mode</span><label class="toggle"><input type="checkbox" ${s.dark?'checked':''} onchange="state.twitter.dark=this.checked;render()"/><span class="toggle-slider"></span></label></div>`;
+  }
+  else if(platform==='facebook'){
+    h=`<div class="panel-title">👥 Facebook <span class="badge">Post</span></div>
+    <div class="form-group"><label class="form-label">Name</label><input class="form-input" oninput="state.facebook.name=this.value;render()" value="${esc(s.name)}"/></div>
+    <div class="form-group"><label class="form-label">Post Text</label><textarea class="form-textarea" oninput="state.facebook.text=this.value;render()">${esc(s.text)}</textarea></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Reactions</label><input class="form-input" oninput="state.facebook.likes=this.value;render()" value="${esc(s.likes)}"/></div>
+      <div class="form-group"><label class="form-label">Comments</label><input class="form-input" oninput="state.facebook.comments=this.value;render()" value="${esc(s.comments)}"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Shares</label><input class="form-input" oninput="state.facebook.shares=this.value;render()" value="${esc(s.shares)}"/></div>
+      <div class="form-group"><label class="form-label">Timestamp</label><input class="form-input" oninput="state.facebook.timestamp=this.value;render()" value="${esc(s.timestamp)}"/></div>
+    </div>
+    <div class="form-group"><label class="form-label">Privacy</label>
+      <select class="form-select" onchange="state.facebook.privacy=this.value;render()">
+        <option value="🌐 Public" ${s.privacy==='🌐 Public'?'selected':''}>🌐 Public</option>
+        <option value="👥 Friends" ${s.privacy==='👥 Friends'?'selected':''}>👥 Friends</option>
+        <option value="🔒 Only Me" ${s.privacy==='🔒 Only Me'?'selected':''}>🔒 Only Me</option>
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">Avatar Color</label><input type="color" class="color-input" oninput="state.facebook.avatarColor=this.value;render()" value="${s.avatarColor}"/></div>
+    <div class="form-group"><label class="form-label">Upload Avatar</label><input type="file" class="form-input" accept="image/*" onchange="loadAvatar(this)"/></div>
+    <div class="form-group"><label class="form-label">Upload Post Image</label><input type="file" class="form-input" accept="image/*" onchange="loadPostImage(this)"/></div>
+    <div class="toggle-row"><span class="toggle-label">Show Post Image</span><label class="toggle"><input type="checkbox" ${s.showImage?'checked':''} onchange="state.facebook.showImage=this.checked;render()"/><span class="toggle-slider"></span></label></div>
+    <div class="toggle-row"><span class="toggle-label">Dark Mode</span><label class="toggle"><input type="checkbox" ${s.dark?'checked':''} onchange="state.facebook.dark=this.checked;render()"/><span class="toggle-slider"></span></label></div>`;
+  }
+  else if(platform==='threads'){
+    h=`<div class="panel-title">🧵 Threads <span class="badge">Post</span></div>
+    <div class="form-group"><label class="form-label">Display Name</label><input class="form-input" oninput="state.threads.name=this.value;render()" value="${esc(s.name)}"/></div>
+    <div class="form-group"><label class="form-label">Handle</label><input class="form-input" oninput="state.threads.handle=this.value;render()" value="${esc(s.handle)}"/></div>
+    <div class="form-group"><label class="form-label">Post Text</label><textarea class="form-textarea" oninput="state.threads.text=this.value;render()" style="min-height:100px">${esc(s.text)}</textarea></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Likes</label><input class="form-input" oninput="state.threads.likes=this.value;render()" value="${esc(s.likes)}"/></div>
+      <div class="form-group"><label class="form-label">Replies</label><input class="form-input" oninput="state.threads.replies=this.value;render()" value="${esc(s.replies)}"/></div>
+    </div>
+    <div class="form-group"><label class="form-label">Timestamp</label><input class="form-input" oninput="state.threads.timestamp=this.value;render()" value="${esc(s.timestamp)}"/></div>
+    <div class="form-group"><label class="form-label">Avatar Color</label><input type="color" class="color-input" oninput="state.threads.avatarColor=this.value;render()" value="${s.avatarColor}"/></div>
+    <div class="form-group"><label class="form-label">Upload Avatar</label><input type="file" class="form-input" accept="image/*" onchange="loadAvatar(this)"/></div>
+    <div class="toggle-row"><span class="toggle-label">Verified Badge</span><label class="toggle"><input type="checkbox" ${s.verified?'checked':''} onchange="state.threads.verified=this.checked;render()"/><span class="toggle-slider"></span></label></div>
+    <div class="toggle-row"><span class="toggle-label">Dark Mode</span><label class="toggle"><input type="checkbox" ${s.dark?'checked':''} onchange="state.threads.dark=this.checked;render()"/><span class="toggle-slider"></span></label></div>`;
+  }
+  else if(platform==='linkedin'){
+    h=`<div class="panel-title">💼 LinkedIn <span class="badge">Post</span></div>
+    <div class="form-group"><label class="form-label">Full Name</label><input class="form-input" oninput="state.linkedin.name=this.value;render()" value="${esc(s.name)}"/></div>
+    <div class="form-group"><label class="form-label">Headline / Title</label><input class="form-input" oninput="state.linkedin.headline=this.value;render()" value="${esc(s.headline)}"/></div>
+    <div class="form-group"><label class="form-label">Post Text</label><textarea class="form-textarea" oninput="state.linkedin.text=this.value;render()" style="min-height:120px">${esc(s.text)}</textarea></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Reactions</label><input class="form-input" oninput="state.linkedin.likes=this.value;render()" value="${esc(s.likes)}"/></div>
+      <div class="form-group"><label class="form-label">Comments</label><input class="form-input" oninput="state.linkedin.comments=this.value;render()" value="${esc(s.comments)}"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Reposts</label><input class="form-input" oninput="state.linkedin.reposts=this.value;render()" value="${esc(s.reposts)}"/></div>
+      <div class="form-group"><label class="form-label">Timestamp</label><input class="form-input" oninput="state.linkedin.timestamp=this.value;render()" value="${esc(s.timestamp)}"/></div>
+    </div>
+    <div class="form-group"><label class="form-label">Avatar Color</label><input type="color" class="color-input" oninput="state.linkedin.avatarColor=this.value;render()" value="${s.avatarColor}"/></div>
+    <div class="form-group"><label class="form-label">Upload Avatar</label><input type="file" class="form-input" accept="image/*" onchange="loadAvatar(this)"/></div>
+    <div class="form-group"><label class="form-label">Upload Post Image</label><input type="file" class="form-input" accept="image/*" onchange="loadPostImage(this)"/></div>
+    <div class="toggle-row"><span class="toggle-label">Show Post Image</span><label class="toggle"><input type="checkbox" ${s.showImage?'checked':''} onchange="state.linkedin.showImage=this.checked;render()"/><span class="toggle-slider"></span></label></div>
+    <div class="toggle-row"><span class="toggle-label">Show Follow Button</span><label class="toggle"><input type="checkbox" ${s.verified?'checked':''} onchange="state.linkedin.verified=this.checked;render()"/><span class="toggle-slider"></span></label></div>
+    <div class="toggle-row"><span class="toggle-label">Dark Mode</span><label class="toggle"><input type="checkbox" ${s.dark?'checked':''} onchange="state.linkedin.dark=this.checked;render()"/><span class="toggle-slider"></span></label></div>`;
+  }
+  else if(platform==='igdm'){
+    h=`<div class="panel-title">💬 Instagram DM <span class="badge">Chat</span></div>
+    <div class="form-group"><label class="form-label">Contact Name</label><input class="form-input" oninput="state.igdm.theirName=this.value;render()" value="${esc(s.theirName)}"/></div>
+    <div class="form-group"><label class="form-label">Contact Avatar Color</label><input type="color" class="color-input" oninput="state.igdm.theirColor=this.value;render()" value="${s.theirColor}"/></div>
+    <div class="form-group"><label class="form-label">Your Name</label><input class="form-input" oninput="state.igdm.myName=this.value;render()" value="${esc(s.myName)}"/></div>
+    <div class="form-group"><label class="form-label">Status Text</label><input class="form-input" oninput="state.igdm.status=this.value;render()" value="${esc(s.status)}"/></div>
+    <div class="toggle-row"><span class="toggle-label">Dark Mode</span><label class="toggle"><input type="checkbox" ${s.dark?'checked':''} onchange="state.igdm.dark=this.checked;render()"/><span class="toggle-slider"></span></label></div>
+    <hr class="section-divider"/>
+    <div class="sub-section-label">Messages</div>
+    <div id="msg-list">${buildMsgList()}</div>
+    <button class="add-msg-btn" onclick="addMsg()">+ Add Message</button>`;
+  }
+  else if(platform==='whatsapp'){
+    h=`<div class="panel-title">📱 WhatsApp <span class="badge">Chat</span></div>
+    <div class="form-group"><label class="form-label">Contact Name</label><input class="form-input" oninput="state.whatsapp.contactName=this.value;render()" value="${esc(s.contactName)}"/></div>
+    <div class="form-group"><label class="form-label">Contact Avatar Color</label><input type="color" class="color-input" oninput="state.whatsapp.contactColor=this.value;render()" value="${s.contactColor}"/></div>
+    <div class="form-group"><label class="form-label">Status</label><input class="form-input" oninput="state.whatsapp.status=this.value;render()" value="${esc(s.status)}"/></div>
+    <div class="toggle-row"><span class="toggle-label">Dark Mode</span><label class="toggle"><input type="checkbox" ${s.dark?'checked':''} onchange="state.whatsapp.dark=this.checked;render()"/><span class="toggle-slider"></span></label></div>
+    <hr class="section-divider"/>
+    <div class="sub-section-label">Messages</div>
+    <div id="msg-list">${buildMsgList()}</div>
+    <button class="add-msg-btn" onclick="addMsg()">+ Add Message</button>`;
+  }
+  else if(platform==='xthread'){
+    h=`<div class="panel-title">🔗 X Thread <span class="badge">Thread</span></div>
+    <div class="form-group"><label class="form-label">Display Name</label><input class="form-input" oninput="state.xthread.name=this.value;render()" value="${esc(s.name)}"/></div>
+    <div class="form-group"><label class="form-label">Handle (without @)</label><input class="form-input" oninput="state.xthread.handle=this.value;render()" value="${esc(s.handle)}"/></div>
+    <div class="form-group"><label class="form-label">Avatar Color</label><input type="color" class="color-input" oninput="state.xthread.avatarColor=this.value;render()" value="${s.avatarColor}"/></div>
+    <div class="form-group"><label class="form-label">Upload Avatar</label><input type="file" class="form-input" accept="image/*" onchange="loadAvatar(this)"/></div>
+    <div class="toggle-row"><span class="toggle-label">Verified Badge</span><label class="toggle"><input type="checkbox" ${s.verified?'checked':''} onchange="state.xthread.verified=this.checked;render()"/><span class="toggle-slider"></span></label></div>
+    <div class="toggle-row"><span class="toggle-label">Dark Mode</span><label class="toggle"><input type="checkbox" ${s.dark?'checked':''} onchange="state.xthread.dark=this.checked;render()"/><span class="toggle-slider"></span></label></div>
+    <hr class="section-divider"/>
+    <div class="sub-section-label">Tweets in Thread</div>
+    <div id="thread-list">${buildThreadList()}</div>
+    <button class="add-msg-btn" onclick="addTweet()" ${threadTweets.length>=6?'disabled':''}>+ Add Tweet (max 6)</button>`;
+  }
+  document.getElementById('form-panel').innerHTML=h;
+}
+
+function buildMsgList(){
+  return messages.map((m,i)=>`
+    <div class="msg-item">
+      <div class="msg-item-top">
+        <div class="msg-side-toggle">
+          <button class="msg-side-btn ${m.side==='recv'?'active':''}" onclick="setMsgSide(${i},'recv')">Recv</button>
+          <button class="msg-side-btn ${m.side==='sent'?'active':''}" onclick="setMsgSide(${i},'sent')">Sent</button>
+        </div>
+        <button class="remove-btn" onclick="removeMsg(${i})">✕</button>
+      </div>
+      <input class="form-input" style="margin-bottom:6px" placeholder="Message text..." value="${esc(m.text)}" oninput="messages[${i}].text=this.value;render()"/>
+      <input class="form-input" style="font-size:0.78rem" placeholder="Time (e.g. 2:30 PM)" value="${esc(m.time)}" oninput="messages[${i}].time=this.value;render()"/>
+    </div>`).join('');
+}
+
+function buildThreadList(){
+  return threadTweets.map((t,i)=>`
+    <div class="msg-item">
+      <div class="msg-item-top">
+        <span style="font-size:0.75rem;font-weight:700;color:var(--sub)">Tweet ${i+1}</span>
+        <button class="remove-btn" onclick="removeTweet(${i})">✕</button>
+      </div>
+      <textarea class="form-textarea" style="min-height:60px;margin-bottom:6px" oninput="threadTweets[${i}].text=this.value;render()">${esc(t.text)}</textarea>
+      <div class="form-row">
+        <input class="form-input" placeholder="Likes" value="${esc(t.likes)}" oninput="threadTweets[${i}].likes=this.value;render()"/>
+        <input class="form-input" placeholder="Retweets" value="${esc(t.rt)}" oninput="threadTweets[${i}].rt=this.value;render()"/>
+      </div>
+    </div>`).join('');
+}
+
+function setMsgSide(i,side){messages[i].side=side;buildForm(currentPlatform);render();}
+function removeMsg(i){messages.splice(i,1);buildForm(currentPlatform);render();}
+function addMsg(){messages.push({side:'sent',text:'New message',time:'12:00 PM'});buildForm(currentPlatform);render();}
+function removeTweet(i){threadTweets.splice(i,1);buildForm(currentPlatform);render();}
+function addTweet(){if(threadTweets.length<6){threadTweets.push({text:'New tweet in thread...',likes:'0',rt:'0',img:false});buildForm(currentPlatform);render();}}
+
+function loadAvatar(input){
+  const f=input.files[0];if(!f)return;
+  const r=new FileReader();r.onload=e=>{avatarDataURL=e.target.result;render();};r.readAsDataURL(f);
+}
+function loadPostImage(input){
+  const f=input.files[0];if(!f)return;
+  const r=new FileReader();r.onload=e=>{postImageDataURL=e.target.result;render();};r.readAsDataURL(f);
+}
+
+// ─────────────────────────────────────────────
+// RENDERERS
+// ─────────────────────────────────────────────
+function renderInstagram(){
+  const s=state.instagram;
+  const dm=s.dark?'dark':'';
+  const av=avatarDataURL?`<img src="${avatarDataURL}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;"/>`
+    :`<div class="ig-avatar" style="width:36px;height:36px;background:${s.avatarColor}">${initials(s.name)}</div>`;
+  let imgBlock=postImageDataURL
+    ?`<img src="${postImageDataURL}" style="width:100%;aspect-ratio:1/1;object-fit:cover;display:block;"/>`
+    :`<div class="ig-post-image-placeholder">📷</div>`;
+  return `<div class="ig-mock ${dm}">
+    <div class="ig-top-bar">
+      <span class="ig-logo" style="color:${s.dark?'#fff':'#000'}">Instagram</span>
+      <div class="ig-icons">❤️ 📨</div>
+    </div>
+    <div class="ig-stories">
+      ${['Your story','friend1','friend2','friend3'].map((n,i)=>`
+        <div class="ig-story-item">
+          <div class="ig-story-ring"><div class="ig-story-inner" style="background:${['#e1306c','#405de6','#fd1d1d','#833ab4'][i]}">${n[0].toUpperCase()}</div></div>
+          <span class="ig-story-name">${n}</span>
+        </div>`).join('')}
+    </div>
+    <div class="ig-divider"></div>
+    <div class="ig-post-header">
+      ${av}
+      <div class="ig-user-info">
+        <div class="ig-username">${esc(s.username)}${s.verified?' ✓':''}</div>
+        ${s.location?`<div class="ig-location-text">${esc(s.location)}</div>`:''}
+      </div>
+      <div class="ig-more">···</div>
+    </div>
+    ${imgBlock}
+    <div class="ig-actions-bar">
+      <span class="ig-action-icon">🤍</span>
+      <span class="ig-action-icon">💬</span>
+      <span class="ig-action-icon">📤</span>
+      <span class="ig-action-icon ig-bookmark">🔖</span>
+    </div>
+    <div class="ig-likes">${esc(s.likes)} likes</div>
+    <div class="ig-caption-area"><span class="ig-caption-user">${esc(s.username)}</span> ${nl2br(s.caption)}</div>
+    <div class="ig-comments-link">View all ${esc(s.comments)} comments</div>
+    <div class="ig-timestamp">${esc(s.timestamp)}</div>
+    <div class="ig-bottom-bar">
+      <span class="ig-comment-box">Add a comment...</span>
+      <div class="ig-bottom-emoji">😊 🙌 ❤️ 🔥</div>
+    </div>
+  </div>`;
+}
+
+function renderTwitter(){
+  const s=state.twitter;
+  const dm=s.dark?'dark':'';
+  const av=avatarDataURL?`<img src="${avatarDataURL}" style="width:44px;height:44px;border-radius:50%;object-fit:cover;"/>`
+    :`<div class="x-tweet-avatar" style="background:${s.avatarColor}">${initials(s.name)}</div>`;
+  let imgBlock='';
+  if(s.showImage){
+    imgBlock=postImageDataURL
+      ?`<div class="x-tweet-img"><img src="${postImageDataURL}"/></div>`
+      :`<div class="x-tweet-img">🖼️</div>`;
+  }
+  return `<div class="x-mock ${dm}">
+    <div class="x-nav">
+      <span style="font-size:1.4rem;font-weight:900;">𝕏</span>
+      <span style="font-size:0.88rem;font-weight:700;">Home</span>
+      <span style="font-size:1rem;">🔔</span>
+    </div>
+    <div class="x-tweet-card">
+      <div class="x-tweet-main">
+        ${av}
+        <div class="x-tweet-body">
+          <div class="x-tweet-top">
+            <span class="x-tweet-name">${esc(s.name)}</span>
+            ${s.verified?`<span class="x-badge">✓</span>`:''}
+            <span class="x-tweet-handle">@${esc(s.handle)}</span>
+            <span class="x-tweet-dot">·</span>
+            <span class="x-tweet-time-inline">${esc(s.time)}</span>
+          </div>
+          <div class="x-tweet-text">${nl2br(s.text)}</div>
+          ${imgBlock}
+        </div>
+      </div>
+      <div class="x-time-row"><span>${esc(s.time)}</span> · ${esc(s.date)} · <span>${esc(s.views)}</span> Views</div>
+      <div class="x-stats-row">
+        <span><b>${esc(s.retweets)}</b> Reposts</span>
+        <span><b>${esc(s.replies)}</b> Replies</span>
+        <span><b>${esc(s.likes)}</b> Likes</span>
+        <span><b>${esc(s.bookmarks)}</b> Bookmarks</span>
+      </div>
+      <div class="x-actions-row">
+        <button class="x-act-btn"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>${esc(s.replies)}</button>
+        <button class="x-act-btn"><svg viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>${esc(s.retweets)}</button>
+        <button class="x-act-btn"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>${esc(s.likes)}</button>
+        <button class="x-act-btn"><svg viewBox="0 0 24 24"><polygon points="19 21 12 16 5 21 5 3 19 3 19 21"/></svg>${esc(s.bookmarks)}</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderFacebook(){
+  const s=state.facebook;
+  const dm=s.dark?'dark':'';
+  const av=avatarDataURL?`<img src="${avatarDataURL}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;"/>`
+    :`<div class="fb-post-avatar" style="background:${s.avatarColor}">${initials(s.name)}</div>`;
+  let imgBlock='';
+  if(s.showImage){
+    imgBlock=postImageDataURL
+      ?`<div class="fb-post-img"><img src="${postImageDataURL}" style="width:100%;height:100%;object-fit:cover;"/></div>`
+      :`<div class="fb-post-img">🖼️</div>`;
+  }
+  return `<div class="fb-mock ${dm}">
+    <div class="fb-nav">
+      <span class="fb-nav-logo">f</span>
+      <div class="fb-nav-icons">
+        <div class="fb-nav-icon">👥</div>
+        <div class="fb-nav-icon">🔔</div>
+        <div class="fb-nav-icon">💬</div>
+      </div>
+    </div>
+    <div class="fb-post-box">
+      <div class="fb-post-header">
+        ${av}
+        <div class="fb-post-meta">
+          <div class="fb-post-name">${esc(s.name)}</div>
+          <div class="fb-post-sub">${esc(s.privacy)} · ${esc(s.timestamp)}</div>
+        </div>
+        <div class="fb-post-more">···</div>
+      </div>
+      <div class="fb-post-text">${nl2br(s.text)}</div>
+      ${imgBlock}
+      <div class="fb-reactions-row">
+        <div class="fb-react-icons"><span>👍❤️😮</span>&nbsp;${esc(s.likes)}</div>
+        <div>${esc(s.comments)} comments · ${esc(s.shares)} shares</div>
+      </div>
+      <div class="fb-actions-row">
+        <button class="fb-act">👍 Like</button>
+        <button class="fb-act">💬 Comment</button>
+        <button class="fb-act">↗️ Share</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderThreads(){
+  const s=state.threads;
+  const dm=s.dark?'dark':'';
+  const av=avatarDataURL?`<img src="${avatarDataURL}" style="width:38px;height:38px;border-radius:50%;object-fit:cover;"/>`
+    :`<div class="ig-avatar" style="width:38px;height:38px;background:${s.avatarColor}">${initials(s.name)}</div>`;
+  const colors=['#e1306c','#405de6','#fd1d1d'];
+  return `<div class="th-mock ${dm}">
+    <div class="th-nav"><span class="th-nav-logo">𝕿</span></div>
+    <div class="th-post-wrap">
+      <div class="th-post-row">
+        <div class="th-post-left">
+          ${av}
+          <div class="th-connector"></div>
+        </div>
+        <div class="th-post-right">
+          <div class="th-post-top">
+            <span class="th-post-name">${esc(s.name)}</span>
+            ${s.verified?`<span class="th-ver">✓</span>`:''}
+            <span class="th-post-time">${esc(s.timestamp)}</span>
+            <span class="th-post-more">···</span>
+          </div>
+          <div class="th-post-text">${nl2br(s.text)}</div>
+          <div class="th-post-actions">
+            <button class="th-post-act"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> ${esc(s.likes)}</button>
+            <button class="th-post-act"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> ${esc(s.replies)}</button>
+            <button class="th-post-act"><svg viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/></svg> Repost</button>
+            <button class="th-post-act"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+          </div>
+        </div>
+      </div>
+      <div class="th-replies-row">
+        <div class="th-reply-avs">
+          ${colors.map(c=>`<div class="th-reply-av" style="background:${c}">•</div>`).join('')}
+        </div>
+        <span class="th-reply-stat">${esc(s.replies)} replies · ${esc(s.likes)} likes</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderLinkedIn(){
+  const s=state.linkedin;
+  const dm=s.dark?'dark':'';
+  const av=avatarDataURL?`<img src="${avatarDataURL}" style="width:48px;height:48px;border-radius:50%;object-fit:cover;"/>`
+    :`<div class="li-post-avatar" style="background:${s.avatarColor}">${initials(s.name)}</div>`;
+  let imgBlock='';
+  if(s.showImage){
+    imgBlock=postImageDataURL
+      ?`<div class="li-post-img"><img src="${postImageDataURL}" style="width:100%;height:100%;object-fit:cover;"/></div>`
+      :`<div class="li-post-img">🖼️</div>`;
+  }
+  const txt=s.text.replace(/(#\w+)/g,'<span class="li-hashtag">$1</span>');
+  return `<div class="li-mock ${dm}">
+    <div class="li-nav">
+      <span class="li-nav-logo">in</span>
+      <input class="li-nav-search" placeholder="Search"/>
+      <span style="font-size:1.2rem">🔔</span>
+    </div>
+    <div class="li-post-card">
+      <div class="li-post-header">
+        ${av}
+        <div class="li-post-meta">
+          <div class="li-post-name">${esc(s.name)}</div>
+          <div class="li-post-headline">${esc(s.headline)}</div>
+          <div class="li-post-time">${esc(s.timestamp)} · 🌐</div>
+        </div>
+        ${s.verified?`<button class="li-follow-btn">+ Follow</button>`:''}
+      </div>
+      <div class="li-post-text">${txt.replace(/\n/g,'<br/>')}</div>
+      ${imgBlock}
+      <div class="li-stats-row">
+        <span>👍❤️💡 ${esc(s.likes)}</span>
+        <span>${esc(s.comments)} comments · ${esc(s.reposts)} reposts</span>
+      </div>
+      <div class="li-actions-row">
+        <button class="li-act"><svg viewBox="0 0 24 24"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg> Like</button>
+        <button class="li-act"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Comment</button>
+        <button class="li-act"><svg viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg> Repost</button>
+        <button class="li-act"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Send</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderIgDM(){
+  const s=state.igdm;
+  const dm=s.dark?'dark':'';
+  const theirAv=`<div class="igdm-avatar" style="background:${s.theirColor}">${initials(s.theirName)}</div>`;
+  const myAv=`<div class="igdm-avatar" style="background:${s.myColor};width:26px;height:26px;font-size:0.65rem;">${initials(s.myName)}</div>`;
+  const bubblesHtml=messages.map(m=>`
+    <div class="igdm-bubble-row ${m.side}">
+      ${m.side==='recv'?`<div class="igdm-avatar" style="width:26px;height:26px;background:${s.theirColor};font-size:0.6rem;flex-shrink:0">${initials(s.theirName)}</div>`:''}
+      <div>
+        <div class="igdm-bubble ${m.side}">${esc(m.text)}</div>
+        <div class="igdm-btime" style="${m.side==='sent'?'text-align:right':''}">${esc(m.time)}</div>
+      </div>
+    </div>`).join('');
+  return `<div class="igdm-mock ${dm}">
+    <div class="igdm-header">
+      <span class="igdm-back">←</span>
+      ${theirAv}
+      <div class="igdm-info">
+        <div class="igdm-name">${esc(s.theirName)}</div>
+        <div class="igdm-status" style="color:${s.statusColor||'#4caf50'}">${esc(s.status)}</div>
+      </div>
+      <div class="igdm-icons">📞 📹 ℹ️</div>
+    </div>
+    <div class="igdm-body">${bubblesHtml}</div>
+    <div class="igdm-footer">
+      <span style="font-size:1.2rem">📷</span>
+      <div class="igdm-input-box">Message...</div>
+      <span style="font-size:1.2rem">🎤</span>
+    </div>
+  </div>`;
+}
+
+function renderWhatsApp(){
+  const s=state.whatsapp;
+  const dm=s.dark?'dark':'';
+  const contactAv=`<div class="wa-contact-av" style="background:${s.contactColor}">${initials(s.contactName)}</div>`;
+  const bubblesHtml=messages.map(m=>`
+    <div class="wa-brow ${m.side}">
+      <div class="wa-bubble ${m.side}">
+        ${esc(m.text)}
+        <div class="wa-bmeta">
+          <span class="wa-btime">${esc(m.time)}</span>
+          ${m.side==='sent'?`<span class="wa-check">✓✓</span>`:''}
+        </div>
+      </div>
+    </div>`).join('');
+  return `<div class="wa-mock ${dm}">
+    <div class="wa-header">
+      <span class="wa-back-btn">←</span>
+      ${contactAv}
+      <div class="wa-contact-info">
+        <div class="wa-contact-name">${esc(s.contactName)}</div>
+        <div class="wa-contact-status">${esc(s.status)}</div>
+      </div>
+      <div class="wa-header-acts">📹 📞 ⋮</div>
+    </div>
+    <div class="wa-body">
+      <div class="wa-date-chip">Today</div>
+      ${bubblesHtml}
+    </div>
+    <div class="wa-footer">
+      <span style="font-size:1.2rem">😊</span>
+      <div class="wa-input-pill">Type a message</div>
+      <span style="font-size:1.1rem;color:#999">📎</span>
+      <button class="wa-send-btn">🎤</button>
+    </div>
+  </div>`;
+}
+
+function renderXThread(){
+  const s=state.xthread;
+  const dm=s.dark?'dark':'';
+  const tweetHTML=threadTweets.map((t,i)=>{
+    const isLast=i===threadTweets.length-1;
+    const av=avatarDataURL?`<img src="${avatarDataURL}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;"/>`
+      :`<div class="xt-tavatar" style="background:${s.avatarColor}">${initials(s.name)}</div>`;
+    return `<div class="xt-tweet-item">
+      <span class="xt-thread-num">${i+1}/${threadTweets.length}</span>
+      <div class="xt-tleft">
+        ${av}
+        ${!isLast?`<div class="xt-tconnect"></div>`:''}
+      </div>
+      <div class="xt-tright">
+        <div class="xt-ttop">
+          <span class="xt-tname">${esc(s.name)}</span>
+          ${s.verified?`<span class="x-badge">✓</span>`:''}
+          <span class="xt-thandle">@${esc(s.handle)}</span>
+          <span class="xt-ttime">2h</span>
+        </div>
+        <div class="xt-ttext">${nl2br(t.text)}</div>
+        <div class="xt-tactions">
+          <button class="xt-tact"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></button>
+          <button class="xt-tact"><svg viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg> ${esc(t.rt)}</button>
+          <button class="xt-tact"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> ${esc(t.likes)}</button>
+          <button class="xt-tact"><svg viewBox="0 0 24 24"><polygon points="19 21 12 16 5 21 5 3 19 3 19 21"/></svg></button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  return `<div class="xt-mock ${dm}">
+    <div class="xt-nav">
+      <span class="xt-nav-back">←</span>
+      <span class="xt-nav-title">Thread</span>
+    </div>
+    ${tweetHTML}
+  </div>`;
+}
+
+function render(){
+  const root=document.getElementById('preview-root');
+  let html='';
+  if(currentPlatform==='instagram') html=renderInstagram();
+  else if(currentPlatform==='twitter') html=renderTwitter();
+  else if(currentPlatform==='facebook') html=renderFacebook();
+  else if(currentPlatform==='threads') html=renderThreads();
+  else if(currentPlatform==='linkedin') html=renderLinkedIn();
+  else if(currentPlatform==='igdm') html=renderIgDM();
+  else if(currentPlatform==='whatsapp') html=renderWhatsApp();
+  else if(currentPlatform==='xthread') html=renderXThread();
+  root.innerHTML=`<div class="mockup-wrapper"><div class="phone-frame"><div class="phone-screen">${html}</div></div></div>`;
+}
+
+function switchPlatform(p){
+  currentPlatform=p;
+  avatarDataURL=null;postImageDataURL=null;
+  document.querySelectorAll('.nav-item').forEach((el,i)=>{
+    const names=['instagram','twitter','facebook','threads','linkedin','igdm','whatsapp','xthread'];
+    el.classList.toggle('active',names[i]===p);
+  });
+  buildForm(p);render();
+}
+
+async function downloadPNG(){
+  const el=document.querySelector('.phone-frame');
+  if(!el){return;}
+  const btn=document.querySelector('.download-btn');
+  btn.textContent='⏳ Generating...';btn.disabled=true;
+  try{
+    const canvas=await html2canvas(el,{scale:3,useCORS:true,backgroundColor:null,logging:false});
+    const link=document.createElement('a');
+    link.download=`${currentPlatform}-mockup.png`;
+    link.href=canvas.toDataURL('image/png');
+    link.click();
+  }catch(e){alert('Export failed. Try again.');}
+  btn.textContent='⬇ Download PNG';btn.disabled=false;
+}
+
+// INIT
+switchPlatform('instagram');
+</script>
+</body>
+</html>

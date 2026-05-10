@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Claude Skills – 02 Scheduling</title>
+  <!-- Matching the card's serif/slab heading and clean body font -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Libre+Baskerville:wght@700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #e8e2d8; /* subtle warm neutral to frame the card */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    /* ── Card shell ── */
+    .card {
+      width: 480px;
+      background: #f5f0e8;           /* warm off-white matching image */
+      border-radius: 0;
+      padding: 36px 36px 0 36px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Grid-line watermark background — subtle squares */
+    .card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(#d8d0c4 1px, transparent 1px),
+        linear-gradient(90deg, #d8d0c4 1px, transparent 1px);
+      background-size: 44px 44px;
+      opacity: 0.55;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* All direct children sit above the grid */
+    .card > * { position: relative; z-index: 1; }
+
+    /* ── Top bar ── */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .top-bar .brand {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 700;
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      color: #c47a5a;          /* terracotta/salmon accent */
+      text-transform: uppercase;
+    }
+
+    .top-bar .handle {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 700;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      color: #c47a5a;
+      text-transform: uppercase;
+    }
+
+    /* ── Large slide number ── */
+    .slide-number {
+      font-family: 'Playfair Display', serif;
+      font-weight: 900;
+      font-size: 110px;
+      line-height: 1;
+      color: #e8c5b0;          /* light dusty salmon — decorative */
+      margin-bottom: -10px;    /* tight spacing before label */
+      letter-spacing: -4px;
+    }
+
+    /* ── Section label ── */
+    .section-label {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 700;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      color: #c47a5a;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+
+    /* ── Main heading ── */
+    .main-heading {
+      font-family: 'Libre Baskerville', serif;
+      font-weight: 700;
+      font-size: 52px;
+      line-height: 1.08;
+      color: #1a2033;          /* dark navy/slate */
+      margin-bottom: 4px;
+      position: relative;
+    }
+
+    /* Red underline beneath heading (hand-drawn feel) */
+    .heading-underline {
+      width: 260px;
+      height: 4px;
+      background: #c47a5a;
+      border-radius: 2px;
+      margin-bottom: 22px;
+      position: relative;
+    }
+
+    /* Swirly arrow — pure CSS approximation using a rotated element + pseudo */
+    .arrow-swirl {
+      position: absolute;
+      top: -28px;
+      right: -30px;
+      width: 64px;
+      height: 64px;
+      pointer-events: none;
+    }
+
+    /* ── GitHub pill ── */
+    .github-pill {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: #1e2433;     /* dark navy matching image */
+      border-radius: 40px;
+      padding: 10px 16px;
+      margin-bottom: 28px;
+      width: fit-content;
+    }
+
+    /* GitHub cat icon — CSS circle + ears approximation */
+    .gh-icon {
+      width: 36px;
+      height: 36px;
+      flex-shrink: 0;
+      /* Using an SVG data URI for accuracy */
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23f5f0e8'%3E%3Cpath d='M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12'/%3E%3C/svg%3E");
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+
+    .gh-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .gh-repo {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+      color: #9aa3b8;
+      font-weight: 400;
+      letter-spacing: 0.01em;
+    }
+
+    .gh-file {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13.5px;
+      color: #f5f0e8;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+    }
+
+    .gh-badge {
+      margin-left: auto;
+      background: transparent;
+      border: 1.5px solid #9aa3b8;
+      border-radius: 20px;
+      padding: 3px 12px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 11px;
+      color: #9aa3b8;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+
+    /* ── Body copy ── */
+    .body-copy {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 700;
+      font-size: 18px;
+      line-height: 1.45;
+      color: #1a2033;
+      margin-bottom: 24px;
+    }
+
+    /* ── Feature box ── */
+    .feature-box {
+      border: 2px solid #c47a5a;
+      border-radius: 14px;
+      padding: 18px 22px;
+      margin-bottom: 28px;
+    }
+
+    .feature-box ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .feature-box li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: #1a2033;
+      line-height: 1.35;
+    }
+
+    /* Bullet dots */
+    .feature-box li::before {
+      content: '•';
+      color: #1a2033;
+      font-size: 16px;
+      flex-shrink: 0;
+      margin-top: 0px;
+    }
+
+    /* ── Bottom section: robot + arrow ── */
+    .bottom-section {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      height: 180px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ── Pixel robot — pure CSS ── */
+    .robot {
+      position: relative;
+      bottom: 0;
+      left: -10px;
+    }
+
+    /* Robot body parts */
+    .robot-head {
+      width: 80px;
+      height: 60px;
+      background: #c47a5a;
+      border-radius: 6px 6px 0 0;
+      position: relative;
+      margin: 0 auto;
+    }
+
+    /* Eyes */
+    .robot-eye {
+      position: absolute;
+      top: 22px;
+      width: 18px;
+      height: 14px;
+      background: #1a2033;
+      clip-path: polygon(30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%, 0% 50%);
+    }
+    .robot-eye.left  { left: 12px; }
+    .robot-eye.right { right: 12px; transform: scaleX(-1); }
+
+    .robot-body {
+      width: 90px;
+      height: 60px;
+      background: #c47a5a;
+      margin: 0 auto;
+      border-radius: 0 0 4px 4px;
+    }
+
+    /* Arms */
+    .robot-arms {
+      display: flex;
+      justify-content: space-between;
+      width: 130px;
+      margin: 0 auto;
+      position: relative;
+      top: -60px;
+      pointer-events: none;
+    }
+
+    .robot-arm {
+      width: 18px;
+      height: 46px;
+      background: #c47a5a;
+      border-radius: 4px;
+      margin-top: 6px;
+    }
+
+    /* Arrow pointing right */
+    .arrow-right {
+      position: absolute;
+      bottom: 32px;
+      right: 0;
+    }
+
+    .arrow-right svg {
+      width: 80px;
+      height: 28px;
+    }
+
+    /* SVG hand-drawn arrow */
+  </style>
+</head>
+<body>
+
+<div class="card">
+
+  <!-- Top bar -->
+  <div class="top-bar">
+    <span class="brand">Claude Skills</span>
+    <span class="handle">@CloudWithSingh</span>
+  </div>
+
+  <!-- Slide number -->
+  <div class="slide-number">02</div>
+
+  <!-- Section label -->
+  <div class="section-label">Scheduling</div>
+
+  <!-- Main heading with decorative arrow -->
+  <div class="main-heading" style="position:relative;">
+    LinkedIn +<br>Buffer
+
+    <!-- Hand-drawn swirly arrow SVG -->
+    <svg class="arrow-swirl" viewBox="0 0 70 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M18 8 C28 4, 48 10, 52 28 C56 46, 42 60, 32 62"
+            stroke="#c47a5a" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+      <path d="M32 62 L26 54 M32 62 L40 58"
+            stroke="#c47a5a" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+    </svg>
+  </div>
+
+  <!-- Red underline -->
+  <div class="heading-underline"></div>
+
+  <!-- GitHub pill -->
+  <div class="github-pill">
+    <div class="gh-icon"></div>
+    <div class="gh-text">
+      <span class="gh-repo">singhparveen/claude-code-skills-pack</span>
+      <span class="gh-file">skills/linkedin-buffer.md</span>
+    </div>
+    <span class="gh-badge">Public</span>
+  </div>
+
+  <!-- Body copy -->
+  <p class="body-copy">
+    Draft single posts, carousels, or entire batch queues — then
+    schedule them straight to Buffer without leaving Claude.
+  </p>
+
+  <!-- Feature list box -->
+  <div class="feature-box">
+    <ul>
+      <li>Single post, carousel, or batch mode</li>
+      <li>Built-in post templates for consistency</li>
+      <li>Schedules directly to your Buffer queue</li>
+    </ul>
+  </div>
+
+  <!-- Bottom: robot + arrow -->
+  <div class="bottom-section">
+
+    <!-- Pixel robot -->
+    <div class="robot">
+      <!-- Arms wrapper sits over body via negative top -->
+      <div class="robot-arms">
+        <div class="robot-arm"></div>
+        <div class="robot-arm"></div>
+      </div>
+      <!-- Head -->
+      <div class="robot-head">
+        <div class="robot-eye left"></div>
+        <div class="robot-eye right"></div>
+      </div>
+      <!-- Body -->
+      <div class="robot-body"></div>
+    </div>
+
+    <!-- Right-pointing arrow -->
+    <div class="arrow-right">
+      <svg viewBox="0 0 90 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M4 15 C20 13, 55 14, 78 15"
+              stroke="#c47a5a" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M72 7 L82 15 L72 23"
+              stroke="#c47a5a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+
+  </div><!-- /bottom-section -->
+
+</div><!-- /card -->
+
+</body>
+</html>

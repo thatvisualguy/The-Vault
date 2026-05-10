@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FrameScore — AI Image Critic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #07070f;
+    --surface: #0d0d1c;
+    --surface2: #111128;
+    --border: #1c1c35;
+    --accent: #5c5cff;
+    --accent2: #9b5cf6;
+    --green: #00e887;
+    --amber: #ffb340;
+    --red: #ff4d6d;
+    --text: #e2e2f0;
+    --muted: #6b6b90;
+    --dim: #2a2a45;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Lato', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grain overlay */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 999; opacity: 0.35;
+  }
+
+  /* Header */
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 32px;
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(12px);
+    position: sticky; top: 0; z-index: 10;
+    background: rgba(7,7,15,0.85);
+  }
+  .logo { display: flex; align-items: center; gap: 10px; }
+  .logo-icon {
+    width: 34px; height: 34px; border-radius: 9px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; box-shadow: 0 0 20px rgba(92,92,255,0.35);
+  }
+  .logo-name {
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: 18px; letter-spacing: -0.5px;
+  }
+  .beta-tag {
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    color: var(--accent); border: 1px solid rgba(92,92,255,0.3);
+    padding: 2px 8px; border-radius: 4px; letter-spacing: 1.5px;
+  }
+
+  /* Main */
+  main { max-width: 780px; margin: 0 auto; padding: 44px 20px 80px; }
+
+  .section-label {
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    letter-spacing: 2.5px; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 12px;
+  }
+
+  /* Mode selector */
+  .modes { display: flex; gap: 10px; margin-bottom: 28px; }
+  .mode-btn {
+    flex: 1; padding: 14px 16px; border-radius: 12px; cursor: pointer;
+    background: var(--surface); border: 1.5px solid var(--border);
+    text-align: left; transition: all 0.2s; outline: none;
+  }
+  .mode-btn:hover { border-color: var(--accent); }
+  .mode-btn.active {
+    background: rgba(92,92,255,0.1);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px rgba(92,92,255,0.15);
+  }
+  .mode-icon { font-size: 20px; margin-bottom: 6px; }
+  .mode-title {
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 13px;
+    color: #ccc; margin-bottom: 2px;
+  }
+  .mode-btn.active .mode-title { color: #e0e0ff; }
+  .mode-desc { font-size: 11px; color: var(--muted); }
+  .mode-btn.active .mode-desc { color: #7777cc; }
+
+  /* Upload zone */
+  #drop-zone {
+    border: 2px dashed var(--border); border-radius: 14px;
+    cursor: pointer; transition: all 0.25s;
+    min-height: 210px; display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden; background: var(--surface);
+  }
+  #drop-zone:hover, #drop-zone.dragging {
+    border-color: var(--accent);
+    background: rgba(92,92,255,0.05);
+  }
+  .upload-placeholder { text-align: center; padding: 40px; }
+  .upload-icon { font-size: 38px; opacity: 0.25; margin-bottom: 12px; }
+  .upload-text { font-size: 14px; color: var(--muted); margin-bottom: 4px; }
+  .upload-sub { font-size: 12px; color: var(--dim); }
+  #preview-img {
+    width: 100%; max-height: 400px; object-fit: cover;
+    display: none; border-radius: 12px;
+  }
+  .change-label {
+    position: absolute; top: 10px; right: 10px;
+    background: rgba(0,0,0,0.65); backdrop-filter: blur(8px);
+    border-radius: 6px; padding: 4px 10px;
+    font-size: 11px; color: #888; display: none;
+  }
+
+  /* Analyze btn */
+  #analyze-btn {
+    width: 100%; margin-top: 12px; padding: 14px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none; border-radius: 10px; cursor: pointer;
+    color: #fff; font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: 15px; letter-spacing: 0.3px;
+    box-shadow: 0 4px 24px rgba(92,92,255,0.35);
+    transition: all 0.2s; display: none;
+  }
+  #analyze-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 32px rgba(92,92,255,0.5);
+  }
+  #analyze-btn:disabled {
+    opacity: 0.5; cursor: not-allowed; transform: none;
+  }
+
+  /* Error */
+  .error-box {
+    margin-top: 14px; padding: 12px 16px;
+    background: rgba(255,77,109,0.08); border: 1px solid rgba(255,77,109,0.25);
+    border-radius: 8px; color: #ff6b85; font-size: 13px; display: none;
+  }
+
+  /* Results */
+  #results { margin-top: 32px; display: none; }
+  .result-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 22px 26px; margin-bottom: 14px;
+    animation: fadeUp 0.45s ease forwards;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Score hero */
+  .score-hero { display: flex; align-items: center; gap: 26px; }
+  .score-ring-wrap { position: relative; flex-shrink: 0; }
+  .score-ring-wrap svg { display: block; }
+  .score-center {
+    position: absolute; inset: 0; display: flex;
+    flex-direction: column; align-items: center; justify-content: center;
+  }
+  .score-num {
+    font-family: 'IBM Plex Mono', monospace; font-weight: 600;
+    font-size: 28px; line-height: 1;
+  }
+  .score-denom {
+    font-size: 9px; color: var(--muted); letter-spacing: 1.5px;
+    font-family: 'IBM Plex Mono', monospace; margin-top: 2px;
+  }
+  .score-meta { flex: 1; }
+  .conversion-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    padding: 3px 10px; border-radius: 20px; margin-bottom: 8px;
+  }
+  .verdict { font-size: 15px; font-weight: 700; color: #ddd; line-height: 1.5; margin-bottom: 12px; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 10px; border-radius: 20px;
+    font-size: 11px; font-weight: 600; font-family: 'IBM Plex Mono', monospace;
+    letter-spacing: 0.3px;
+  }
+  .tag.positive { background: rgba(0,232,135,0.1); border: 1px solid rgba(0,232,135,0.25); color: var(--green); }
+  .tag.negative { background: rgba(255,77,109,0.1); border: 1px solid rgba(255,77,109,0.25); color: var(--red); }
+  .tag.warning { background: rgba(255,179,64,0.1); border: 1px solid rgba(255,179,64,0.25); color: var(--amber); }
+
+  /* Dimensions */
+  .dim-row { margin-bottom: 14px; }
+  .dim-row:last-child { margin-bottom: 0; }
+  .dim-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px; }
+  .dim-name { font-size: 13px; font-weight: 700; }
+  .dim-right { display: flex; align-items: center; gap: 10px; }
+  .dim-comment { font-size: 11px; color: var(--muted); }
+  .dim-score { font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; min-width: 24px; text-align: right; }
+  .dim-track { height: 4px; background: rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden; }
+  .dim-fill { height: 100%; border-radius: 4px; width: 0; transition: width 1s cubic-bezier(0.34,1.56,0.64,1); }
+
+  /* LR edits */
+  .lr-panel { margin-bottom: 16px; }
+  .lr-panel:last-child { margin-bottom: 0; }
+  .lr-panel-name {
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    font-weight: 600; color: var(--accent); letter-spacing: 2px;
+    text-transform: uppercase; margin-bottom: 8px;
+  }
+  .lr-item { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 6px; }
+  .lr-arrow { color: var(--dim); margin-top: 2px; }
+  .lr-text { font-size: 13px; color: #aaa; line-height: 1.55; }
+
+  /* Improvements */
+  .imp-row { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 12px; }
+  .imp-row:last-child { margin-bottom: 0; }
+  .imp-priority {
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600;
+    padding: 2px 8px; border-radius: 4px; letter-spacing: 0.5px;
+    white-space: nowrap; margin-top: 2px;
+  }
+  .imp-body {}
+  .imp-action { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
+  .imp-impact { font-size: 12px; color: var(--muted); }
+
+  /* Top tip */
+  .top-tip {
+    background: linear-gradient(135deg, rgba(92,92,255,0.1), rgba(155,92,246,0.1));
+    border: 1px solid rgba(92,92,255,0.22);
+    border-radius: 14px; padding: 18px 22px;
+    display: flex; gap: 12px; align-items: flex-start;
+    margin-bottom: 14px;
+  }
+  .tip-star { font-size: 20px; flex-shrink: 0; }
+  .tip-label {
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6666cc;
+    letter-spacing: 2px; text-transform: uppercase; margin-bottom: 5px;
+  }
+  .tip-text { font-size: 14px; color: #c0c0ff; line-height: 1.6; }
+
+  /* Loading pulse */
+  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+  .pulsing { animation: pulse 1.4s ease-in-out infinite; }
+
+  /* Delay helpers */
+  .delay-1 { animation-delay: 0.08s; opacity: 0; }
+  .delay-2 { animation-delay: 0.16s; opacity: 0; }
+  .delay-3 { animation-delay: 0.24s; opacity: 0; }
+  .delay-4 { animation-delay: 0.32s; opacity: 0; }
+
+  @media (max-width: 520px) {
+    header { padding: 16px 18px; }
+    main { padding: 28px 14px 60px; }
+    .score-hero { flex-direction: column; align-items: flex-start; gap: 16px; }
+    .modes { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">◈</div>
+    <span class="logo-name">FrameScore</span>
+  </div>
+  <span class="beta-tag">BETA</span>
+</header>
+
+<main>
+  <!-- Mode selector -->
+  <p class="section-label">Analysis mode</p>
+  <div class="modes">
+    <button class="mode-btn active" data-mode="photography" onclick="setMode(this)">
+      <div class="mode-icon">⬡</div>
+      <div class="mode-title">Photography</div>
+      <div class="mode-desc">Lightroom edits & composition</div>
+    </button>
+    <button class="mode-btn" data-mode="ecommerce" onclick="setMode(this)">
+      <div class="mode-icon">◈</div>
+      <div class="mode-title">Product / E-com</div>
+      <div class="mode-desc">Conversion & trust signals</div>
+    </button>
+  </div>
+
+  <!-- Upload -->
+  <p class="section-label">Your image</p>
+  <div id="drop-zone"
+    onclick="document.getElementById('file-input').click()"
+    ondragover="handleDragOver(event)"
+    ondragleave="handleDragLeave()"
+    ondrop="handleDrop(event)">
+    <div class="upload-placeholder" id="upload-placeholder">
+      <div class="upload-icon">⬆</div>
+      <div class="upload-text">Drop your image here or click to browse</div>
+      <div class="upload-sub">PNG, JPG, WEBP · up to ~10MB</div>
+    </div>
+    <img id="preview-img" alt="Preview" />
+    <div class="change-label" id="change-label">click to change</div>
+  </div>
+  <input type="file" id="file-input" accept="image/*" style="display:none" onchange="handleFileSelect(this)" />
+
+  <button id="analyze-btn" onclick="analyze()">Analyze Image →</button>
+  <div class="error-box" id="error-box"></div>
+
+  <!-- Results -->
+  <div id="results"></div>
+</main>
+
+<script>
+let currentMode = 'photography';
+let imageBase64 = null;
+let imageMime = 'image/jpeg';
+
+function setMode(btn) {
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentMode = btn.dataset.mode;
+  clearResults();
+}
+
+function clearResults() {
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('results').innerHTML = '';
+  document.getElementById('error-box').style.display = 'none';
+}
+
+function handleDragOver(e) {
+  e.preventDefault();
+  document.getElementById('drop-zone').classList.add('dragging');
+}
+function handleDragLeave() {
+  document.getElementById('drop-zone').classList.remove('dragging');
+}
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('drop-zone').classList.remove('dragging');
+  const file = e.dataTransfer.files[0];
+  if (file) loadFile(file);
+}
+function handleFileSelect(input) {
+  if (input.files[0]) loadFile(input.files[0]);
+}
+function loadFile(file) {
+  if (!file.type.startsWith('image/')) return;
+  imageMime = file.type || 'image/jpeg';
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    imageBase64 = e.target.result.split(',')[1];
+    const img = document.getElementById('preview-img');
+    img.src = e.target.result;
+    img.style.display = 'block';
+    document.getElementById('upload-placeholder').style.display = 'none';
+    document.getElementById('change-label').style.display = 'block';
+    document.getElementById('analyze-btn').style.display = 'block';
+    clearResults();
+  };
+  reader.readAsDataURL(file);
+}
+
+function scoreColor(s) {
+  if (s < 5) return '#ff4d6d';
+  if (s < 7.5) return '#ffb340';
+  return '#00e887';
+}
+
+function buildRing(score, size = 120) {
+  const r = 46, circ = 2 * Math.PI * r;
+  const progress = (score / 10) * circ;
+  const c = scoreColor(score);
+  return `
+    <div class="score-ring-wrap" style="width:${size}px;height:${size}px;">
+      <svg width="${size}" height="${size}" viewBox="0 0 100 100" style="transform:rotate(-90deg)">
+        <circle cx="50" cy="50" r="${r}" fill="none" stroke="#1a1a35" stroke-width="7"/>
+        <circle cx="50" cy="50" r="${r}" fill="none" stroke="${c}" stroke-width="7"
+          stroke-dasharray="0 ${circ}" stroke-linecap="round"
+          id="ring-arc" style="transition:stroke-dasharray 1.2s cubic-bezier(0.34,1.56,0.64,1)"/>
+      </svg>
+      <div class="score-center">
+        <span class="score-num" style="color:${c}">${score.toFixed(1)}</span>
+        <span class="score-denom">/ 10</span>
+      </div>
+    </div>`;
+}
+
+function buildTag(t) {
+  const sym = t.type === 'positive' ? '+' : t.type === 'negative' ? '−' : '~';
+  return `<span class="tag ${t.type}">${sym} ${t.label}</span>`;
+}
+
+function buildDimension(d, idx) {
+  const c = scoreColor(d.score);
+  return `
+    <div class="dim-row">
+      <div class="dim-header">
+        <span class="dim-name">${d.name}</span>
+        <div class="dim-right">
+          <span class="dim-comment">${d.comment}</span>
+          <span class="dim-score" style="color:${c}">${d.score}</span>
+        </div>
+      </div>
+      <div class="dim-track">
+        <div class="dim-fill" data-width="${d.score * 10}" style="background:linear-gradient(90deg,${c},${c}88)"></div>
+      </div>
+    </div>`;
+}
+
+function buildLREdits(edits) {
+  return edits.map(panel => `
+    <div class="lr-panel">
+      <div class="lr-panel-name">${panel.panel}</div>
+      ${panel.adjustments.map(adj => `
+        <div class="lr-item">
+          <span class="lr-arrow">›</span>
+          <span class="lr-text">${adj}</span>
+        </div>`).join('')}
+    </div>`).join('');
+}
+
+const priorityColors = { High: '#ff4d6d', Medium: '#ffb340', Low: '#00e887' };
+function buildImprovements(imps) {
+  return imps.map(imp => {
+    const c = priorityColors[imp.priority] || '#aaa';
+    return `
+      <div class="imp-row">
+        <span class="imp-priority" style="background:${c}18;color:${c}">${imp.priority}</span>
+        <div class="imp-body">
+          <div class="imp-action">${imp.action}</div>
+          <div class="imp-impact">${imp.impact}</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function renderResults(data) {
+  const container = document.getElementById('results');
+  container.innerHTML = '';
+
+  // Score card
+  const convHtml = data.conversionPotential ? `
+    <div class="conversion-badge" style="background:${priorityColors[data.conversionPotential] || '#aaa'}18;
+      color:${priorityColors[data.conversionPotential] || '#aaa'};
+      border:1px solid ${priorityColors[data.conversionPotential] || '#aaa'}40">
+      Conversion Potential: ${data.conversionPotential}
+    </div>` : '';
+
+  container.innerHTML += `
+    <div class="result-card">
+      <div class="score-hero">
+        ${buildRing(data.overallScore)}
+        <div class="score-meta">
+          ${convHtml}
+          <div class="verdict">${data.verdict}</div>
+          <div class="tags">${(data.tags||[]).map(buildTag).join('')}</div>
+        </div>
+      </div>
+    </div>`;
+
+  // Dimensions
+  container.innerHTML += `
+    <div class="result-card delay-1">
+      <p class="section-label" style="margin-bottom:18px">Breakdown</p>
+      ${(data.dimensions||[]).map(buildDimension).join('')}
+    </div>`;
+
+  // Lightroom or Improvements
+  if (currentMode === 'photography' && data.lightroomEdits) {
+    container.innerHTML += `
+      <div class="result-card delay-2">
+        <p class="section-label" style="margin-bottom:18px">Lightroom Edits</p>
+        ${buildLREdits(data.lightroomEdits)}
+      </div>`;
+  } else if (currentMode === 'ecommerce' && data.improvements) {
+    container.innerHTML += `
+      <div class="result-card delay-2">
+        <p class="section-label" style="margin-bottom:18px">Conversion Improvements</p>
+        ${buildImprovements(data.improvements)}
+      </div>`;
+  }
+
+  // Top tip
+  if (data.topTip) {
+    container.innerHTML += `
+      <div class="top-tip delay-3">
+        <span class="tip-star">✦</span>
+        <div>
+          <div class="tip-label">Top Priority</div>
+          <div class="tip-text">${data.topTip}</div>
+        </div>
+      </div>`;
+  }
+
+  container.style.display = 'block';
+
+  // Animate ring
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      const arc = document.getElementById('ring-arc');
+      if (arc) {
+        const r = 46, circ = 2 * Math.PI * r;
+        arc.style.strokeDasharray = `${(data.overallScore / 10) * circ} ${circ}`;
+      }
+      // Animate bars
+      document.querySelectorAll('.dim-fill').forEach(el => {
+        el.style.width = el.dataset.width + '%';
+      });
+    });
+  });
+}
+
+async function analyze() {
+  if (!imageBase64) return;
+  const btn = document.getElementById('analyze-btn');
+  const errBox = document.getElementById('error-box');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="pulsing">Analyzing your image…</span>';
+  errBox.style.display = 'none';
+  clearResults();
+
+  const photographyPrompt = `You are an expert photography critic and Adobe Lightroom specialist. Analyze this image and return ONLY valid JSON (no markdown, no code fences) in this exact shape:
+{"overallScore":<0-10 one decimal>,"verdict":"<punchy one-sentence verdict>","dimensions":[{"name":"Exposure","score":<0-10>,"comment":"<brief>"},{"name":"Composition","score":<0-10>,"comment":"<brief>"},{"name":"Color & Tone","score":<0-10>,"comment":"<brief>"},{"name":"Sharpness","score":<0-10>,"comment":"<brief>"},{"name":"Mood / Story","score":<0-10>,"comment":"<brief>"}],"tags":[{"label":"<strength>","type":"positive"},{"label":"<strength>","type":"positive"},{"label":"<weakness>","type":"negative"},{"label":"<area>","type":"warning"}],"lightroomEdits":[{"panel":"Light","adjustments":["<slider>: <value> — <reason>","<slider>: <value> — <reason>"]},{"panel":"Color","adjustments":["<adjustment> — <reason>"]},{"panel":"Detail","adjustments":["<adjustment> — <reason>"]},{"panel":"Effects","adjustments":["<adjustment> — <reason>"]}],"topTip":"<the single most impactful change>"}`;
+
+  const ecommercePrompt = `You are a conversion rate optimization expert for e-commerce product photography. Analyze this image and return ONLY valid JSON (no markdown, no code fences) in this exact shape:
+{"overallScore":<0-10 one decimal>,"verdict":"<punchy conversion-focused verdict>","conversionPotential":"<Low|Medium|High>","dimensions":[{"name":"Background","score":<0-10>,"comment":"<brief>"},{"name":"Lighting","score":<0-10>,"comment":"<brief>"},{"name":"Product Focus","score":<0-10>,"comment":"<brief>"},{"name":"Trust Signals","score":<0-10>,"comment":"<brief>"},{"name":"Mobile Readiness","score":<0-10>,"comment":"<brief>"}],"tags":[{"label":"<strength>","type":"positive"},{"label":"<strength>","type":"positive"},{"label":"<weakness>","type":"negative"},{"label":"<risk>","type":"warning"}],"improvements":[{"priority":"High","action":"<specific fix>","impact":"<why it helps conversion>"},{"priority":"High","action":"<specific fix>","impact":"<why it helps conversion>"},{"priority":"Medium","action":"<specific fix>","impact":"<why it helps conversion>"},{"priority":"Low","action":"<specific fix>","impact":"<why it helps conversion>"}],"topTip":"<single most impactful change for conversion>"}`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: imageMime, data: imageBase64 } },
+            { type: 'text', text: currentMode === 'photography' ? photographyPrompt : ecommercePrompt }
+          ]
+        }]
+      })
+    });
+
+    const data = await res.json();
+    const text = (data.content || []).map(b => b.text || '').join('\n');
+
+    // Strip any markdown fences
+    const clean = text.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
+    const jsonMatch = clean.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('No JSON found');
+
+    const parsed = JSON.parse(jsonMatch[0]);
+    renderResults(parsed);
+  } catch (e) {
+    errBox.textContent = 'Analysis failed — ' + (e.message || 'please try again.');
+    errBox.style.display = 'block';
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Re-analyze →';
+}
+</script>
+</body>
+</html>

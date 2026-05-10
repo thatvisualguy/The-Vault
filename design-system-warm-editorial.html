@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design System — Extracted from App Ideas Analysis</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;900&family=Outfit:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============================================
+   DESIGN SYSTEM: WARM EDITORIAL
+   Extracted from: app-ideas-ranked-analysis.html
+   Aesthetic: Warm paper, editorial, structured
+   ============================================ */
+
+/* ── DESIGN TOKENS ── */
+:root {
+  /* Core Palette */
+  --bg:       #f5f2eb;
+  --surface:  #faf8f4;
+  --card:     #ffffff;
+  --ink:      #1a1a1a;
+  --muted:    #7a756d;
+  --border:   #e2ddd4;
+
+  /* Semantic / Tier Colors */
+  --s-tier:   #1a6b4a;   /* Deep green — success, top tier */
+  --a-tier:   #2956a3;   /* Royal blue — strong, reliable */
+  --b-tier:   #c47f17;   /* Amber — conditional, caution */
+  --c-tier:   #b04a3a;   /* Warm red — deprioritize, risk */
+  --gold:     #c49a2a;   /* Gold — accent, highlights */
+
+  /* Extended Palette (derived) */
+  --desc:     #444444;
+  --rev-text: #555555;
+  --hover-bg: #faf8f4;
+  --insight-bg: linear-gradient(135deg, #eef5ee, #e8f0e8);
+  --missing-bg: linear-gradient(135deg, #fef9ef, #f5f0e5);
+
+  /* Typography */
+  --font-display:  'Fraunces', serif;
+  --font-body:     'Outfit', sans-serif;
+  --font-mono:     'IBM Plex Mono', monospace;
+
+  /* Spacing Scale */
+  --space-xs:   4px;
+  --space-sm:   8px;
+  --space-md:   12px;
+  --space-lg:   18px;
+  --space-xl:   24px;
+  --space-2xl:  48px;
+  --space-3xl:  56px;
+
+  /* Radii */
+  --radius-sm:  3px;
+  --radius-md:  6px;
+  --radius-lg:  10px;
+
+  /* Borders */
+  --border-default: 1px solid var(--border);
+  --border-section: 2px solid var(--border);
+  --border-hero:    3px double var(--ink);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: var(--font-body); background: var(--bg); color: var(--ink); line-height: 1.65; }
+.ds { max-width: 960px; margin: 0 auto; padding: 48px 24px 120px; }
+
+/* ── DS HEADER ── */
+.ds-hero {
+  padding: 56px 0 40px;
+  border-bottom: var(--border-hero);
+  margin-bottom: 56px;
+}
+.ds-hero-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 12px;
+}
+.ds-hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(30px, 5vw, 48px);
+  font-weight: 900;
+  line-height: 1.12;
+  margin-bottom: 12px;
+}
+.ds-hero p {
+  font-size: 16px;
+  color: var(--muted);
+  max-width: 560px;
+}
+
+/* ── SECTION ── */
+.ds-section { margin-bottom: 64px; }
+.ds-section-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--s-tier);
+  margin-bottom: 6px;
+}
+.ds-section h2 {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: var(--border-section);
+}
+.ds-section h3 {
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 700;
+  margin: 28px 0 12px;
+}
+.ds-section p, .ds-section li {
+  font-size: 15px;
+  margin-bottom: 10px;
+}
+.ds-section code {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  background: var(--surface);
+  padding: 2px 7px;
+  border-radius: var(--radius-sm);
+  border: var(--border-default);
+}
+
+/* ── COLOR SWATCHES ── */
+.swatch-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 16px;
+  margin: 20px 0;
+}
+.swatch {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: var(--border-default);
+  background: var(--card);
+}
+.swatch-color {
+  height: 80px;
+  display: flex;
+  align-items: flex-end;
+  padding: 8px 12px;
+}
+.swatch-color span {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: rgba(255,255,255,.85);
+  color: var(--ink);
+}
+.swatch-info {
+  padding: 10px 12px;
+}
+.swatch-name {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+.swatch-var {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+
+/* ── TYPOGRAPHY SPECIMENS ── */
+.type-specimen {
+  background: var(--card);
+  border: var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  margin: 16px 0;
+}
+.type-specimen .sample {
+  margin-bottom: 12px;
+  color: var(--ink);
+}
+.type-specimen .details {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.type-specimen .details span {
+  background: var(--surface);
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+}
+
+/* ── COMPONENT PREVIEWS ── */
+.comp-preview {
+  background: var(--card);
+  border: var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  margin: 16px 0;
+}
+.comp-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 14px;
+}
+
+/* ── SPACING VISUAL ── */
+.spacing-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 8px 0;
+}
+.spacing-block {
+  background: var(--s-tier);
+  opacity: 0.3;
+  border-radius: 3px;
+  height: 24px;
+}
+.spacing-label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--muted);
+  min-width: 90px;
+}
+.spacing-val {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink);
+  font-weight: 500;
+}
+
+/* ── TOKEN TABLE ── */
+.token-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+  font-size: 13px;
+}
+.token-table th {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: .5px;
+  text-align: left;
+  padding: 10px 14px;
+  background: var(--ink);
+  color: #fff;
+}
+.token-table th:first-child { border-radius: 6px 0 0 0; }
+.token-table th:last-child { border-radius: 0 6px 0 0; }
+.token-table td {
+  padding: 10px 14px;
+  border-bottom: var(--border-default);
+  vertical-align: top;
+}
+.token-table td code {
+  background: var(--surface);
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+.token-table tr:hover td { background: var(--hover-bg); }
+
+/* ── COMPONENT CARDS (from source) ── */
+.demo-app {
+  background: var(--card);
+  border: var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  margin-bottom: var(--space-lg);
+  position: relative;
+}
+.demo-app .rank-badge {
+  position: absolute;
+  top: -1px;
+  right: 20px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 0 0 6px 6px;
+  color: #fff;
+  background: var(--s-tier);
+}
+.demo-app h3 {
+  font-family: var(--font-display);
+  font-size: 19px;
+  margin-bottom: 4px;
+  padding-right: 60px;
+}
+.demo-app .meta {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+.demo-app .desc {
+  font-size: 14px;
+  margin-bottom: 14px;
+  color: var(--desc);
+}
+.demo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.demo-metric {
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  padding: 10px;
+  text-align: center;
+}
+.demo-metric .v {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-weight: 600;
+}
+.demo-metric .l {
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 2px;
+  text-transform: uppercase;
+  letter-spacing: .3px;
+}
+.demo-rev {
+  font-size: 13px;
+  color: var(--rev-text);
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: var(--border-default);
+}
+.demo-rev strong { color: var(--ink); }
+
+/* Tier Labels */
+.demo-tier {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 3px 10px;
+  border-radius: var(--radius-sm);
+  color: #fff;
+}
+
+/* Tags */
+.demo-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.demo-tag {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .5px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1px solid;
+}
+.tag-demand { color: var(--s-tier); border-color: var(--s-tier); }
+.tag-comp   { color: var(--a-tier); border-color: var(--a-tier); }
+.tag-margin { color: var(--gold);   border-color: var(--gold); }
+
+/* Callout Boxes */
+.demo-insight {
+  background: var(--insight-bg);
+  border-left: 4px solid var(--s-tier);
+  padding: 16px 20px;
+  border-radius: 0 8px 8px 0;
+  margin: 18px 0;
+  font-size: 14px;
+}
+.demo-insight strong { color: var(--s-tier); }
+
+.demo-missing {
+  background: var(--missing-bg);
+  border-left: 4px solid var(--gold);
+  padding: 16px 20px;
+  border-radius: 0 8px 8px 0;
+  margin: 18px 0;
+  font-size: 14px;
+}
+.demo-missing strong { color: var(--gold); }
+
+/* Score Table */
+.demo-score {
+  font-family: var(--font-mono);
+  font-weight: 700;
+}
+
+/* Bar chart */
+.demo-bar { height: 6px; border-radius: 3px; background: #eee; margin: 6px 0; }
+.demo-bar-fill { height: 100%; border-radius: 3px; }
+
+@media (max-width: 640px) {
+  .swatch-grid { grid-template-columns: repeat(2, 1fr); }
+  .demo-grid { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="ds">
+
+<!-- HEADER -->
+<div class="ds-hero">
+  <div class="ds-hero-eyebrow">Design System Reference</div>
+  <h1>Warm Editorial</h1>
+  <p>Extracted from <code>app-ideas-ranked-analysis.html</code>. A structured, warm-toned editorial system for reports, rankings, and analytical content.</p>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION 1: COLORS -->
+<!-- ═══════════════════════════════════════ -->
+<div class="ds-section">
+  <div class="ds-section-label">01 · Foundations</div>
+  <h2>Color Tokens</h2>
+
+  <h3>Core Palette</h3>
+  <div class="swatch-grid">
+    <div class="swatch">
+      <div class="swatch-color" style="background:#f5f2eb"><span>#f5f2eb</span></div>
+      <div class="swatch-info"><div class="swatch-name">Background</div><div class="swatch-var">--bg</div></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:#faf8f4"><span>#faf8f4</span></div>
+      <div class="swatch-info"><div class="swatch-name">Surface</div><div class="swatch-var">--surface</div></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:#ffffff;border-bottom:1px solid #e2ddd4"><span>#ffffff</span></div>
+      <div class="swatch-info"><div class="swatch-name">Card</div><div class="swatch-var">--card</div></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:#1a1a1a"><span style="background:rgba(255,255,255,.9)">#1a1a1a</span></div>
+      <div class="swatch-info"><div class="swatch-name">Ink (Primary text)</div><div class="swatch-var">--ink</div></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:#7a756d"><span>#7a756d</span></div>
+      <div class="swatch-info"><div class="swatch-name">Muted</div><div class="swatch-var">--muted</div></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:#e2ddd4"><span>#e2ddd4</span></div>
+      <div class="swatch-info"><div class="swatch-name">Border</div><div class="swatch-var">--border</div></div>
+    </div>
+  </div>
+
+  <h3>Semantic / Tier Colors</h3>
+  <div class="swatch-grid">
+    <div class="swatch">
+      <div class="swatch-color" style="background:#1a6b4a"><span style="color:#fff;background:rgba(0,0,0,.4)">#1a6b4a</span></div>
+      <div class="swatch-info"><div class="swatch-name">S-Tier · Success</div><div class="swatch-var">--s-tier</div></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:#2956a3"><span style="color:#fff;background:rgba(0,0,0,.4)">#2956a3</span></div>
+      <div class="swatch-info"><div class="swatch-name">A-Tier · Strong</div><div class="swatch-var">--a-tier</div></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:#c47f17"><span style="color:#fff;background:rgba(0,0,0,.3)">#c47f17</span></div>
+      <div class="swatch-info"><div class="swatch-name">B-Tier · Caution</div><div class="swatch-var">--b-tier</div></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:#b04a3a"><span style="color:#fff;background:rgba(0,0,0,.3)">#b04a3a</span></div>
+      <div class="swatch-info"><div class="swatch-name">C-Tier · Risk</div><div class="swatch-var">--c-tier</div></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:#c49a2a"><span style="color:#fff;background:rgba(0,0,0,.3)">#c49a2a</span></div>
+      <div class="swatch-info"><div class="swatch-name">Gold · Accent</div><div class="swatch-var">--gold</div></div>
+    </div>
+  </div>
+
+  <h3>Extended / Derived</h3>
+  <table class="token-table">
+    <tr><th>Token</th><th>Value</th><th>Usage</th></tr>
+    <tr><td><code>--desc</code></td><td><code>#444444</code></td><td>Card description text</td></tr>
+    <tr><td><code>--rev-text</code></td><td><code>#555555</code></td><td>Revenue / secondary info text</td></tr>
+    <tr><td><code>--hover-bg</code></td><td><code>#faf8f4</code></td><td>Table row hover</td></tr>
+    <tr><td><code>--insight-bg</code></td><td><code>linear-gradient(135deg, #eef5ee, #e8f0e8)</code></td><td>Green insight callout background</td></tr>
+    <tr><td><code>--missing-bg</code></td><td><code>linear-gradient(135deg, #fef9ef, #f5f0e5)</code></td><td>Gold/warning callout background</td></tr>
+  </table>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION 2: TYPOGRAPHY -->
+<!-- ═══════════════════════════════════════ -->
+<div class="ds-section">
+  <div class="ds-section-label">02 · Typography</div>
+  <h2>Type Scale & Families</h2>
+
+  <h3>Font Stack</h3>
+  <table class="token-table">
+    <tr><th>Token</th><th>Family</th><th>Weights</th><th>Role</th></tr>
+    <tr><td><code>--font-display</code></td><td>Fraunces, serif</td><td>700, 900</td><td>Headings, card titles, hero</td></tr>
+    <tr><td><code>--font-body</code></td><td>Outfit, sans-serif</td><td>400, 500, 600, 700</td><td>Body text, UI, descriptions</td></tr>
+    <tr><td><code>--font-mono</code></td><td>IBM Plex Mono, monospace</td><td>400, 500</td><td>Labels, scores, data, code</td></tr>
+  </table>
+
+  <h3>Specimens</h3>
+
+  <div class="type-specimen">
+    <div class="sample" style="font-family:var(--font-display);font-size:clamp(28px,4.5vw,46px);font-weight:900;line-height:1.15;">Hero Heading / H1</div>
+    <div class="details">
+      <span>Fraunces 900</span>
+      <span>clamp(28px, 4.5vw, 46px)</span>
+      <span>line-height: 1.15</span>
+      <span>.hero h1</span>
+    </div>
+  </div>
+
+  <div class="type-specimen">
+    <div class="sample" style="font-family:var(--font-display);font-size:26px;font-weight:700;line-height:1.3;">Section Heading / H2</div>
+    <div class="details">
+      <span>Fraunces 700</span>
+      <span>26px</span>
+      <span>line-height: 1.3</span>
+      <span>border-bottom: 2px solid --border</span>
+    </div>
+  </div>
+
+  <div class="type-specimen">
+    <div class="sample" style="font-family:var(--font-display);font-size:19px;font-weight:700;line-height:1.4;">Card Title / H3</div>
+    <div class="details">
+      <span>Fraunces 700</span>
+      <span>19px</span>
+      <span>padding-right: 60px (for badge)</span>
+      <span>.app h3</span>
+    </div>
+  </div>
+
+  <div class="type-specimen">
+    <div class="sample" style="font-family:var(--font-body);font-size:15px;font-weight:400;line-height:1.65;color:var(--ink);">Body text at 15px with 1.65 line-height. Used for section paragraphs, descriptions, and general content. The warm tone comes from Outfit's rounded geometry paired with generous line spacing.</div>
+    <div class="details">
+      <span>Outfit 400</span>
+      <span>15px</span>
+      <span>line-height: 1.65</span>
+      <span>.section p</span>
+    </div>
+  </div>
+
+  <div class="type-specimen">
+    <div class="sample" style="font-family:var(--font-mono);font-size:11px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:var(--s-tier);">Section Label / Eyebrow</div>
+    <div class="details">
+      <span>IBM Plex Mono 500</span>
+      <span>11px</span>
+      <span>letter-spacing: 2–3px</span>
+      <span>text-transform: uppercase</span>
+    </div>
+  </div>
+
+  <div class="type-specimen">
+    <div class="sample" style="font-family:var(--font-mono);font-size:15px;font-weight:600;color:var(--s-tier);">8.4</div>
+    <div class="details">
+      <span>IBM Plex Mono 600–700</span>
+      <span>15px</span>
+      <span>Used for scores, metrics, data values</span>
+      <span>.score, .metric .v</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION 3: SPACING -->
+<!-- ═══════════════════════════════════════ -->
+<div class="ds-section">
+  <div class="ds-section-label">03 · Spacing</div>
+  <h2>Spacing Scale</h2>
+
+  <div class="spacing-row"><div class="spacing-label">--space-xs</div><div class="spacing-block" style="width:4px"></div><div class="spacing-val">4px</div></div>
+  <div class="spacing-row"><div class="spacing-label">--space-sm</div><div class="spacing-block" style="width:8px"></div><div class="spacing-val">8px</div></div>
+  <div class="spacing-row"><div class="spacing-label">--space-md</div><div class="spacing-block" style="width:12px"></div><div class="spacing-val">12px</div></div>
+  <div class="spacing-row"><div class="spacing-label">--space-lg</div><div class="spacing-block" style="width:18px"></div><div class="spacing-val">18px</div></div>
+  <div class="spacing-row"><div class="spacing-label">--space-xl</div><div class="spacing-block" style="width:24px"></div><div class="spacing-val">24px</div></div>
+  <div class="spacing-row"><div class="spacing-label">--space-2xl</div><div class="spacing-block" style="width:48px"></div><div class="spacing-val">48px</div></div>
+  <div class="spacing-row"><div class="spacing-label">--space-3xl</div><div class="spacing-block" style="width:56px"></div><div class="spacing-val">56px</div></div>
+
+  <h3>Border Radii</h3>
+  <table class="token-table">
+    <tr><th>Token</th><th>Value</th><th>Usage</th></tr>
+    <tr><td><code>--radius-sm</code></td><td><code>3px</code></td><td>Tier labels, tags, code snippets</td></tr>
+    <tr><td><code>--radius-md</code></td><td><code>6px</code></td><td>Metric boxes, table corners</td></tr>
+    <tr><td><code>--radius-lg</code></td><td><code>10px</code></td><td>Cards, swatches, callout boxes</td></tr>
+    <tr><td>pill</td><td><code>20px</code></td><td>Tags (inline)</td></tr>
+    <tr><td>badge bottom</td><td><code>0 0 6px 6px</code></td><td>Rank badge (flat top, rounded bottom)</td></tr>
+  </table>
+
+  <h3>Layout</h3>
+  <table class="token-table">
+    <tr><th>Property</th><th>Value</th></tr>
+    <tr><td>Container max-width</td><td><code>940px</code></td></tr>
+    <tr><td>Container padding</td><td><code>48px 24px 100px</code></td></tr>
+    <tr><td>Section margin-bottom</td><td><code>56px</code></td></tr>
+    <tr><td>Card padding</td><td><code>24px</code></td></tr>
+    <tr><td>Metric grid gap</td><td><code>10px</code></td></tr>
+    <tr><td>Card stack gap</td><td><code>18px</code> (margin-bottom)</td></tr>
+  </table>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION 4: COMPONENTS -->
+<!-- ═══════════════════════════════════════ -->
+<div class="ds-section">
+  <div class="ds-section-label">04 · Components</div>
+  <h2>Component Library</h2>
+
+  <!-- COMPONENT: App Card -->
+  <h3>App / Idea Card</h3>
+  <div class="comp-preview">
+    <div class="comp-label">Component · .app</div>
+    <div class="demo-app">
+      <div class="rank-badge">#1</div>
+      <h3>Card Title Goes Here</h3>
+      <div class="meta">Type · Price Range · Market Context</div>
+      <div class="demo-tags">
+        <span class="demo-tag tag-demand">HIGH DEMAND</span>
+        <span class="demo-tag tag-comp">LOW COMP</span>
+        <span class="demo-tag tag-margin">95% MARGIN</span>
+      </div>
+      <div class="desc">Description text at 14px in #444. Provides context, competitive analysis, market data, and strategic positioning for the idea.</div>
+      <div class="demo-grid">
+        <div class="demo-metric"><div class="v">$88.7B</div><div class="l">Market Size</div></div>
+        <div class="demo-metric"><div class="v">30%+</div><div class="l">CAGR</div></div>
+        <div class="demo-metric"><div class="v">$19–99</div><div class="l">Monthly</div></div>
+      </div>
+      <div class="demo-rev"><strong>Revenue Max:</strong> Strategy text explaining monetization tiers, upsells, and revenue projections.</div>
+    </div>
+  </div>
+
+  <!-- COMPONENT: Tier Label -->
+  <h3>Tier Labels</h3>
+  <div class="comp-preview">
+    <div class="comp-label">Component · .tier-label</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <span class="demo-tier" style="background:var(--s-tier)">S-TIER — BUILD FIRST</span>
+      <span class="demo-tier" style="background:var(--a-tier)">A-TIER — STRONG</span>
+      <span class="demo-tier" style="background:var(--b-tier)">B-TIER — CONDITIONAL</span>
+      <span class="demo-tier" style="background:var(--c-tier)">C-TIER — RETHINK</span>
+    </div>
+  </div>
+
+  <!-- COMPONENT: Tags -->
+  <h3>Tags</h3>
+  <div class="comp-preview">
+    <div class="comp-label">Component · .tag (outline pills)</div>
+    <div class="demo-tags">
+      <span class="demo-tag tag-demand">HIGH DEMAND</span>
+      <span class="demo-tag tag-comp">VERY LOW COMP</span>
+      <span class="demo-tag tag-margin">95% MARGIN</span>
+      <span class="demo-tag" style="color:var(--a-tier);border-color:var(--a-tier)">RECURRING</span>
+      <span class="demo-tag" style="color:var(--c-tier);border-color:var(--c-tier)">SATURATED</span>
+    </div>
+  </div>
+
+  <!-- COMPONENT: Callout Boxes -->
+  <h3>Callout Boxes</h3>
+  <div class="comp-preview">
+    <div class="comp-label">Component · .insight (green)</div>
+    <div class="demo-insight"><strong>Insight title:</strong> Body text with strategic recommendation. Uses --s-tier green accent with subtle gradient background.</div>
+  </div>
+  <div class="comp-preview">
+    <div class="comp-label">Component · .missing (gold/warning)</div>
+    <div class="demo-missing"><strong>Warning/Gap:</strong> Body text highlighting what's missing or needs attention. Uses --gold accent with warm gradient background.</div>
+  </div>
+
+  <!-- COMPONENT: Score Display -->
+  <h3>Score Display</h3>
+  <div class="comp-preview">
+    <div class="comp-label">Component · .score (in tables)</div>
+    <div style="display:flex;gap:24px;align-items:center">
+      <div><span class="demo-score" style="color:var(--s-tier);font-size:20px">8.4</span><br><span style="font-size:11px;color:var(--muted)">S-Tier</span></div>
+      <div><span class="demo-score" style="color:var(--a-tier);font-size:20px">7.1</span><br><span style="font-size:11px;color:var(--muted)">A-Tier</span></div>
+      <div><span class="demo-score" style="color:var(--b-tier);font-size:20px">5.4</span><br><span style="font-size:11px;color:var(--muted)">B-Tier</span></div>
+      <div><span class="demo-score" style="color:var(--c-tier);font-size:20px">4.4</span><br><span style="font-size:11px;color:var(--muted)">C-Tier</span></div>
+    </div>
+  </div>
+
+  <!-- COMPONENT: Progress Bar -->
+  <h3>Progress / Level Bars</h3>
+  <div class="comp-preview">
+    <div class="comp-label">Component · .bar</div>
+    <div style="max-width:300px">
+      <div style="font-size:12px;margin-bottom:4px">Very High (95%)</div>
+      <div class="demo-bar"><div class="demo-bar-fill" style="width:95%;background:var(--s-tier);border-radius:3px"></div></div>
+      <div style="font-size:12px;margin:8px 0 4px">High (85%)</div>
+      <div class="demo-bar"><div class="demo-bar-fill" style="width:85%;background:var(--s-tier);border-radius:3px"></div></div>
+      <div style="font-size:12px;margin:8px 0 4px">Medium (55%)</div>
+      <div class="demo-bar"><div class="demo-bar-fill" style="width:55%;background:var(--b-tier);border-radius:3px"></div></div>
+      <div style="font-size:12px;margin:8px 0 4px">Low (30%)</div>
+      <div class="demo-bar"><div class="demo-bar-fill" style="width:30%;background:var(--c-tier);border-radius:3px"></div></div>
+    </div>
+  </div>
+
+  <!-- COMPONENT: Metric Box -->
+  <h3>Metric Boxes</h3>
+  <div class="comp-preview">
+    <div class="comp-label">Component · .metric (inside grid3 or grid4)</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:500px">
+      <div class="demo-metric"><div class="v">9M+</div><div class="l">TAM</div></div>
+      <div class="demo-metric"><div class="v">$2,300</div><div class="l">LTV</div></div>
+      <div class="demo-metric"><div class="v">57:1</div><div class="l">LTV:CAC</div></div>
+      <div class="demo-metric"><div class="v">90%</div><div class="l">Margin</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION 5: BORDERS & EFFECTS -->
+<!-- ═══════════════════════════════════════ -->
+<div class="ds-section">
+  <div class="ds-section-label">05 · Borders & Effects</div>
+  <h2>Borders, Dividers, & States</h2>
+
+  <table class="token-table">
+    <tr><th>Element</th><th>Border Style</th><th>Usage</th></tr>
+    <tr><td>Card default</td><td><code>1px solid #e2ddd4</code></td><td>All cards, tables, inputs</td></tr>
+    <tr><td>Card highlighted</td><td><code>2px solid var(--s-tier)</code></td><td>Featured / new items</td></tr>
+    <tr><td>Section divider</td><td><code>2px solid #e2ddd4</code></td><td>Below H2 headings</td></tr>
+    <tr><td>Hero divider</td><td><code>3px double #1a1a1a</code></td><td>Below hero section</td></tr>
+    <tr><td>Callout left accent</td><td><code>4px solid var(--s-tier|--gold)</code></td><td>Insight & warning callouts</td></tr>
+    <tr><td>Revenue separator</td><td><code>1px solid #e2ddd4</code></td><td>Above revenue text in cards</td></tr>
+    <tr><td>Table row hover</td><td><code>background: #faf8f4</code></td><td>Interactive table rows</td></tr>
+  </table>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION 6: RESPONSIVE -->
+<!-- ═══════════════════════════════════════ -->
+<div class="ds-section">
+  <div class="ds-section-label">06 · Responsive</div>
+  <h2>Breakpoints & Adaptations</h2>
+
+  <table class="token-table">
+    <tr><th>Breakpoint</th><th>Behavior</th></tr>
+    <tr><td><code>max-width: 640px</code></td><td>Metric grids collapse from 3–4 columns → 2 columns</td></tr>
+    <tr><td>Fluid typography</td><td>Hero H1 uses <code>clamp(28px, 4.5vw, 46px)</code> for smooth scaling</td></tr>
+    <tr><td>Container</td><td><code>max-width: 940px</code> with <code>24px</code> horizontal padding</td></tr>
+  </table>
+</div>
+
+<!-- FOOTER -->
+<div style="text-align:center;padding-top:40px;border-top:2px solid var(--border);font-size:12px;color:var(--muted);margin-top:40px">
+  <p>Design system extracted April 19, 2026</p>
+  <p style="margin-top:4px">Source: app-ideas-ranked-analysis.html · Aesthetic: Warm Editorial</p>
+</div>
+
+</div>
+</body>
+</html>

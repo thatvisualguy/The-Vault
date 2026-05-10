@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Write 30 Posts In 47 Minutes</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #b8ccd8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: 'Inter', sans-serif;
+      padding: 40px 20px;
+    }
+
+    /*
+      Reference image is ~960 × 1194px → ratio ≈ 0.804 (portrait, close to 4:5)
+      We render at 480px wide → height = 480 / 0.804 ≈ 597px
+      Using min-height so content never clips, but padding keeps it proportional.
+    */
+    .card {
+      width: 480px;
+      min-height: 597px;
+      background: #dde8f0;
+      border-radius: 20px;
+      padding: 28px 26px 24px 26px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Faint LinkedIn watermark top-right */
+    .card::after {
+      content: 'in';
+      position: absolute;
+      top: 4px;
+      right: 12px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 900;
+      font-size: 80px;
+      color: rgba(80,120,150,0.13);
+      letter-spacing: -4px;
+      pointer-events: none;
+      line-height: 1;
+    }
+
+    /* ── Top pill badge ── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #1e6b55;
+      border-radius: 40px;
+      padding: 7px 16px;
+      margin-bottom: 18px;
+      width: fit-content;
+    }
+    .badge span {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.13em;
+      color: #fff;
+      text-transform: uppercase;
+    }
+    .badge .arrow { color: #b4e84a; font-size: 12px; }
+
+    /* ── Hero heading ── */
+    .hero-heading {
+      font-weight: 900;
+      font-size: 48px;
+      line-height: 1.07;
+      color: #0c1810;
+      margin-bottom: 14px;
+      letter-spacing: -2px;
+    }
+
+    /* Bright yellow-green highlight pill */
+    .highlight {
+      display: inline-block;
+      background: #c8f135;
+      border-radius: 10px;
+      padding: 1px 12px 3px 12px;
+      color: #0c1810;
+    }
+
+    /* ── Sub-copy ── */
+    .sub-copy {
+      font-size: 14.5px;
+      font-weight: 400;
+      line-height: 1.55;
+      color: #233328;
+      margin-bottom: 18px;
+    }
+
+    /* ── Section label ── */
+    .section-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      color: #789888;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    /* ── 3-column feature cards ── */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 9px;
+      margin-bottom: 18px;
+    }
+
+    .feat-card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 13px 11px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .feat-num {
+      width: 26px;
+      height: 26px;
+      background: #1e6b55;
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10.5px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .feat-title {
+      font-size: 12.5px;
+      font-weight: 800;
+      color: #0c1810;
+      line-height: 1.2;
+    }
+
+    .feat-desc {
+      font-size: 11px;
+      font-weight: 400;
+      color: #4a6050;
+      line-height: 1.45;
+    }
+
+    /* ── MCP Connectors row ── */
+    .connectors-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #ccd8e2;
+      border-radius: 40px;
+      padding: 8px 14px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .connectors-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      color: #7a9a8a;
+      text-transform: uppercase;
+      white-space: nowrap;
+      margin-right: 2px;
+    }
+
+    .connector-pill {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: #fff;
+      border-radius: 20px;
+      padding: 4px 11px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #1a2820;
+    }
+
+    .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .dot-notion { background: #111; }
+    .dot-slack  { background: #611f69; }
+    .dot-gamma  { background: #7c3aed; }
+
+    /* ── Terminal block ── */
+    .terminal {
+      background: #1a2028;
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+    }
+
+    .terminal-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      color: #4a7060;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .t-line {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      line-height: 1.75;
+      display: block;
+    }
+
+    .t-prompt  { color: #a8e06a; font-weight: 600; }
+    .t-cmd     { color: #e2ede4; }
+    .t-flag    { color: #7ac0e8; }
+    .t-check   { color: #a8e06a; font-weight: 700; }
+    .t-ok      { color: #a8e06a; }
+    .t-muted   { color: #506860; }
+
+    /* ── Outcome box ── */
+    .outcome {
+      background: #1e6b55;
+      border-radius: 12px;
+      padding: 13px 16px;
+      margin-bottom: 18px;
+    }
+
+    .outcome-label {
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      color: #a8e06a;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+    }
+
+    .outcome-text {
+      font-size: 13.5px;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.35;
+    }
+
+    /* ── Divider ── */
+    .divider {
+      height: 1px;
+      background: #b0c4ce;
+      margin-bottom: 16px;
+    }
+
+    /* ── Footer ── */
+    .footer {
+      text-align: center;
+      font-size: 17px;
+      font-weight: 700;
+      color: #233328;
+      letter-spacing: -0.2px;
+      padding-bottom: 2px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+
+  <!-- Badge -->
+  <div class="badge">
+    <span>01</span>
+    <span class="arrow">→</span>
+    <span>Content at Scale</span>
+  </div>
+
+  <!-- Heading -->
+  <div class="hero-heading">
+    Write 30 Posts<br>
+    In&nbsp;<span class="highlight">47 Minutes</span>
+  </div>
+
+  <!-- Sub-copy -->
+  <p class="sub-copy">
+    Claude Code reads your brand doc, batches posts, and pushes to Slack for 1-click
+    approval — no manual writing needed.
+  </p>
+
+  <!-- Section label -->
+  <div class="section-label">3 Ways It Works</div>
+
+  <!-- Feature cards -->
+  <div class="features">
+    <div class="feat-card">
+      <div class="feat-num">01</div>
+      <div class="feat-title">Brand voice lock</div>
+      <div class="feat-desc">Claude reads your Notion doc. Every post sounds exactly like you.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-num">02</div>
+      <div class="feat-title">Batch creation</div>
+      <div class="feat-desc">One Claude Code command. 30 posts, hooks, and carousels in bulk.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-num">03</div>
+      <div class="feat-title">1-click publish</div>
+      <div class="feat-desc">Gamma builds the carousel deck. Slack sends it for approval.</div>
+    </div>
+  </div>
+
+  <!-- MCP Connectors -->
+  <div class="connectors-row">
+    <span class="connectors-label">MCP Connectors</span>
+    <div class="connector-pill"><span class="dot dot-notion"></span>Notion</div>
+    <div class="connector-pill"><span class="dot dot-slack"></span>Slack</div>
+    <div class="connector-pill"><span class="dot dot-gamma"></span>Gamma</div>
+  </div>
+
+  <!-- Terminal -->
+  <div class="terminal">
+    <div class="terminal-label">Claude Code Skill</div>
+    <span class="t-line">
+      <span class="t-prompt">$</span>
+      <span class="t-cmd"> claude run generate-posts.sh </span>
+      <span class="t-flag">--brand=notion --n=30</span>
+    </span>
+    <span class="t-line">
+      <span class="t-check">✓ </span>
+      <span class="t-ok">30 posts generated</span>
+      <span class="t-muted"> | carousel ×4 | hooks ×8 | 47m 12s</span>
+    </span>
+    <span class="t-line">
+      <span class="t-check">✓ </span>
+      <span class="t-ok">slack:post</span>
+      <span class="t-muted"> #content-review — pushed for 1-click approval</span>
+    </span>
+  </div>
+
+  <!-- Outcome -->
+  <div class="outcome">
+    <div class="outcome-label">Outcome</div>
+    <div class="outcome-text">Never stare at a blank page. Content engine runs on live brand data.</div>
+  </div>
+
+  <!-- Divider -->
+  <div class="divider"></div>
+
+  <!-- Footer -->
+  <div class="footer">@meghanify</div>
+
+</div>
+
+</body>
+</html>

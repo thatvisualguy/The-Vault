@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PresetAI — Extract Lightroom Presets from Any Photo</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0a0a0a; --surface: #111111; --border: #222222;
+    --accent: #e8d5a3; --accent2: #c4956a; --text: #f0ebe0;
+    --muted: #666666; --danger: #e07070; --success: #7ab87a;
+  }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-weight: 300; min-height: 100vh; overflow-x: hidden; }
+  body::before { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events: none; z-index: 9999; opacity: 0.4; }
+  header { padding: 2.5rem 3rem 1.5rem; display: flex; align-items: baseline; gap: 1.5rem; border-bottom: 1px solid var(--border); }
+  .logo { font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; letter-spacing: 0.05em; color: var(--accent); }
+  .logo span { color: var(--muted); }
+  .tagline { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
+  main { display: grid; grid-template-columns: 1fr 1fr; min-height: calc(100vh - 80px); }
+  .upload-panel { border-right: 1px solid var(--border); padding: 3rem; display: flex; flex-direction: column; gap: 2rem; }
+  .panel-label { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); }
+  .drop-zone { flex: 1; border: 1px dashed var(--border); border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.2rem; cursor: pointer; transition: all 0.2s ease; position: relative; overflow: hidden; min-height: 380px; background: var(--surface); }
+  .drop-zone:hover, .drop-zone.drag-over { border-color: var(--accent2); background: #141414; }
+  .drop-zone.has-image { border-style: solid; border-color: var(--border); padding: 0; }
+  .drop-zone img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; border-radius: 3px; }
+  .drop-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.6); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.8rem; opacity: 0; transition: opacity 0.2s; border-radius: 3px; }
+  .drop-zone.has-image:hover .drop-overlay { opacity: 1; }
+  .upload-icon { width: 52px; height: 52px; border: 1px solid var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--muted); }
+  .drop-zone:hover .upload-icon, .drop-zone.drag-over .upload-icon { border-color: var(--accent2); color: var(--accent2); }
+  .upload-text { text-align: center; }
+  .upload-text p { font-size: 0.9rem; color: var(--text); }
+  .upload-text span { font-size: 0.75rem; color: var(--muted); }
+  #fileInput { display: none; }
+  .analyze-btn { background: var(--accent); color: #0a0a0a; border: none; padding: 1rem 2rem; font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem; letter-spacing: 0.1em; cursor: pointer; border-radius: 3px; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 0.8rem; }
+  .analyze-btn:hover { background: var(--accent2); }
+  .analyze-btn:disabled { background: #333; color: var(--muted); cursor: not-allowed; }
+  .result-panel { padding: 3rem; display: flex; flex-direction: column; gap: 2rem; overflow-y: auto; }
+  .empty-state { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; color: var(--muted); }
+  .empty-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; width: 120px; height: 80px; margin-bottom: 1rem; opacity: 0.3; }
+  .empty-grid div { background: var(--border); border-radius: 1px; }
+  .empty-state p { font-size: 0.8rem; letter-spacing: 0.05em; }
+  .results { display: flex; flex-direction: column; gap: 2rem; }
+  .section-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; letter-spacing: 0.08em; color: var(--accent); display: flex; align-items: center; gap: 0.8rem; }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .style-description { font-size: 0.85rem; line-height: 1.7; color: #aaa; font-style: italic; border-left: 2px solid var(--accent2); padding-left: 1rem; }
+  .sliders-grid { display: flex; flex-direction: column; gap: 0.6rem; }
+  .slider-row { display: grid; grid-template-columns: 130px 1fr 45px; align-items: center; gap: 0.8rem; font-size: 0.75rem; }
+  .slider-name { font-family: 'DM Mono', monospace; color: var(--muted); font-size: 0.68rem; letter-spacing: 0.05em; }
+  .slider-track { height: 3px; background: var(--border); border-radius: 2px; position: relative; }
+  .slider-fill { position: absolute; height: 100%; border-radius: 2px; }
+  .slider-fill.positive { background: var(--accent); right: 50%; }
+  .slider-fill.negative { background: var(--accent2); left: 50%; }
+  .slider-fill.neutral  { background: var(--accent); left: 50%; }
+  .slider-val { font-family: 'DM Mono', monospace; font-size: 0.7rem; text-align: right; }
+  .slider-val.pos { color: var(--accent); }
+  .slider-val.neg { color: var(--accent2); }
+  .xmp-container { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
+  .xmp-header { display: flex; align-items: center; justify-content: space-between; padding: 0.8rem 1rem; border-bottom: 1px solid var(--border); background: #161616; }
+  .xmp-filename { font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--accent2); letter-spacing: 0.05em; }
+  .copy-btn, .dl-btn { background: none; border: 1px solid var(--border); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; padding: 0.4rem 0.8rem; cursor: pointer; border-radius: 2px; text-transform: uppercase; transition: all 0.2s; }
+  .copy-btn:hover, .dl-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .copy-btn.copied { border-color: var(--success); color: var(--success); }
+  .xmp-btns { display: flex; gap: 0.5rem; }
+  .xmp-code { padding: 1.2rem; font-family: 'DM Mono', monospace; font-size: 0.68rem; line-height: 1.7; color: #888; overflow-x: auto; max-height: 320px; overflow-y: auto; white-space: pre; }
+  .xmp-code .tag { color: #6a9fb5; }
+  .xmp-code .attr { color: var(--accent); }
+  .xmp-code .val  { color: var(--accent2); }
+  .how-to { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 1.2rem; display: flex; flex-direction: column; gap: 0.6rem; }
+  .how-to-title { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.4rem; }
+  .step { display: flex; gap: 0.8rem; align-items: flex-start; font-size: 0.8rem; color: #888; line-height: 1.5; }
+  .step-num { font-family: 'Bebas Neue', sans-serif; font-size: 1rem; color: var(--accent2); line-height: 1; min-width: 16px; }
+  @media (max-width: 900px) {
+    main { grid-template-columns: 1fr; }
+    .upload-panel { border-right: none; border-bottom: 1px solid var(--border); padding: 2rem; }
+    .result-panel { padding: 2rem; }
+    header { padding: 1.5rem 2rem; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">Preset<span>AI</span></div>
+  <div class="tagline">Extract Lightroom Presets from Any Photo</div>
+</header>
+<main>
+  <div class="upload-panel">
+    <div class="panel-label">01 — Upload Source Image</div>
+    <div class="drop-zone" id="dropZone">
+      <div class="upload-icon">
+        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+        </svg>
+      </div>
+      <div class="upload-text">
+        <p>Drop your photo here</p>
+        <span>JPG, PNG, WEBP — any photo</span>
+      </div>
+      <div class="drop-overlay">
+        <svg width="22" height="22" fill="none" stroke="white" stroke-width="1.5" viewBox="0 0 24 24">
+          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+        </svg>
+        <span style="font-size:0.8rem;color:white">Change photo</span>
+      </div>
+    </div>
+    <input type="file" id="fileInput" accept="image/*">
+    <button class="analyze-btn" id="analyzeBtn" disabled>Extract Preset</button>
+  </div>
+
+  <div class="result-panel">
+    <div class="empty-state" id="emptyState">
+      <div class="empty-grid">
+        <div></div><div style="opacity:0.5"></div><div style="opacity:0.2"></div>
+        <div style="opacity:0.6"></div><div></div><div style="opacity:0.3"></div>
+        <div style="opacity:0.2"></div><div style="opacity:0.7"></div><div></div>
+      </div>
+      <p>Upload a photo to extract its Lightroom preset</p>
+    </div>
+    <div class="results" id="results" style="display:none"></div>
+  </div>
+</main>
+<canvas id="canvas" style="display:none"></canvas>
+
+<script>
+const dropZone   = document.getElementById('dropZone');
+const fileInput  = document.getElementById('fileInput');
+const analyzeBtn = document.getElementById('analyzeBtn');
+const emptyState = document.getElementById('emptyState');
+const resultsEl  = document.getElementById('results');
+const canvas     = document.getElementById('canvas');
+const ctx        = canvas.getContext('2d');
+let loadedImage  = null;
+
+dropZone.addEventListener('click', () => fileInput.click());
+dropZone.addEventListener('dragover',  e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault(); dropZone.classList.remove('drag-over');
+  const f = e.dataTransfer.files[0];
+  if (f && f.type.startsWith('image/')) loadImageFile(f);
+});
+fileInput.addEventListener('change', () => { if (fileInput.files[0]) loadImageFile(fileInput.files[0]); });
+
+function loadImageFile(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      loadedImage = img;
+      const old = dropZone.querySelector('img');
+      if (old) old.remove();
+      const preview = document.createElement('img');
+      preview.src = e.target.result;
+      dropZone.prepend(preview);
+      dropZone.classList.add('has-image');
+      dropZone.querySelector('.upload-icon').style.display = 'none';
+      dropZone.querySelector('.upload-text').style.display = 'none';
+      analyzeBtn.disabled = false;
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+analyzeBtn.addEventListener('click', () => {
+  if (!loadedImage) return;
+  const preset = analyzeImage(loadedImage);
+  renderResults(preset);
+});
+
+// ── Image Analysis ────────────────────────────────────────────────────────────
+
+function analyzeImage(img) {
+  const W = 200, H = Math.round(img.height * 200 / img.width);
+  canvas.width = W; canvas.height = H;
+  ctx.drawImage(img, 0, 0, W, H);
+  const d = ctx.getImageData(0, 0, W, H).data;
+  return buildPreset(computeStats(d, W * H));
+}
+
+function computeStats(data, n) {
+  let rS=0, gS=0, bS=0, lumS=0, lumSq=0, sS=0;
+  let dark=0, high=0;
+  const lumH = new Array(256).fill(0);
+  const cc = { red:0, orange:0, yellow:0, green:0, cyan:0, blue:0, purple:0 };
+
+  for (let i = 0; i < data.length; i += 4) {
+    const r=data[i], g=data[i+1], b=data[i+2];
+    rS+=r; gS+=g; bS+=b;
+    const lum = 0.299*r + 0.587*g + 0.114*b;
+    lumS+=lum; lumSq+=lum*lum;
+    lumH[Math.round(lum)]++;
+    if (lum < 85) dark++; else if (lum >= 170) high++;
+    const [h, s] = rgbToHsv(r, g, b);
+    sS += s;
+    if (s > 0.2) {
+      if      (h < 15 || h >= 345) cc.red++;
+      else if (h < 45)  cc.orange++;
+      else if (h < 75)  cc.yellow++;
+      else if (h < 165) cc.green++;
+      else if (h < 195) cc.cyan++;
+      else if (h < 255) cc.blue++;
+      else              cc.purple++;
+    }
+  }
+
+  const rM=rS/n, gM=gS/n, bM=bS/n, lumM=lumS/n;
+  const lumStd = Math.sqrt(lumSq/n - lumM*lumM);
+  const dominant = Object.entries(cc).sort((a,b)=>b[1]-a[1])[0][0];
+
+  return {
+    rM, gM, bM, lumM, lumStd, sMean: sS/n,
+    darkR: dark/n, highR: high/n,
+    rbDiff: rM-bM, rgDiff: rM-gM,
+    lumP5:  pct(lumH,n,0.05), lumP95: pct(lumH,n,0.95),
+    dominant, cc, n
+  };
+}
+
+function pct(hist, n, p) {
+  let c=0, t=p*n;
+  for (let i=0;i<256;i++) { c+=hist[i]; if(c>=t) return i; }
+  return 255;
+}
+
+function buildPreset(s) {
+  const exposure    = Math.round(((128 - s.lumM) / 128) * 250) / 100;
+  const contrast    = clamp(Math.round((70 - s.lumStd) / 1.2), -80, 80);
+  const highlights  = clamp(Math.round(-(s.highR - 0.25) * 280), -90, 30);
+  const shadows     = clamp(Math.round((0.25 - s.darkR) * 280), -30, 90);
+  const whites      = clamp(Math.round((s.lumP95 - 220) / -2.5), -60, 60);
+  const blacks      = clamp(Math.round((s.lumP5  -  20) /  1.5), -60, 60);
+  const clarity     = clamp(Math.round((s.lumStd - 40) * 0.6), -30, 50);
+  const saturation  = clamp(Math.round((0.35 - s.sMean) * 120), -40, 40);
+  const vibrance    = clamp(Math.round((0.35 - s.sMean) * 80),  -30, 60);
+  const temperature = clamp(5500 - Math.round(s.rbDiff * 60), 2500, 9000);
+  const tint        = clamp(Math.round(-s.rgDiff * 2), -60, 60);
+  const sharpness   = clamp(Math.round(40 + s.lumStd * 0.4), 20, 100);
+  const vignette    = clamp(Math.round(-(s.highR * 40 + 5)), -40, 0);
+
+  const cStr = contrast > 20 ? 'S' : contrast < -20 ? 'flat' : 'normal';
+  const curves = {
+    S:      '0, 0, 64, 55, 128, 128, 192, 201, 255, 255',
+    flat:   '0, 10, 128, 128, 255, 245',
+    normal: '0, 0, 128, 128, 255, 255'
+  };
+
+  const toneName = s.lumM > 160 ? 'high-key' : s.lumM < 90 ? 'low-key' : 'mid-toned';
+  const tempDesc = s.rbDiff > 8 ? 'warm' : s.rbDiff < -8 ? 'cool' : 'neutral';
+  const satDesc  = s.sMean > 0.45 ? 'vibrant' : s.sMean < 0.2 ? 'muted' : 'balanced';
+  const presetName = `${cap(tempDesc)} ${cap(toneName)} ${cap(s.dominant)}`;
+  const style = `A ${toneName}, ${tempDesc}-toned image with ${satDesc} color. Dominated by ${s.dominant} hues with ${s.lumStd < 35 ? 'soft, low-contrast' : s.lumStd > 65 ? 'punchy, high-contrast' : 'balanced'} tones.${shadows > 20 ? ' Lifted shadows give an airy feel.' : shadows < -10 ? ' Deep shadows add drama.' : ''}${highlights < -20 ? ' Pulled-back highlights preserve bright detail.' : ''}`;
+
+  return {
+    presetName, style,
+    settings: {
+      Exposure: clamp(exposure, -4, 4),
+      Contrast: contrast, Highlights: highlights, Shadows: shadows,
+      Whites: whites, Blacks: blacks, Clarity: clarity,
+      Vibrance: vibrance, Saturation: saturation,
+      Temperature: temperature, Tint: tint,
+      Sharpness: sharpness, SharpenRadius: 1.0, SharpenDetail: 25, LuminanceSmoothing: 0,
+      HueAdjustmentRed: s.rM > 140 ? -5 : 5,
+      HueAdjustmentOrange: s.dominant === 'orange' ? -8 : 0,
+      HueAdjustmentYellow: s.dominant === 'yellow' ? 5 : 0,
+      HueAdjustmentGreen: s.dominant === 'green' ? -5 : 0,
+      HueAdjustmentAqua: 0, HueAdjustmentBlue: s.bM > 120 ? 5 : -5,
+      HueAdjustmentPurple: 0, HueAdjustmentMagenta: 0,
+      SaturationAdjustmentRed:    clamp(Math.round(s.cc.red    / s.n * 800 - 10), -30, 40),
+      SaturationAdjustmentOrange: clamp(Math.round(s.cc.orange / s.n * 800 - 10), -30, 40),
+      SaturationAdjustmentYellow: clamp(Math.round(s.cc.yellow / s.n * 800 - 10), -30, 40),
+      SaturationAdjustmentGreen:  clamp(Math.round(s.cc.green  / s.n * 800 - 10), -30, 40),
+      SaturationAdjustmentAqua: 0,
+      SaturationAdjustmentBlue:   clamp(Math.round(s.cc.blue   / s.n * 800 - 10), -30, 40),
+      LuminanceAdjustmentRed: 0, LuminanceAdjustmentOrange: 0,
+      LuminanceAdjustmentYellow: 0, LuminanceAdjustmentGreen: 0, LuminanceAdjustmentBlue: 0,
+      SplitToningShadowHue:         s.rbDiff > 5 ? 215 : s.rbDiff < -5 ? 30 : 220,
+      SplitToningShadowSaturation:  clamp(Math.round(Math.abs(s.rbDiff) * 1.2), 0, 30),
+      SplitToningHighlightHue:      s.rbDiff > 5 ? 40 : 200,
+      SplitToningHighlightSaturation: clamp(Math.round(Math.abs(s.rbDiff) * 0.8), 0, 20),
+      SplitToningBalance: 0,
+      VignetteAmount: vignette, VignetteMidpoint: 50,
+      GrainAmount: s.lumStd < 30 ? 15 : 0, GrainSize: 25, GrainFrequency: 50,
+      ToneCurvePV2012Red:   curves[cStr],
+      ToneCurvePV2012Green: curves[cStr],
+      ToneCurvePV2012Blue:  curves[cStr],
+    }
+  };
+}
+
+function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+function rgbToHsv(r,g,b) {
+  r/=255; g/=255; b/=255;
+  const max=Math.max(r,g,b), min=Math.min(r,g,b), d=max-min;
+  let h=0, s=max===0?0:d/max;
+  if (d) {
+    if      (max===r) h=((g-b)/d+(g<b?6:0))/6;
+    else if (max===g) h=((b-r)/d+2)/6;
+    else              h=((r-g)/d+4)/6;
+  }
+  return [h*360, s, max];
+}
+
+// ── Render ────────────────────────────────────────────────────────────────────
+
+const SLIDERS = [
+  ['Exposure',[-5,5]],['Contrast',[-100,100]],['Highlights',[-100,100]],
+  ['Shadows',[-100,100]],['Whites',[-100,100]],['Blacks',[-100,100]],
+  ['Clarity',[-100,100]],['Vibrance',[-100,100]],['Saturation',[-100,100]],['Tint',[-150,150]]
+];
+
+function renderResults(preset) {
+  const s   = preset.settings;
+  const xmp = generateXMP(preset);
+
+  resultsEl.innerHTML = `
+    <div class="section-title">Style Analysis</div>
+    <p class="style-description">${preset.style}</p>
+    <div class="section-title">Key Adjustments</div>
+    <div class="sliders-grid">
+      ${SLIDERS.map(([key,[min,max]]) => {
+        const val = s[key] ?? 0;
+        const pct = Math.abs(val) / (max-min) * 100;
+        const cls = val < 0 ? 'negative' : 'neutral';
+        const vc  = val > 0 ? 'pos' : val < 0 ? 'neg' : '';
+        return `<div class="slider-row">
+          <span class="slider-name">${key}</span>
+          <div class="slider-track"><div class="slider-fill ${cls}" style="width:${pct}%"></div></div>
+          <span class="slider-val ${vc}">${val>0?'+':''}${val}</span>
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="section-title">XMP Preset File</div>
+    <div class="xmp-container">
+      <div class="xmp-header">
+        <span class="xmp-filename">${san(preset.presetName)}.xmp</span>
+        <div class="xmp-btns">
+          <button class="copy-btn" id="copyBtn">Copy</button>
+          <button class="dl-btn"   id="dlBtn">Download</button>
+        </div>
+      </div>
+      <div class="xmp-code">${highlight(xmp)}</div>
+    </div>
+    <div class="how-to">
+      <div class="how-to-title">How to Apply in Lightroom</div>
+      <div class="step"><span class="step-num">1</span><span>Download the .xmp file above</span></div>
+      <div class="step"><span class="step-num">2</span><span>In Lightroom, go to the <strong>Develop</strong> module → Presets panel</span></div>
+      <div class="step"><span class="step-num">3</span><span>Click the <strong>+</strong> icon → <em>Import Presets</em> and select the file</span></div>
+      <div class="step"><span class="step-num">4</span><span>Click the preset to apply it to any photo instantly</span></div>
+    </div>`;
+
+  resultsEl.style.display = 'flex';
+  emptyState.style.display = 'none';
+
+  document.getElementById('copyBtn').addEventListener('click', () => {
+    navigator.clipboard.writeText(xmp).then(() => {
+      const b = document.getElementById('copyBtn');
+      b.textContent = 'Copied!'; b.classList.add('copied');
+      setTimeout(() => { b.textContent = 'Copy'; b.classList.remove('copied'); }, 2000);
+    });
+  });
+  document.getElementById('dlBtn').addEventListener('click', () => {
+    const a = Object.assign(document.createElement('a'), {
+      href: URL.createObjectURL(new Blob([xmp], {type:'text/xml'})),
+      download: `${san(preset.presetName)}.xmp`
+    });
+    a.click();
+  });
+}
+
+function san(name) { return (name||'preset').replace(/[^a-zA-Z0-9_\-\s]/g,'').replace(/\s+/g,'_').slice(0,40); }
+
+function generateXMP(p) {
+  const s=p.settings, name=p.presetName||'Preset';
+  return `<?xpacket begin="" id="W5M0MpCehiHzreSzNTczkc9d"?>
+<x:xmpmeta xmlns:x="adobe:ns:meta/">
+  <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+    <rdf:Description rdf:about=""
+      xmlns:crs="http://ns.adobe.com/camera-raw-settings/1.0/"
+      crs:PresetType="Normal"
+      crs:Name="${name}"
+      crs:ProcessVersion="11.0"
+      crs:WhiteBalance="Custom"
+      crs:Temperature="${s.Temperature}"
+      crs:Tint="${s.Tint}"
+      crs:Exposure2012="${s.Exposure.toFixed(2)}"
+      crs:Contrast2012="${s.Contrast}"
+      crs:Highlights2012="${s.Highlights}"
+      crs:Shadows2012="${s.Shadows}"
+      crs:Whites2012="${s.Whites}"
+      crs:Blacks2012="${s.Blacks}"
+      crs:Clarity2012="${s.Clarity}"
+      crs:Vibrance="${s.Vibrance}"
+      crs:Saturation="${s.Saturation}"
+      crs:Sharpness="${s.Sharpness}"
+      crs:SharpenRadius="${s.SharpenRadius.toFixed(1)}"
+      crs:SharpenDetail="${s.SharpenDetail}"
+      crs:LuminanceSmoothing="${s.LuminanceSmoothing}"
+      crs:HueAdjustmentRed="${s.HueAdjustmentRed}"
+      crs:HueAdjustmentOrange="${s.HueAdjustmentOrange}"
+      crs:HueAdjustmentYellow="${s.HueAdjustmentYellow}"
+      crs:HueAdjustmentGreen="${s.HueAdjustmentGreen}"
+      crs:HueAdjustmentAqua="${s.HueAdjustmentAqua}"
+      crs:HueAdjustmentBlue="${s.HueAdjustmentBlue}"
+      crs:HueAdjustmentPurple="${s.HueAdjustmentPurple}"
+      crs:HueAdjustmentMagenta="${s.HueAdjustmentMagenta}"
+      crs:SaturationAdjustmentRed="${s.SaturationAdjustmentRed}"
+      crs:SaturationAdjustmentOrange="${s.SaturationAdjustmentOrange}"
+      crs:SaturationAdjustmentYellow="${s.SaturationAdjustmentYellow}"
+      crs:SaturationAdjustmentGreen="${s.SaturationAdjustmentGreen}"
+      crs:SaturationAdjustmentAqua="${s.SaturationAdjustmentAqua}"
+      crs:SaturationAdjustmentBlue="${s.SaturationAdjustmentBlue}"
+      crs:LuminanceAdjustmentRed="${s.LuminanceAdjustmentRed}"
+      crs:LuminanceAdjustmentOrange="${s.LuminanceAdjustmentOrange}"
+      crs:LuminanceAdjustmentYellow="${s.LuminanceAdjustmentYellow}"
+      crs:LuminanceAdjustmentGreen="${s.LuminanceAdjustmentGreen}"
+      crs:LuminanceAdjustmentBlue="${s.LuminanceAdjustmentBlue}"
+      crs:SplitToningShadowHue="${s.SplitToningShadowHue}"
+      crs:SplitToningShadowSaturation="${s.SplitToningShadowSaturation}"
+      crs:SplitToningHighlightHue="${s.SplitToningHighlightHue}"
+      crs:SplitToningHighlightSaturation="${s.SplitToningHighlightSaturation}"
+      crs:SplitToningBalance="${s.SplitToningBalance}"
+      crs:VignetteAmount="${s.VignetteAmount}"
+      crs:VignetteMidpoint="${s.VignetteMidpoint}"
+      crs:GrainAmount="${s.GrainAmount}"
+      crs:GrainSize="${s.GrainSize}"
+      crs:GrainFrequency="${s.GrainFrequency}"
+      crs:ToneCurvePV2012Red="${s.ToneCurvePV2012Red}"
+      crs:ToneCurvePV2012Green="${s.ToneCurvePV2012Green}"
+      crs:ToneCurvePV2012Blue="${s.ToneCurvePV2012Blue}">
+    </rdf:Description>
+  </rdf:RDF>
+</x:xmpmeta>
+<?xpacket end="w"?>`;
+}
+
+function highlight(xml) {
+  return xml
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/(&lt;\/?[\w:]+)/g,'<span class="tag">$1</span>')
+    .replace(/([\w:]+)=/g,'<span class="attr">$1</span>=')
+    .replace(/"([^"]*)"/g,'"<span class="val">$1</span>"');
+}
+</script>
+</body>
+</html>

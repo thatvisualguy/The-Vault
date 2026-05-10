@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CAPTURE — Screen Recorder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0a0c;
+    --surface: #111114;
+    --card: #17171c;
+    --border: #2a2a35;
+    --accent: #e8ff47;
+    --accent2: #ff4747;
+    --accent3: #47c8ff;
+    --text: #f0f0f5;
+    --muted: #6b6b80;
+    --font-head: 'Syne', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-mono);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+  }
+
+  /* Noise texture overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.6;
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 32px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+
+  .logo {
+    font-family: var(--font-head);
+    font-weight: 800;
+    font-size: 22px;
+    letter-spacing: -0.02em;
+    color: var(--accent);
+  }
+
+  .logo span {
+    color: var(--text);
+    opacity: 0.4;
+    font-weight: 400;
+  }
+
+  .status-bar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .status-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--muted);
+    transition: all 0.3s;
+  }
+  .status-dot.active { background: var(--accent); box-shadow: 0 0 8px var(--accent); animation: pulse 1.4s ease-in-out infinite; }
+  .status-dot.recording { background: var(--accent2); box-shadow: 0 0 12px var(--accent2); animation: pulse 0.8s ease-in-out infinite; }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.85); }
+  }
+
+  main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    grid-template-rows: 1fr auto;
+    gap: 0;
+    height: calc(100vh - 65px);
+  }
+
+  /* Preview area */
+  .preview-area {
+    grid-row: 1 / 2;
+    grid-column: 1 / 2;
+    position: relative;
+    background: #05050a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-right: 1px solid var(--border);
+  }
+
+  .preview-bg {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 30% 40%, rgba(232,255,71,0.03) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 70%, rgba(71,200,255,0.03) 0%, transparent 60%);
+  }
+
+  .preview-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  .preview-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    color: var(--muted);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    position: relative;
+    z-index: 1;
+  }
+
+  .preview-icon {
+    width: 64px; height: 64px;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .preview-icon svg { width: 28px; height: 28px; opacity: 0.4; }
+
+  #screenPreview {
+    position: absolute;
+    inset: 0;
+    width: 100%; height: 100%;
+    object-fit: contain;
+    z-index: 2;
+    display: none;
+  }
+
+  /* Webcam pip */
+  .webcam-pip {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    width: 160px;
+    height: 100px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    background: #000;
+    z-index: 10;
+    display: none;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+    cursor: move;
+    transition: border-color 0.2s;
+  }
+
+  .webcam-pip:hover { border-color: var(--accent); }
+  .webcam-pip.visible { display: block; }
+
+  #webcamVideo {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transform: scaleX(-1);
+  }
+
+  .webcam-label {
+    position: absolute;
+    top: 6px; left: 8px;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+    font-family: var(--font-mono);
+  }
+
+  /* Sidebar */
+  .sidebar {
+    grid-row: 1 / 3;
+    grid-column: 2 / 3;
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid var(--border);
+    background: var(--surface);
+    overflow-y: auto;
+  }
+
+  .sidebar-section {
+    padding: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-label {
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* Toggles */
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    padding: 10px 12px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+
+  .toggle-row:hover { border-color: var(--accent); }
+  .toggle-row.active { border-color: rgba(232,255,71,0.3); background: rgba(232,255,71,0.04); }
+
+  .toggle-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .toggle-name {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text);
+    font-family: var(--font-head);
+  }
+
+  .toggle-desc {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+  }
+
+  .toggle-switch {
+    width: 36px; height: 20px;
+    background: var(--border);
+    border-radius: 10px;
+    position: relative;
+    transition: background 0.25s;
+    flex-shrink: 0;
+  }
+
+  .toggle-switch::after {
+    content: '';
+    position: absolute;
+    width: 14px; height: 14px;
+    background: var(--muted);
+    border-radius: 50%;
+    top: 3px; left: 3px;
+    transition: all 0.25s;
+  }
+
+  .toggle-row.active .toggle-switch { background: rgba(232,255,71,0.3); }
+  .toggle-row.active .toggle-switch::after { background: var(--accent); left: 19px; }
+
+  /* Quality selector */
+  .quality-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 6px;
+  }
+
+  .quality-btn {
+    padding: 8px 4px;
+    text-align: center;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--card);
+    color: var(--muted);
+    font-size: 11px;
+    font-family: var(--font-mono);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .quality-btn:hover { border-color: var(--accent); color: var(--text); }
+  .quality-btn.selected { border-color: var(--accent); color: var(--accent); background: rgba(232,255,71,0.06); }
+
+  /* Timer */
+  .timer-display {
+    font-family: var(--font-mono);
+    font-size: 32px;
+    font-weight: 300;
+    color: var(--text);
+    letter-spacing: 0.06em;
+    text-align: center;
+    padding: 16px 0 8px;
+    position: relative;
+  }
+
+  .timer-display.recording { color: var(--accent2); }
+  .timer-display::after {
+    content: '';
+    display: block;
+    width: 40px; height: 1px;
+    background: var(--border);
+    margin: 12px auto 0;
+  }
+
+  /* VU meter */
+  .vu-meter {
+    display: flex;
+    gap: 2px;
+    align-items: flex-end;
+    height: 28px;
+    padding: 0 4px;
+  }
+
+  .vu-bar {
+    flex: 1;
+    background: var(--border);
+    border-radius: 2px 2px 0 0;
+    height: 4px;
+    transition: height 0.08s ease-out, background 0.08s;
+    min-height: 4px;
+  }
+
+  /* Controls bar */
+  .controls-bar {
+    grid-row: 2 / 3;
+    grid-column: 1 / 2;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 24px;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: 1.5px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent, rgba(255,255,255,0.03));
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .btn:hover::before { opacity: 1; }
+  .btn:hover { border-color: var(--muted); }
+  .btn:disabled { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #0a0a0c;
+    border-color: var(--accent);
+    font-weight: 500;
+    font-family: var(--font-head);
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    padding: 10px 28px;
+  }
+
+  .btn-primary:hover { background: #d4e83c; border-color: #d4e83c; }
+
+  .btn-danger {
+    border-color: var(--accent2);
+    color: var(--accent2);
+  }
+
+  .btn-danger:hover { background: rgba(255,71,71,0.08); }
+
+  .btn-pause {
+    border-color: var(--accent3);
+    color: var(--accent3);
+  }
+
+  .btn-pause:hover { background: rgba(71,200,255,0.08); }
+
+  .btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+  .spacer { flex: 1; }
+
+  /* Recordings list */
+  .recordings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .recording-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--card);
+    animation: slideIn 0.3s ease;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .recording-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .recording-name {
+    font-size: 11px;
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .recording-time {
+    font-size: 10px;
+    color: var(--muted);
+  }
+
+  .recording-actions {
+    display: flex;
+    gap: 6px;
+  }
+
+  .rec-btn {
+    padding: 5px 10px;
+    border-radius: 5px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    cursor: pointer;
+    letter-spacing: 0.06em;
+    transition: all 0.15s;
+  }
+
+  .rec-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .rec-btn.danger:hover { border-color: var(--accent2); color: var(--accent2); }
+
+  .empty-state {
+    text-align: center;
+    padding: 24px 16px;
+    color: var(--muted);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    line-height: 1.8;
+  }
+
+  /* Waveform indicator */
+  .waveform {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    height: 20px;
+  }
+
+  .wave-bar {
+    width: 3px;
+    background: var(--accent);
+    border-radius: 2px;
+    animation: wave 0.8s ease-in-out infinite;
+    opacity: 0;
+  }
+
+  .wave-bar:nth-child(2) { animation-delay: 0.1s; }
+  .wave-bar:nth-child(3) { animation-delay: 0.2s; }
+  .wave-bar:nth-child(4) { animation-delay: 0.15s; }
+  .wave-bar:nth-child(5) { animation-delay: 0.05s; }
+
+  .wave-bar.active { opacity: 1; }
+
+  @keyframes wave {
+    0%, 100% { height: 4px; }
+    50% { height: 16px; }
+  }
+
+  /* Format tag */
+  .format-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border: 1px solid;
+    font-weight: 500;
+  }
+
+  .format-webm { color: var(--accent3); border-color: rgba(71,200,255,0.3); background: rgba(71,200,255,0.06); }
+
+  /* REC indicator */
+  .rec-indicator {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--accent2);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .rec-indicator.visible { display: flex; }
+  .rec-indicator .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent2); animation: pulse 0.8s ease-in-out infinite; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    main { grid-template-columns: 1fr; grid-template-rows: 1fr auto auto; }
+    .sidebar { grid-row: 3; grid-column: 1; border-left: none; border-top: 1px solid var(--border); max-height: 280px; }
+    .controls-bar { grid-row: 2; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">CAPTURE <span>/ v1.0</span></div>
+  <div class="status-bar">
+    <div class="status-dot" id="statusDot"></div>
+    <span id="statusText">STANDBY</span>
+    <div class="rec-indicator" id="recIndicator">
+      <div class="dot"></div>
+      REC
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- Preview -->
+  <div class="preview-area">
+    <div class="preview-bg"></div>
+    <div class="preview-grid"></div>
+
+    <div class="preview-placeholder" id="placeholder">
+      <div class="preview-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="2" y="3" width="20" height="14" rx="2"/>
+          <path d="M8 21h8M12 17v4"/>
+        </svg>
+      </div>
+      <div>Select a source to begin</div>
+    </div>
+
+    <video id="screenPreview" autoplay muted playsinline></video>
+
+    <div class="webcam-pip" id="webcamPip">
+      <div class="webcam-label">CAM</div>
+      <video id="webcamVideo" autoplay muted playsinline></video>
+    </div>
+  </div>
+
+  <!-- Controls bar -->
+  <div class="controls-bar">
+    <button class="btn btn-primary" id="startBtn">
+      <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="8"/></svg>
+      Start Recording
+    </button>
+    <button class="btn btn-pause" id="pauseBtn" disabled>
+      <svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+      Pause
+    </button>
+    <button class="btn btn-danger" id="stopBtn" disabled>
+      <svg viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>
+      Stop
+    </button>
+    <div class="spacer"></div>
+    <div class="waveform" id="waveform">
+      <div class="wave-bar"></div>
+      <div class="wave-bar"></div>
+      <div class="wave-bar"></div>
+      <div class="wave-bar"></div>
+      <div class="wave-bar"></div>
+    </div>
+    <div class="timer-display" id="timerDisplay">00:00:00</div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+
+    <!-- Sources -->
+    <div class="sidebar-section">
+      <div class="section-label">Sources</div>
+      <div class="toggle-row" id="toggleMic" onclick="toggleOption('mic')">
+        <div class="toggle-info">
+          <div class="toggle-name">Microphone</div>
+          <div class="toggle-desc">Capture system mic audio</div>
+        </div>
+        <div class="toggle-switch"></div>
+      </div>
+      <div class="toggle-row" id="toggleSysAudio" onclick="toggleOption('sysAudio')">
+        <div class="toggle-info">
+          <div class="toggle-name">System Audio</div>
+          <div class="toggle-desc">Record desktop sounds</div>
+        </div>
+        <div class="toggle-switch"></div>
+      </div>
+      <div class="toggle-row" id="toggleWebcam" onclick="toggleOption('webcam')">
+        <div class="toggle-info">
+          <div class="toggle-name">Webcam PiP</div>
+          <div class="toggle-desc">Overlay camera feed</div>
+        </div>
+        <div class="toggle-switch"></div>
+      </div>
+    </div>
+
+    <!-- Quality -->
+    <div class="sidebar-section">
+      <div class="section-label">Quality</div>
+      <div class="quality-grid">
+        <div class="quality-btn" data-q="720">720p</div>
+        <div class="quality-btn selected" data-q="1080">1080p</div>
+        <div class="quality-btn" data-q="1440">1440p</div>
+      </div>
+    </div>
+
+    <!-- Audio meter -->
+    <div class="sidebar-section">
+      <div class="section-label">Audio Level</div>
+      <div class="vu-meter" id="vuMeter">
+        <!-- bars filled by JS -->
+      </div>
+    </div>
+
+    <!-- Recordings -->
+    <div class="sidebar-section" style="flex:1">
+      <div class="section-label">Recordings</div>
+      <div class="recordings-list" id="recordingsList">
+        <div class="empty-state" id="emptyState">
+          No recordings yet.<br>
+          Hit start to capture.
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script>
+// ─── State ───────────────────────────────────────────────────────────────────
+const state = {
+  mic: false,
+  sysAudio: true,
+  webcam: false,
+  quality: '1080',
+  recording: false,
+  paused: false,
+  screenStream: null,
+  micStream: null,
+  webcamStream: null,
+  mediaRecorder: null,
+  chunks: [],
+  startTime: null,
+  elapsed: 0,
+  timerInterval: null,
+  audioCtx: null,
+  analyser: null,
+  recordings: [],
+};
+
+// ─── Init VU Meter ────────────────────────────────────────────────────────────
+const vuMeter = document.getElementById('vuMeter');
+for (let i = 0; i < 20; i++) {
+  const bar = document.createElement('div');
+  bar.className = 'vu-bar';
+  vuMeter.appendChild(bar);
+}
+const vuBars = vuMeter.querySelectorAll('.vu-bar');
+
+// ─── Quality selector ─────────────────────────────────────────────────────────
+document.querySelectorAll('.quality-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.quality-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    state.quality = btn.dataset.q;
+  });
+});
+
+// ─── Toggle options ───────────────────────────────────────────────────────────
+function toggleOption(key) {
+  if (state.recording) return;
+  state[key] = !state[key];
+  document.getElementById('toggle' + key.charAt(0).toUpperCase() + key.slice(1))
+    .classList.toggle('active', state[key]);
+
+  if (key === 'webcam') {
+    if (state[key]) startWebcam();
+    else stopWebcam();
+  }
+}
+
+async function startWebcam() {
+  try {
+    state.webcamStream = await navigator.mediaDevices.getUserMedia({ video: true });
+    document.getElementById('webcamVideo').srcObject = state.webcamStream;
+    document.getElementById('webcamPip').classList.add('visible');
+  } catch (e) {
+    state.webcam = false;
+    document.getElementById('toggleWebcam').classList.remove('active');
+    alert('Could not access webcam: ' + e.message);
+  }
+}
+
+function stopWebcam() {
+  if (state.webcamStream) {
+    state.webcamStream.getTracks().forEach(t => t.stop());
+    state.webcamStream = null;
+  }
+  document.getElementById('webcamPip').classList.remove('visible');
+  document.getElementById('webcamVideo').srcObject = null;
+}
+
+// ─── Start recording ──────────────────────────────────────────────────────────
+document.getElementById('startBtn').addEventListener('click', startRecording);
+document.getElementById('stopBtn').addEventListener('click', stopRecording);
+document.getElementById('pauseBtn').addEventListener('click', togglePause);
+
+async function startRecording() {
+  try {
+    // Screen capture
+    const displayConstraints = {
+      video: { width: { ideal: parseInt(state.quality === '720' ? 1280 : state.quality === '1080' ? 1920 : 2560) } },
+      audio: state.sysAudio,
+    };
+
+    state.screenStream = await navigator.mediaDevices.getDisplayMedia(displayConstraints);
+
+    // Show preview
+    const preview = document.getElementById('screenPreview');
+    preview.srcObject = state.screenStream;
+    preview.style.display = 'block';
+    document.getElementById('placeholder').style.display = 'none';
+
+    // Build combined audio tracks
+    const audioTracks = [];
+
+    if (state.sysAudio) {
+      state.screenStream.getAudioTracks().forEach(t => audioTracks.push(t));
+    }
+
+    if (state.mic) {
+      try {
+        state.micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        state.micStream.getAudioTracks().forEach(t => audioTracks.push(t));
+        setupAudioAnalyser(state.micStream);
+      } catch (e) { console.warn('Mic not available', e); }
+    } else if (state.sysAudio && state.screenStream.getAudioTracks().length > 0) {
+      setupAudioAnalyser(state.screenStream);
+    }
+
+    // Combine streams
+    const tracks = [...state.screenStream.getVideoTracks(), ...audioTracks];
+    const combined = new MediaStream(tracks);
+
+    // MediaRecorder
+    const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus')
+      ? 'video/webm;codecs=vp9,opus'
+      : 'video/webm';
+
+    state.mediaRecorder = new MediaRecorder(combined, { mimeType, videoBitsPerSecond: 8_000_000 });
+    state.chunks = [];
+
+    state.mediaRecorder.ondataavailable = e => { if (e.data.size > 0) state.chunks.push(e.data); };
+    state.mediaRecorder.onstop = saveRecording;
+    state.mediaRecorder.start(1000);
+
+    // Handle user stopping screen share from browser UI
+    state.screenStream.getVideoTracks()[0].addEventListener('ended', () => {
+      if (state.recording) stopRecording();
+    });
+
+    // State
+    state.recording = true;
+    state.startTime = Date.now();
+    state.elapsed = 0;
+    startTimer();
+    updateUI();
+
+  } catch (e) {
+    if (e.name !== 'NotAllowedError') alert('Failed to start recording: ' + e.message);
+  }
+}
+
+function togglePause() {
+  if (!state.mediaRecorder) return;
+  if (state.paused) {
+    state.mediaRecorder.resume();
+    state.startTime = Date.now() - state.elapsed;
+    state.paused = false;
+    startTimer();
+  } else {
+    state.mediaRecorder.pause();
+    state.elapsed = Date.now() - state.startTime;
+    state.paused = true;
+    clearInterval(state.timerInterval);
+  }
+  document.getElementById('pauseBtn').innerHTML = state.paused
+    ? `<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg> Resume`
+    : `<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg> Pause`;
+  updateStatus();
+}
+
+function stopRecording() {
+  if (!state.mediaRecorder) return;
+  state.mediaRecorder.stop();
+  clearInterval(state.timerInterval);
+
+  if (state.screenStream) { state.screenStream.getTracks().forEach(t => t.stop()); state.screenStream = null; }
+  if (state.micStream) { state.micStream.getTracks().forEach(t => t.stop()); state.micStream = null; }
+  if (state.audioCtx) { state.audioCtx.close(); state.audioCtx = null; }
+
+  // Reset preview
+  document.getElementById('screenPreview').style.display = 'none';
+  document.getElementById('screenPreview').srcObject = null;
+  document.getElementById('placeholder').style.display = 'flex';
+
+  state.recording = false;
+  state.paused = false;
+  vuBars.forEach(b => { b.style.height = '4px'; b.style.background = 'var(--border)'; });
+  document.querySelectorAll('.wave-bar').forEach(b => b.classList.remove('active'));
+  document.getElementById('pauseBtn').innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg> Pause`;
+  updateUI();
+}
+
+function saveRecording() {
+  const blob = new Blob(state.chunks, { type: 'video/webm' });
+  const url = URL.createObjectURL(blob);
+  const duration = formatTime(state.elapsed || Date.now() - state.startTime);
+  const name = `REC_${new Date().toISOString().slice(0,19).replace(/[:T]/g, '-')}`;
+  const size = (blob.size / 1024 / 1024).toFixed(1);
+
+  state.recordings.unshift({ name, url, duration, size });
+  renderRecordings();
+}
+
+// ─── Audio Analyser ───────────────────────────────────────────────────────────
+function setupAudioAnalyser(stream) {
+  try {
+    state.audioCtx = new AudioContext();
+    state.analyser = state.audioCtx.createAnalyser();
+    state.analyser.fftSize = 64;
+    const src = state.audioCtx.createMediaStreamSource(stream);
+    src.connect(state.analyser);
+    animateVU();
+    document.querySelectorAll('.wave-bar').forEach(b => b.classList.add('active'));
+  } catch(e) {}
+}
+
+function animateVU() {
+  if (!state.analyser) return;
+  const data = new Uint8Array(state.analyser.frequencyBinCount);
+  state.analyser.getByteFrequencyData(data);
+
+  const count = vuBars.length;
+  for (let i = 0; i < count; i++) {
+    const val = data[Math.floor(i * data.length / count)] / 255;
+    const h = Math.max(4, val * 28);
+    const color = i < count * 0.7 ? 'var(--accent)' : i < count * 0.9 ? '#f0c040' : 'var(--accent2)';
+    vuBars[i].style.height = h + 'px';
+    vuBars[i].style.background = val > 0.05 ? color : 'var(--border)';
+  }
+
+  if (state.recording && !state.paused) requestAnimationFrame(animateVU);
+}
+
+// ─── Timer ────────────────────────────────────────────────────────────────────
+function startTimer() {
+  clearInterval(state.timerInterval);
+  state.timerInterval = setInterval(() => {
+    state.elapsed = Date.now() - state.startTime;
+    document.getElementById('timerDisplay').textContent = formatTime(state.elapsed);
+  }, 1000);
+}
+
+function formatTime(ms) {
+  const s = Math.floor(ms / 1000);
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const sec = s % 60;
+  return [h, m, sec].map(n => String(n).padStart(2, '0')).join(':');
+}
+
+// ─── Recordings list ──────────────────────────────────────────────────────────
+function renderRecordings() {
+  const list = document.getElementById('recordingsList');
+  const empty = document.getElementById('emptyState');
+
+  if (state.recordings.length === 0) {
+    empty.style.display = 'block';
+    list.querySelectorAll('.recording-item').forEach(el => el.remove());
+    return;
+  }
+
+  empty.style.display = 'none';
+  list.querySelectorAll('.recording-item').forEach(el => el.remove());
+
+  state.recordings.forEach((rec, idx) => {
+    const item = document.createElement('div');
+    item.className = 'recording-item';
+    item.innerHTML = `
+      <div class="recording-meta">
+        <span class="recording-name">${rec.name.slice(-16)}</span>
+        <span class="format-tag format-webm">webm</span>
+      </div>
+      <div class="recording-meta">
+        <span class="recording-time">⏱ ${rec.duration} · ${rec.size} MB</span>
+        <div class="recording-actions">
+          <button class="rec-btn" onclick="downloadRec(${idx})">↓ Save</button>
+          <button class="rec-btn danger" onclick="deleteRec(${idx})">✕</button>
+        </div>
+      </div>
+    `;
+    list.appendChild(item);
+  });
+}
+
+function downloadRec(idx) {
+  const rec = state.recordings[idx];
+  const a = document.createElement('a');
+  a.href = rec.url;
+  a.download = rec.name + '.webm';
+  a.click();
+}
+
+function deleteRec(idx) {
+  URL.revokeObjectURL(state.recordings[idx].url);
+  state.recordings.splice(idx, 1);
+  renderRecordings();
+}
+
+// ─── UI Updates ───────────────────────────────────────────────────────────────
+function updateUI() {
+  const startBtn = document.getElementById('startBtn');
+  const stopBtn = document.getElementById('stopBtn');
+  const pauseBtn = document.getElementById('pauseBtn');
+
+  startBtn.disabled = state.recording;
+  stopBtn.disabled = !state.recording;
+  pauseBtn.disabled = !state.recording;
+
+  const timer = document.getElementById('timerDisplay');
+  timer.classList.toggle('recording', state.recording && !state.paused);
+
+  updateStatus();
+}
+
+function updateStatus() {
+  const dot = document.getElementById('statusDot');
+  const text = document.getElementById('statusText');
+  const recInd = document.getElementById('recIndicator');
+
+  if (!state.recording) {
+    dot.className = 'status-dot';
+    text.textContent = 'STANDBY';
+    recInd.classList.remove('visible');
+  } else if (state.paused) {
+    dot.className = 'status-dot active';
+    text.textContent = 'PAUSED';
+    recInd.classList.remove('visible');
+  } else {
+    dot.className = 'status-dot recording';
+    text.textContent = 'CAPTURING';
+    recInd.classList.add('visible');
+  }
+}
+
+// ─── Draggable webcam pip ─────────────────────────────────────────────────────
+(function() {
+  const pip = document.getElementById('webcamPip');
+  let dragging = false, ox = 0, oy = 0;
+
+  pip.addEventListener('mousedown', e => {
+    dragging = true;
+    ox = e.clientX - pip.offsetLeft;
+    oy = e.clientY - pip.offsetTop;
+    pip.style.transition = 'none';
+  });
+
+  document.addEventListener('mousemove', e => {
+    if (!dragging) return;
+    pip.style.right = 'auto';
+    pip.style.bottom = 'auto';
+    pip.style.left = Math.max(0, e.clientX - ox) + 'px';
+    pip.style.top = Math.max(0, e.clientY - oy) + 'px';
+  });
+
+  document.addEventListener('mouseup', () => { dragging = false; });
+})();
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+updateUI();
+renderRecordings();
+</script>
+</body>
+</html>

@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1080">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <title>Weekly AI News Carousel – Apr 27–May 3, 2026</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0a0a0a;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      padding: 24px;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .slide {
+      width: 1080px;
+      height: 1440px;
+      position: relative;
+      overflow: hidden;
+      background: #0d0d0d;
+    }
+
+    /* ─── SHARED ELEMENTS ─── */
+    .tag {
+      font-family: 'Space Mono', monospace;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+
+    .slide-counter {
+      position: absolute;
+      bottom: 60px;
+      right: 80px;
+      font-family: 'Space Mono', monospace;
+      font-size: 24px;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 2px;
+    }
+
+    .handle {
+      position: absolute;
+      bottom: 60px;
+      left: 80px;
+      font-family: 'Space Mono', monospace;
+      font-size: 24px;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 1px;
+    }
+
+    /* ─── NOISE TEXTURE OVERLAY ─── */
+    .noise {
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    /* ══════════════════════════════════
+       SLIDE 1 — COVER
+    ══════════════════════════════════ */
+    #s1 {
+      background: #08080f;
+    }
+    #s1 .bg-gradient {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 90% 60% at 50% 30%, #1a0a3e 0%, #0d0520 40%, #08080f 100%);
+    }
+    #s1 .grid-lines {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(138,43,226,0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(138,43,226,0.08) 1px, transparent 1px);
+      background-size: 80px 80px;
+    }
+    #s1 .glow-orb {
+      position: absolute;
+      top: -200px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 700px;
+      height: 700px;
+      background: radial-gradient(circle, rgba(120,40,220,0.35) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+    #s1 .week-badge {
+      position: absolute;
+      top: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(138,43,226,0.15);
+      border: 1px solid rgba(138,43,226,0.4);
+      border-radius: 100px;
+      padding: 14px 44px;
+      font-family: 'Space Mono', monospace;
+      font-size: 22px;
+      color: #c084fc;
+      letter-spacing: 3px;
+      white-space: nowrap;
+    }
+    #s1 .main-title {
+      position: absolute;
+      top: 50%;
+      left: 80px;
+      right: 80px;
+      transform: translateY(-58%);
+      text-align: center;
+    }
+    #s1 .main-title .label {
+      font-family: 'Space Mono', monospace;
+      font-size: 26px;
+      color: #8b5cf6;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      margin-bottom: 32px;
+    }
+    #s1 .main-title h1 {
+      font-size: 108px;
+      font-weight: 700;
+      line-height: 1.0;
+      color: #fff;
+      letter-spacing: -2px;
+    }
+    #s1 .main-title h1 span {
+      background: linear-gradient(135deg, #a855f7, #06b6d4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    #s1 .main-title .sub {
+      margin-top: 36px;
+      font-size: 34px;
+      color: rgba(255,255,255,0.5);
+      font-weight: 400;
+      letter-spacing: 0.5px;
+    }
+    #s1 .swipe-hint {
+      position: absolute;
+      bottom: 110px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-family: 'Space Mono', monospace;
+      font-size: 22px;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 2px;
+      white-space: nowrap;
+    }
+    #s1 .swipe-hint .arrow {
+      font-size: 28px;
+      color: #8b5cf6;
+    }
+
+    /* ══════════════════════════════════
+       SLIDE 2 — OpenAI + Microsoft Breakup
+    ══════════════════════════════════ */
+    #s2 {
+      background: #08080f;
+    }
+    #s2 .bg {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(160deg, #0f0a20 0%, #080810 60%, #05101a 100%);
+    }
+    #s2 .accent-bar {
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 8px;
+      background: linear-gradient(180deg, #8b5cf6, #06b6d4);
+    }
+    #s2 .top-tag {
+      position: absolute;
+      top: 90px;
+      left: 100px;
+      background: rgba(139,92,246,0.15);
+      border: 1px solid rgba(139,92,246,0.4);
+      border-radius: 8px;
+      padding: 10px 28px;
+      font-family: 'Space Mono', monospace;
+      font-size: 20px;
+      color: #a78bfa;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+    #s2 .emoji-big {
+      position: absolute;
+      top: 200px;
+      left: 100px;
+      font-size: 120px;
+      line-height: 1;
+    }
+    #s2 .headline {
+      position: absolute;
+      top: 350px;
+      left: 100px;
+      right: 80px;
+    }
+    #s2 .headline h2 {
+      font-size: 86px;
+      font-weight: 700;
+      line-height: 1.05;
+      color: #fff;
+      letter-spacing: -1px;
+    }
+    #s2 .headline h2 .gradient {
+      background: linear-gradient(135deg, #a855f7, #38bdf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    #s2 .body-block {
+      position: absolute;
+      top: 830px;
+      left: 100px;
+      right: 80px;
+    }
+    #s2 .body-block p {
+      font-size: 36px;
+      color: rgba(255,255,255,0.65);
+      line-height: 1.6;
+      margin-bottom: 40px;
+    }
+    #s2 .stat-pill {
+      display: inline-block;
+      background: rgba(6,182,212,0.1);
+      border: 1px solid rgba(6,182,212,0.35);
+      border-radius: 12px;
+      padding: 18px 36px;
+      font-family: 'Space Mono', monospace;
+      font-size: 28px;
+      color: #22d3ee;
+      letter-spacing: 1px;
+    }
+
+    /* ══════════════════════════════════
+       SLIDE 3 — Meta goes Closed Source
+    ══════════════════════════════════ */
+    #s3 {
+      background: #08080f;
+    }
+    #s3 .bg {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(150deg, #0f0808 0%, #08080f 50%, #080f0a 100%);
+    }
+    #s3 .blob {
+      position: absolute;
+      top: -100px;
+      right: -150px;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(239,68,68,0.2) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+    #s3 .top-tag {
+      position: absolute;
+      top: 90px;
+      left: 80px;
+      background: rgba(239,68,68,0.12);
+      border: 1px solid rgba(239,68,68,0.35);
+      border-radius: 8px;
+      padding: 10px 28px;
+      font-family: 'Space Mono', monospace;
+      font-size: 20px;
+      color: #f87171;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+    #s3 .content {
+      position: absolute;
+      top: 220px;
+      left: 80px;
+      right: 80px;
+    }
+    #s3 .content h2 {
+      font-size: 92px;
+      font-weight: 700;
+      line-height: 1.0;
+      color: #fff;
+      letter-spacing: -2px;
+      margin-bottom: 50px;
+    }
+    #s3 .content h2 .red {
+      color: #f87171;
+    }
+    #s3 .divider {
+      width: 80px;
+      height: 4px;
+      background: linear-gradient(90deg, #ef4444, transparent);
+      margin-bottom: 50px;
+      border-radius: 2px;
+    }
+    #s3 .content p {
+      font-size: 38px;
+      color: rgba(255,255,255,0.6);
+      line-height: 1.65;
+      margin-bottom: 60px;
+    }
+    #s3 .box {
+      background: rgba(239,68,68,0.08);
+      border: 1px solid rgba(239,68,68,0.25);
+      border-radius: 16px;
+      padding: 40px;
+    }
+    #s3 .box .box-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 20px;
+      color: #f87171;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    #s3 .box .box-stat {
+      font-size: 56px;
+      font-weight: 700;
+      color: #fff;
+    }
+    #s3 .box .box-sub {
+      font-size: 30px;
+      color: rgba(255,255,255,0.45);
+      margin-top: 8px;
+    }
+
+    /* ══════════════════════════════════
+       SLIDE 4 — OpenAI Phone
+    ══════════════════════════════════ */
+    #s4 {
+      background: #05080f;
+    }
+    #s4 .bg {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, #050810 0%, #080f18 100%);
+    }
+    #s4 .grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(6,182,212,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(6,182,212,0.05) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+    #s4 .glow {
+      position: absolute;
+      bottom: -200px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 800px;
+      height: 600px;
+      background: radial-gradient(ellipse, rgba(6,182,212,0.2) 0%, transparent 70%);
+    }
+    #s4 .content {
+      position: absolute;
+      top: 120px;
+      left: 80px;
+      right: 80px;
+    }
+    #s4 .top-tag {
+      display: inline-block;
+      background: rgba(6,182,212,0.12);
+      border: 1px solid rgba(6,182,212,0.35);
+      border-radius: 8px;
+      padding: 10px 28px;
+      font-family: 'Space Mono', monospace;
+      font-size: 20px;
+      color: #22d3ee;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 60px;
+    }
+    #s4 .phone-icon {
+      font-size: 130px;
+      line-height: 1;
+      margin-bottom: 50px;
+    }
+    #s4 .content h2 {
+      font-size: 88px;
+      font-weight: 700;
+      line-height: 1.0;
+      color: #fff;
+      letter-spacing: -2px;
+      margin-bottom: 50px;
+    }
+    #s4 .content h2 .cyan {
+      background: linear-gradient(135deg, #06b6d4, #0ea5e9);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    #s4 .content p {
+      font-size: 36px;
+      color: rgba(255,255,255,0.6);
+      line-height: 1.65;
+      margin-bottom: 60px;
+    }
+    #s4 .chips {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    #s4 .chip {
+      background: rgba(6,182,212,0.1);
+      border: 1px solid rgba(6,182,212,0.3);
+      border-radius: 100px;
+      padding: 14px 32px;
+      font-family: 'Space Mono', monospace;
+      font-size: 24px;
+      color: #38bdf8;
+    }
+
+    /* ══════════════════════════════════
+       SLIDE 5 — AI Hacking Speed
+    ══════════════════════════════════ */
+    #s5 {
+      background: #08080a;
+    }
+    #s5 .bg {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(160deg, #0a0808 0%, #08080a 60%, #080a08 100%);
+    }
+    #s5 .scanlines {
+      position: absolute;
+      inset: 0;
+      background-image: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 3px,
+        rgba(0,255,65,0.015) 3px,
+        rgba(0,255,65,0.015) 4px
+      );
+    }
+    #s5 .content {
+      position: absolute;
+      top: 110px;
+      left: 80px;
+      right: 80px;
+    }
+    #s5 .top-tag {
+      display: inline-block;
+      background: rgba(0,255,65,0.08);
+      border: 1px solid rgba(0,255,65,0.3);
+      border-radius: 8px;
+      padding: 10px 28px;
+      font-family: 'Space Mono', monospace;
+      font-size: 20px;
+      color: #4ade80;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 60px;
+    }
+    #s5 .content h2 {
+      font-size: 84px;
+      font-weight: 700;
+      line-height: 1.05;
+      color: #fff;
+      letter-spacing: -2px;
+      margin-bottom: 50px;
+    }
+    #s5 .content h2 .green {
+      color: #4ade80;
+    }
+    #s5 .stat-block {
+      display: flex;
+      gap: 30px;
+      margin-bottom: 60px;
+    }
+    #s5 .stat-card {
+      flex: 1;
+      background: rgba(0,255,65,0.05);
+      border: 1px solid rgba(0,255,65,0.2);
+      border-radius: 16px;
+      padding: 40px 30px;
+      text-align: center;
+    }
+    #s5 .stat-card .num {
+      font-family: 'Space Mono', monospace;
+      font-size: 60px;
+      font-weight: 700;
+      color: #4ade80;
+      line-height: 1;
+    }
+    #s5 .stat-card .unit {
+      font-size: 26px;
+      color: rgba(255,255,255,0.4);
+      margin-top: 10px;
+    }
+    #s5 .content p {
+      font-size: 36px;
+      color: rgba(255,255,255,0.6);
+      line-height: 1.65;
+    }
+    #s5 .warning-box {
+      margin-top: 50px;
+      background: rgba(239,68,68,0.08);
+      border-left: 4px solid #ef4444;
+      border-radius: 0 12px 12px 0;
+      padding: 32px 40px;
+      font-size: 32px;
+      color: rgba(255,255,255,0.65);
+      line-height: 1.5;
+    }
+
+    /* ══════════════════════════════════
+       SLIDE 6 — AI Web Hijacking
+    ══════════════════════════════════ */
+    #s6 {
+      background: #080808;
+    }
+    #s6 .bg {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(160deg, #100808 0%, #080808 100%);
+    }
+    #s6 .top-bar {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, #ef4444, #f97316, #eab308);
+    }
+    #s6 .content {
+      position: absolute;
+      top: 120px;
+      left: 80px;
+      right: 80px;
+    }
+    #s6 .top-tag {
+      display: inline-block;
+      background: rgba(249,115,22,0.1);
+      border: 1px solid rgba(249,115,22,0.35);
+      border-radius: 8px;
+      padding: 10px 28px;
+      font-family: 'Space Mono', monospace;
+      font-size: 20px;
+      color: #fb923c;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 60px;
+    }
+    #s6 .emoji-big {
+      font-size: 110px;
+      line-height: 1;
+      margin-bottom: 40px;
+    }
+    #s6 .content h2 {
+      font-size: 84px;
+      font-weight: 700;
+      line-height: 1.05;
+      color: #fff;
+      letter-spacing: -2px;
+      margin-bottom: 50px;
+    }
+    #s6 .content h2 .orange {
+      color: #fb923c;
+    }
+    #s6 .content p {
+      font-size: 36px;
+      color: rgba(255,255,255,0.6);
+      line-height: 1.65;
+      margin-bottom: 40px;
+    }
+    #s6 .how-it-works {
+      background: rgba(249,115,22,0.07);
+      border: 1px solid rgba(249,115,22,0.2);
+      border-radius: 16px;
+      padding: 44px;
+    }
+    #s6 .how-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 20px;
+      color: #fb923c;
+      letter-spacing: 3px;
+      margin-bottom: 28px;
+    }
+    #s6 .step {
+      font-size: 32px;
+      color: rgba(255,255,255,0.65);
+      line-height: 1.5;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    #s6 .step:last-child { border-bottom: none; }
+    #s6 .step .num { color: #fb923c; font-weight: 700; margin-right: 14px; }
+
+    /* ══════════════════════════════════
+       SLIDE 7 — Amazon AI Audio Shopping
+    ══════════════════════════════════ */
+    #s7 {
+      background: #05080f;
+    }
+    #s7 .bg {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(150deg, #050f18 0%, #05080f 100%);
+    }
+    #s7 .blob {
+      position: absolute;
+      top: 200px;
+      right: -100px;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(234,179,8,0.15) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+    #s7 .content {
+      position: absolute;
+      top: 110px;
+      left: 80px;
+      right: 80px;
+    }
+    #s7 .top-tag {
+      display: inline-block;
+      background: rgba(234,179,8,0.1);
+      border: 1px solid rgba(234,179,8,0.35);
+      border-radius: 8px;
+      padding: 10px 28px;
+      font-family: 'Space Mono', monospace;
+      font-size: 20px;
+      color: #facc15;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 60px;
+    }
+    #s7 .icon { font-size: 120px; line-height: 1; margin-bottom: 40px; }
+    #s7 .content h2 {
+      font-size: 84px;
+      font-weight: 700;
+      line-height: 1.05;
+      color: #fff;
+      letter-spacing: -2px;
+      margin-bottom: 48px;
+    }
+    #s7 .content h2 .yellow { color: #facc15; }
+    #s7 .content p {
+      font-size: 36px;
+      color: rgba(255,255,255,0.6);
+      line-height: 1.65;
+      margin-bottom: 50px;
+    }
+    #s7 .features {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    #s7 .feat {
+      display: flex;
+      align-items: flex-start;
+      gap: 24px;
+      font-size: 32px;
+      color: rgba(255,255,255,0.65);
+      line-height: 1.5;
+    }
+    #s7 .feat .dot {
+      width: 10px;
+      height: 10px;
+      background: #facc15;
+      border-radius: 50%;
+      margin-top: 14px;
+      flex-shrink: 0;
+    }
+
+    /* ══════════════════════════════════
+       SLIDE 8 — Meta Business AI 10M chats
+    ══════════════════════════════════ */
+    #s8 {
+      background: #08080f;
+    }
+    #s8 .bg {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(150deg, #0a0820 0%, #08080f 100%);
+    }
+    #s8 .content {
+      position: absolute;
+      top: 110px;
+      left: 80px;
+      right: 80px;
+    }
+    #s8 .top-tag {
+      display: inline-block;
+      background: rgba(139,92,246,0.12);
+      border: 1px solid rgba(139,92,246,0.35);
+      border-radius: 8px;
+      padding: 10px 28px;
+      font-family: 'Space Mono', monospace;
+      font-size: 20px;
+      color: #a78bfa;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 60px;
+    }
+    #s8 .big-number {
+      font-family: 'Space Mono', monospace;
+      font-size: 160px;
+      font-weight: 700;
+      color: #a855f7;
+      line-height: 1;
+      margin-bottom: 0;
+      letter-spacing: -4px;
+    }
+    #s8 .big-label {
+      font-size: 38px;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 50px;
+    }
+    #s8 .divider {
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(139,92,246,0.5), transparent);
+      margin-bottom: 50px;
+    }
+    #s8 .content h2 {
+      font-size: 76px;
+      font-weight: 700;
+      line-height: 1.1;
+      color: #fff;
+      letter-spacing: -1.5px;
+      margin-bottom: 40px;
+    }
+    #s8 .content p {
+      font-size: 36px;
+      color: rgba(255,255,255,0.6);
+      line-height: 1.65;
+    }
+
+    /* ══════════════════════════════════
+       SLIDE 9 — Lawyer AI Hallucination
+    ══════════════════════════════════ */
+    #s9 {
+      background: #080808;
+    }
+    #s9 .bg {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(160deg, #0d0808 0%, #080808 100%);
+    }
+    #s9 .content {
+      position: absolute;
+      top: 110px;
+      left: 80px;
+      right: 80px;
+    }
+    #s9 .top-tag {
+      display: inline-block;
+      background: rgba(239,68,68,0.1);
+      border: 1px solid rgba(239,68,68,0.3);
+      border-radius: 8px;
+      padding: 10px 28px;
+      font-family: 'Space Mono', monospace;
+      font-size: 20px;
+      color: #f87171;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 60px;
+    }
+    #s9 .emoji { font-size: 110px; line-height: 1; margin-bottom: 40px; }
+    #s9 .content h2 {
+      font-size: 86px;
+      font-weight: 700;
+      line-height: 1.05;
+      color: #fff;
+      letter-spacing: -2px;
+      margin-bottom: 50px;
+    }
+    #s9 .content h2 .red { color: #f87171; }
+    #s9 .content p {
+      font-size: 36px;
+      color: rgba(255,255,255,0.6);
+      line-height: 1.65;
+      margin-bottom: 40px;
+    }
+    #s9 .receipt {
+      background: rgba(239,68,68,0.06);
+      border: 1px solid rgba(239,68,68,0.2);
+      border-radius: 16px;
+      padding: 40px;
+    }
+    #s9 .receipt-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 16px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      font-size: 30px;
+    }
+    #s9 .receipt-row:last-child { border-bottom: none; }
+    #s9 .receipt-row .label { color: rgba(255,255,255,0.4); }
+    #s9 .receipt-row .val { color: #f87171; font-weight: 600; font-family: 'Space Mono', monospace; }
+
+    /* ══════════════════════════════════
+       SLIDE 10 — CTA
+    ══════════════════════════════════ */
+    #s10 {
+      background: #08080f;
+    }
+    #s10 .bg {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 110% 80% at 50% 100%, #1a0a3e 0%, #0d0520 40%, #08080f 100%);
+    }
+    #s10 .grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(138,43,226,0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(138,43,226,0.06) 1px, transparent 1px);
+      background-size: 80px 80px;
+    }
+    #s10 .glow {
+      position: absolute;
+      bottom: -150px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 900px;
+      height: 600px;
+      background: radial-gradient(ellipse, rgba(120,40,220,0.4) 0%, transparent 70%);
+    }
+    #s10 .content {
+      position: absolute;
+      top: 50%;
+      left: 80px;
+      right: 80px;
+      transform: translateY(-50%);
+      text-align: center;
+    }
+    #s10 .content .thanks {
+      font-family: 'Space Mono', monospace;
+      font-size: 24px;
+      color: #8b5cf6;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      margin-bottom: 40px;
+    }
+    #s10 .content h2 {
+      font-size: 96px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.05;
+      letter-spacing: -2px;
+      margin-bottom: 40px;
+    }
+    #s10 .content h2 .gradient {
+      background: linear-gradient(135deg, #a855f7, #06b6d4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    #s10 .content p {
+      font-size: 38px;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 80px;
+      line-height: 1.5;
+    }
+    #s10 .cta-pills {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+      margin-bottom: 80px;
+    }
+    #s10 .cta-pill {
+      background: rgba(139,92,246,0.15);
+      border: 1.5px solid rgba(139,92,246,0.5);
+      border-radius: 100px;
+      padding: 20px 44px;
+      font-family: 'Space Mono', monospace;
+      font-size: 26px;
+      color: #c084fc;
+      letter-spacing: 1px;
+    }
+    #s10 .handle-big {
+      font-family: 'Space Mono', monospace;
+      font-size: 36px;
+      color: rgba(255,255,255,0.25);
+      letter-spacing: 2px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══ SLIDE 1: COVER ══ -->
+  <div class="slide" id="s1">
+    <div class="bg-gradient"></div>
+    <div class="grid-lines"></div>
+    <div class="glow-orb"></div>
+    <div class="noise"></div>
+    <div class="week-badge">APR 27 – MAY 3, 2026</div>
+    <div class="main-title">
+      <div class="label">⚡ Weekly Recap</div>
+      <h1>THE AI<br><span>WEEK THAT</span><br>BROKE RULES</h1>
+      <div class="sub">10 stories you actually need to know</div>
+    </div>
+    <div class="swipe-hint">
+      <span class="arrow">→</span>
+      SWIPE TO READ
+      <span class="arrow">→</span>
+    </div>
+    <div class="handle">@aiweekly</div>
+    <div class="slide-counter">01 / 10</div>
+  </div>
+
+  <!-- ══ SLIDE 2: OpenAI + Microsoft breakup ══ -->
+  <div class="slide" id="s2">
+    <div class="bg"></div>
+    <div class="accent-bar"></div>
+    <div class="noise"></div>
+    <div class="top-tag">💔 BIG BREAKUP</div>
+    <div class="emoji-big">🤝💔</div>
+    <div class="headline">
+      <h2>OpenAI &amp;<br>Microsoft<br><span class="gradient">Split Their<br>Deal</span></h2>
+    </div>
+    <div class="body-block">
+      <p>The most powerful partnership in tech just got restructured. Microsoft drops its Azure revenue share — OpenAI keeps paying Microsoft a capped cut through 2030.</p>
+      <div class="stat-pill">EXCLUSIVE ERA → OVER</div>
+    </div>
+    <div class="handle">@aiweekly</div>
+    <div class="slide-counter">02 / 10</div>
+  </div>
+
+  <!-- ══ SLIDE 3: Meta goes closed source ══ -->
+  <div class="slide" id="s3">
+    <div class="bg"></div>
+    <div class="blob"></div>
+    <div class="noise"></div>
+    <div class="top-tag">🔒 META FLIPS</div>
+    <div class="content">
+      <h2>Meta Killed<br>Open Source.<br><span class="red">Hello<br>Muse Spark.</span></h2>
+      <div class="divider"></div>
+      <p>Meta's first proprietary flagship LLM just dropped — built under new Chief AI Officer Alexandr Wang. A full 180° from their Llama-for-everyone strategy.</p>
+      <div class="box">
+        <div class="box-label">💸 2026 AI Spend</div>
+        <div class="box-stat">$115–135B</div>
+        <div class="box-sub">Nearly double last year. The race is on.</div>
+      </div>
+    </div>
+    <div class="handle">@aiweekly</div>
+    <div class="slide-counter">03 / 10</div>
+  </div>
+
+  <!-- ══ SLIDE 4: OpenAI Phone ══ -->
+  <div class="slide" id="s4">
+    <div class="bg"></div>
+    <div class="grid"></div>
+    <div class="glow"></div>
+    <div class="noise"></div>
+    <div class="content">
+      <div class="top-tag">📱 RUMOR ALERT</div>
+      <div class="phone-icon">📱🤖</div>
+      <h2>OpenAI Is<br>Building<br>A <span class="cyan">Phone</span></h2>
+      <p>Analyst Ming-Chi Kuo leaked it. MediaTek + Qualcomm on chips. Luxshare on manufacturing. No apps — just AI agents doing everything.</p>
+      <div class="chips">
+        <div class="chip">MediaTek</div>
+        <div class="chip">Qualcomm</div>
+        <div class="chip">Luxshare</div>
+        <div class="chip">Agent-First</div>
+      </div>
+    </div>
+    <div class="handle">@aiweekly</div>
+    <div class="slide-counter">04 / 10</div>
+  </div>
+
+  <!-- ══ SLIDE 5: AI Hacking Speed ══ -->
+  <div class="slide" id="s5">
+    <div class="bg"></div>
+    <div class="scanlines"></div>
+    <div class="noise"></div>
+    <div class="content">
+      <div class="top-tag">⚠️ SECURITY</div>
+      <h2>AI Hacks<br>You<br><span class="green">10× Faster</span></h2>
+      <div class="stat-block">
+        <div class="stat-card">
+          <div class="num">5mo</div>
+          <div class="unit">bug→exploit 2023</div>
+        </div>
+        <div class="stat-card">
+          <div class="num">10hr</div>
+          <div class="unit">bug→exploit 2026</div>
+        </div>
+      </div>
+      <p>Black Hat Asia dropped a bomb: frontier LLMs like GPT-5.5 and Anthropic's Mythos are powering a new wave of agentic offensive security tools.</p>
+      <div class="warning-box">
+        🛡️ Defenders need AI-native reasoning and multi-agent systems — traditional tools won't cut it.
+      </div>
+    </div>
+    <div class="handle">@aiweekly</div>
+    <div class="slide-counter">05 / 10</div>
+  </div>
+
+  <!-- ══ SLIDE 6: AI Web Prompt Injection ══ -->
+  <div class="slide" id="s6">
+    <div class="bg"></div>
+    <div class="top-bar"></div>
+    <div class="noise"></div>
+    <div class="content">
+      <div class="top-tag">🕷️ GOOGLE WARNING</div>
+      <div class="emoji-big">🌐💀</div>
+      <h2>The Web Is<br><span class="orange">Hijacking</span><br>Your AI</h2>
+      <p>Google researchers found attackers hiding commands inside public web pages. Any AI agent browsing the web can be turned against you — using its own real permissions.</p>
+      <div class="how-it-works">
+        <div class="how-label">HOW IT WORKS</div>
+        <div class="step"><span class="num">1.</span>Attacker hides hidden text in a webpage</div>
+        <div class="step"><span class="num">2.</span>Your AI agent reads the page</div>
+        <div class="step"><span class="num">3.</span>AI follows the attacker's instructions</div>
+        <div class="step"><span class="num">4.</span>Traditional security sees nothing wrong</div>
+      </div>
+    </div>
+    <div class="handle">@aiweekly</div>
+    <div class="slide-counter">06 / 10</div>
+  </div>
+
+  <!-- ══ SLIDE 7: Amazon Audio AI ══ -->
+  <div class="slide" id="s7">
+    <div class="bg"></div>
+    <div class="blob"></div>
+    <div class="noise"></div>
+    <div class="content">
+      <div class="top-tag">🛒 AMAZON</div>
+      <div class="icon">🎙️🛍️</div>
+      <h2>Amazon<br>Made Shopping<br><span class="yellow">Conversational</span></h2>
+      <p>Forget reading reviews. Amazon's new "Join the Chat" feature lets you voice-chat with AI about any product — while you keep browsing.</p>
+      <div class="features">
+        <div class="feat"><div class="dot"></div><span>Builds on previous questions, no repetition</span></div>
+        <div class="feat"><div class="dot"></div><span>Switch between voice and text mid-chat</span></div>
+        <div class="feat"><div class="dot"></div><span>Pulls from features + real customer reviews</span></div>
+        <div class="feat"><div class="dot"></div><span>Works while you continue scrolling</span></div>
+      </div>
+    </div>
+    <div class="handle">@aiweekly</div>
+    <div class="slide-counter">07 / 10</div>
+  </div>
+
+  <!-- ══ SLIDE 8: Meta Business AI 10M ══ -->
+  <div class="slide" id="s8">
+    <div class="bg"></div>
+    <div class="noise"></div>
+    <div class="content">
+      <div class="top-tag">💬 META MILESTONE</div>
+      <div class="big-number">10M</div>
+      <div class="big-label">business AI conversations / week</div>
+      <div class="divider"></div>
+      <h2>AI Is Now<br>Running Business<br>At Scale</h2>
+      <p>Meta's business AI is handling 10 million conversations per week. This isn't a chatbot — it's the new customer service layer. The implications for jobs and workflows are massive.</p>
+    </div>
+    <div class="handle">@aiweekly</div>
+    <div class="slide-counter">08 / 10</div>
+  </div>
+
+  <!-- ══ SLIDE 9: Lawyer AI Hallucination ══ -->
+  <div class="slide" id="s9">
+    <div class="bg"></div>
+    <div class="noise"></div>
+    <div class="content">
+      <div class="top-tag">⚖️ CAUTIONARY TALE</div>
+      <div class="emoji">😬⚖️</div>
+      <h2>Lawyer Got<br>Suspended For<br><span class="red">AI Lies</span></h2>
+      <p>Nebraska attorney filed a legal brief with 57 defective citations — 20 were pure AI hallucinations. Fake cases. Fake quotes. Fake statutes. He then denied using AI.</p>
+      <div class="receipt">
+        <div class="receipt-row">
+          <span class="label">Total citations</span>
+          <span class="val">63</span>
+        </div>
+        <div class="receipt-row">
+          <span class="label">Defective</span>
+          <span class="val">57 / 63</span>
+        </div>
+        <div class="receipt-row">
+          <span class="label">AI hallucinations</span>
+          <span class="val">20</span>
+        </div>
+        <div class="receipt-row">
+          <span class="label">US sanctions Q1 2026</span>
+          <span class="val">$145,000+</span>
+        </div>
+        <div class="receipt-row">
+          <span class="label">Result</span>
+          <span class="val">SUSPENDED</span>
+        </div>
+      </div>
+    </div>
+    <div class="handle">@aiweekly</div>
+    <div class="slide-counter">09 / 10</div>
+  </div>
+
+  <!-- ══ SLIDE 10: CTA ══ -->
+  <div class="slide" id="s10">
+    <div class="bg"></div>
+    <div class="grid"></div>
+    <div class="glow"></div>
+    <div class="noise"></div>
+    <div class="content">
+      <div class="thanks">THAT'S A WRAP ✦</div>
+      <h2>Stay Ahead<br>of the <span class="gradient">AI Curve</span></h2>
+      <p>New drops every week.<br>Follow so you never miss a thing.</p>
+      <div class="cta-pills">
+        <div class="cta-pill">💾 SAVE THIS</div>
+        <div class="cta-pill">🔁 SHARE IT</div>
+        <div class="cta-pill">👥 FOLLOW US</div>
+      </div>
+      <div class="handle-big">@aiweekly · Apr 27 – May 3, 2026</div>
+    </div>
+  </div>
+
+</body>
+</html>

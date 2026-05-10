@@ -1,0 +1,1395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="page-title">My Links</title>
+<meta id="meta-desc" name="description" content="">
+<meta id="og-title" property="og:title" content="My Links">
+<meta id="og-image" property="og:image" content="">
+<link rel="icon" id="favicon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔗</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f5f3ef;
+    --surface: #ffffff;
+    --text: #1a1a1a;
+    --text-muted: #888;
+    --accent: #1a1a1a;
+    --accent-fg: #ffffff;
+    --border: #e8e4de;
+    --radius: 12px;
+    --btn-radius: 12px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+    --shadow-hover: 0 2px 8px rgba(0,0,0,0.1), 0 8px 24px rgba(0,0,0,0.07);
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: transparent;
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.5;
+  }
+
+  /* ── PUBLIC PAGE ── */
+  #public-page {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+    animation: fadeUp 0.5s ease both;
+    position: relative;
+    z-index: 1;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .profile {
+    text-align: center;
+    margin-bottom: 36px;
+  }
+
+  .profile-photo {
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: var(--border);
+    display: block;
+    margin: 0 auto 16px;
+    border: 3px solid var(--surface);
+    box-shadow: var(--shadow);
+  }
+
+  .profile-photo-placeholder {
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    background: var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    font-size: 32px;
+    border: 3px solid var(--surface);
+    box-shadow: var(--shadow);
+  }
+
+  .profile-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 26px;
+    letter-spacing: -0.3px;
+    margin-bottom: 6px;
+  }
+
+  .profile-tagline {
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+  }
+
+  .profile-bio {
+    font-size: 14px;
+    color: var(--text-muted);
+    max-width: 320px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  .links-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .link-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    background: var(--surface);
+    border-radius: var(--btn-radius);
+    text-decoration: none;
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: var(--shadow);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    border: 1px solid var(--border);
+    cursor: pointer;
+  }
+
+  .link-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+  }
+
+  .link-btn.pinned {
+    background: var(--accent);
+    color: var(--accent-fg);
+    border-color: var(--accent);
+  }
+
+  .link-icon { font-size: 18px; flex-shrink: 0; width: 24px; text-align: center; }
+  .link-title { flex: 1; }
+
+  .public-footer {
+    text-align: center;
+    margin-top: 48px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .admin-link-btn {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 11px;
+    color: var(--text-muted);
+    text-decoration: none;
+    opacity: 0.4;
+    transition: opacity 0.2s;
+  }
+  .admin-link-btn:hover { opacity: 1; }
+
+  /* ── ADMIN PAGE ── */
+  #admin-page {
+    display: none;
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 32px 24px 80px;
+    animation: fadeUp 0.4s ease both;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Admin always renders on a clean neutral surface, immune to public bg */
+  body.admin-mode {
+    background: #f0ede8 !important;
+    background-image: none !important;
+  }
+
+  .admin-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 36px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .admin-header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+  }
+
+  .admin-tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--border);
+    border-radius: 10px;
+    padding: 4px;
+    margin-bottom: 28px;
+  }
+
+  .admin-tab {
+    flex: 1;
+    padding: 8px 12px;
+    border: none;
+    background: transparent;
+    border-radius: 7px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: all 0.15s;
+  }
+
+  .admin-tab.active {
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* Cards */
+  .card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+  }
+
+  .card-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+  }
+
+  /* Form elements */
+  label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-bottom: 5px;
+    margin-top: 14px;
+  }
+  label:first-child { margin-top: 0; }
+
+  input[type="text"], input[type="url"], input[type="password"], textarea, select {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--text);
+    background: #faf9f7;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  input:focus, textarea:focus, select:focus {
+    border-color: #aaa;
+    background: #ffffff;
+  }
+
+  textarea { resize: vertical; min-height: 72px; }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 16px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: var(--accent-fg);
+  }
+  .btn-primary:hover { opacity: 0.85; }
+
+  .btn-ghost {
+    background: #ffffff;
+    color: #444;
+    border: 1px solid #d0ccc6;
+  }
+  .btn-ghost:hover { background: #f5f3ef; color: #1a1a1a; border-color: #aaa; }
+
+  .btn-danger {
+    background: transparent;
+    color: #e03;
+    border: 1px solid #fdd;
+  }
+  .btn-danger:hover { background: #fff5f5; }
+
+  .btn-sm { padding: 6px 11px; font-size: 12px; }
+
+  /* Link items in admin */
+  .link-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    background: #faf9f7;
+    border-radius: 9px;
+    border: 1px solid var(--border);
+    margin-bottom: 8px;
+    transition: box-shadow 0.15s;
+    cursor: grab;
+  }
+
+  .link-item:active { cursor: grabbing; }
+  .link-item.dragging { opacity: 0.4; }
+  .link-item.drag-over { box-shadow: 0 0 0 2px var(--accent); }
+
+  .drag-handle { color: var(--text-muted); font-size: 14px; cursor: grab; flex-shrink: 0; }
+  .link-item-icon { font-size: 16px; flex-shrink: 0; width: 20px; text-align: center; }
+  .link-item-info { flex: 1; min-width: 0; }
+  .link-item-title { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .link-item-url { font-size: 11px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .link-item-actions { display: flex; gap: 6px; flex-shrink: 0; }
+
+  .toggle-switch {
+    position: relative;
+    width: 36px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+  .toggle-switch input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider {
+    position: absolute;
+    inset: 0;
+    background: var(--border);
+    border-radius: 20px;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .toggle-slider::before {
+    content: '';
+    position: absolute;
+    width: 14px; height: 14px;
+    left: 3px; top: 3px;
+    background: white;
+    border-radius: 50%;
+    transition: 0.2s;
+  }
+  .toggle-switch input:checked + .toggle-slider { background: var(--accent); }
+  .toggle-switch input:checked + .toggle-slider::before { transform: translateX(16px); }
+
+  /* Add link form */
+  #add-link-form {
+    display: none;
+    background: #faf9f7;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+
+  .form-row { display: flex; gap: 10px; }
+  .form-row > * { flex: 1; }
+
+  /* Color swatches */
+  .color-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+  .color-swatch {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: transform 0.15s, border-color 0.15s;
+  }
+  .color-swatch:hover { transform: scale(1.15); }
+  .color-swatch.active { border-color: var(--accent); }
+
+  /* Radius options */
+  .radius-opts { display: flex; gap: 8px; margin-top: 6px; }
+  .radius-opt {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+  }
+  .radius-opt.active { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+
+  /* Pin badge */
+  .pin-badge {
+    font-size: 10px;
+    background: var(--accent);
+    color: var(--accent-fg);
+    padding: 2px 6px;
+    border-radius: 20px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+  }
+
+  /* Toast */
+  #toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--text);
+    color: var(--accent-fg);
+    padding: 10px 20px;
+    border-radius: 100px;
+    font-size: 13px;
+    font-weight: 500;
+    z-index: 9999;
+    transition: transform 0.3s ease;
+    white-space: nowrap;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* Modal */
+  #modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.3);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+  }
+  #modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface);
+    border-radius: 16px;
+    padding: 32px;
+    max-width: 360px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    animation: fadeUp 0.25s ease;
+  }
+  .modal h2 { font-family: 'DM Serif Display', serif; font-size: 20px; margin-bottom: 8px; }
+  .modal p { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
+
+  /* Edit modal */
+  #edit-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.3);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+  }
+  #edit-modal-overlay.open { display: flex; }
+
+  /* QR */
+  #qr-container { text-align: center; margin-top: 12px; }
+  #qr-container canvas { border-radius: 8px; }
+
+  /* Password page */
+  #password-page {
+    display: none;
+    min-height: 100vh;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 24px;
+  }
+  #password-page.active { display: flex; }
+
+  .pw-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    padding: 32px;
+    max-width: 320px;
+    width: 90%;
+    box-shadow: var(--shadow);
+    text-align: center;
+  }
+  .pw-card h2 { font-family: 'DM Serif Display', serif; font-size: 22px; margin-bottom: 8px; }
+  .pw-card p { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+
+  .section-divider { height: 1px; background: var(--border); margin: 20px 0; }
+  .flex-end { display: flex; justify-content: flex-end; margin-top: 12px; }
+  .flex-between { display: flex; align-items: center; justify-content: space-between; }
+  .gap-8 { gap: 8px; }
+
+  @media (max-width: 480px) {
+    #admin-page { padding: 20px 16px 80px; }
+    .form-row { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<div id="bg-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:0;pointer-events:none"></div>
+
+<!-- PASSWORD PAGE -->
+<div id="password-page">
+  <div class="pw-card">
+    <h2>Welcome 👋</h2>
+    <p>This page is password protected.</p>
+    <input type="password" id="pw-input" placeholder="Enter password" style="margin-bottom: 12px;">
+    <button class="btn btn-primary" style="width:100%" onclick="checkPassword()">Unlock</button>
+    <p id="pw-error" style="color:#e03;font-size:12px;margin-top:8px;display:none;">Incorrect password.</p>
+  </div>
+</div>
+
+<!-- PUBLIC PAGE -->
+<div id="public-page">
+  <div class="profile">
+    <div id="profile-photo-wrap"></div>
+    <h1 class="profile-name" id="pub-name">Your Name</h1>
+    <p class="profile-tagline" id="pub-tagline"></p>
+    <p class="profile-bio" id="pub-bio"></p>
+  </div>
+  <div class="links-list" id="pub-links"></div>
+  <div class="public-footer">
+    <a href="#admin" class="admin-link-btn">⚙</a>
+  </div>
+</div>
+
+<!-- ADMIN PAGE -->
+<div id="admin-page">
+  <div class="admin-header">
+    <h1>✦ Admin</h1>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-ghost btn-sm" onclick="exportData()">↓ Export</button>
+      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('import-input').click()">↑ Import</button>
+      <input type="file" id="import-input" accept=".json" style="display:none" onchange="importData(event)">
+      <button class="btn btn-ghost btn-sm" onclick="goPublic()">← View page</button>
+    </div>
+  </div>
+
+  <div class="admin-tabs">
+    <button class="admin-tab active" onclick="switchTab('links')">Links</button>
+    <button class="admin-tab" onclick="switchTab('profile')">Profile</button>
+    <button class="admin-tab" onclick="switchTab('appearance')">Appearance</button>
+    <button class="admin-tab" onclick="switchTab('settings')">Settings</button>
+  </div>
+
+  <!-- LINKS TAB -->
+  <div class="tab-panel active" id="tab-links">
+    <button class="btn btn-primary" style="margin-bottom:14px;width:100%" onclick="toggleAddForm()">+ Add link</button>
+
+    <div id="add-link-form">
+      <div class="form-row">
+        <div>
+          <label>Icon (emoji)</label>
+          <input type="text" id="new-icon" placeholder="🔗" maxlength="4" style="text-align:center;font-size:20px">
+        </div>
+        <div style="flex:3">
+          <label>Title</label>
+          <input type="text" id="new-title" placeholder="Link title">
+        </div>
+      </div>
+      <label>URL</label>
+      <input type="url" id="new-url" placeholder="https://" oninput="autoDetectIcon()">
+      <label style="display:flex;align-items:center;gap:8px;margin-top:14px">
+        <input type="checkbox" id="new-pinned"> Pin to top
+      </label>
+      <div class="flex-end" style="gap:8px;margin-top:14px">
+        <button class="btn btn-ghost btn-sm" onclick="toggleAddForm()">Cancel</button>
+        <button class="btn btn-primary btn-sm" onclick="addLink()">Add link</button>
+      </div>
+    </div>
+
+    <div id="links-admin-list"></div>
+  </div>
+
+  <!-- PROFILE TAB -->
+  <div class="tab-panel" id="tab-profile">
+    <div class="card">
+      <div class="card-title">Profile</div>
+      <label>Photo URL</label>
+      <input type="url" id="prof-photo" placeholder="https://..." oninput="saveProfile()">
+      <label>Display Name</label>
+      <input type="text" id="prof-name" placeholder="Your Name" oninput="saveProfile()">
+      <label>Tagline</label>
+      <input type="text" id="prof-tagline" placeholder="Designer · Creator · Human" oninput="saveProfile()">
+      <label>Bio</label>
+      <textarea id="prof-bio" placeholder="A short line about you..." oninput="saveProfile()"></textarea>
+    </div>
+  </div>
+
+  <!-- APPEARANCE TAB -->
+  <div class="tab-panel" id="tab-appearance">
+    <div class="card">
+      <div class="card-title">Background</div>
+      <div class="radius-opts" style="margin-bottom:14px">
+        <div class="radius-opt active" id="bg-type-solid" onclick="setBgType('solid', this)">Solid</div>
+        <div class="radius-opt" id="bg-type-gradient" onclick="setBgType('gradient', this)">Gradient</div>
+        <div class="radius-opt" id="bg-type-image" onclick="setBgType('image', this)">Image</div>
+      </div>
+
+      <!-- Solid -->
+      <div id="bg-solid-opts">
+        <label>Color</label>
+        <input type="color" id="bg-color" value="#f5f3ef" oninput="saveBg()">
+      </div>
+
+      <!-- Gradient -->
+      <div id="bg-gradient-opts" style="display:none">
+        <div class="form-row">
+          <div>
+            <label>From</label>
+            <input type="color" id="bg-grad-from" value="#f5f3ef" oninput="saveBg()">
+          </div>
+          <div>
+            <label>To</label>
+            <input type="color" id="bg-grad-to" value="#dce8f0" oninput="saveBg()">
+          </div>
+        </div>
+        <label>Direction</label>
+        <select id="bg-grad-dir" onchange="saveBg()">
+          <option value="to bottom">Top → Bottom</option>
+          <option value="to bottom right">Diagonal ↘</option>
+          <option value="to right">Left → Right</option>
+          <option value="135deg">135°</option>
+        </select>
+      </div>
+
+      <!-- Image -->
+      <div id="bg-image-opts" style="display:none">
+        <label>Image URL</label>
+        <input type="url" id="bg-image-url" placeholder="https://..." oninput="saveBg()">
+        <label>Size</label>
+        <select id="bg-image-size" onchange="saveBg()">
+          <option value="cover">Cover (fill)</option>
+          <option value="contain">Contain</option>
+          <option value="auto">Original size</option>
+        </select>
+        <label>Position</label>
+        <select id="bg-image-pos" onchange="saveBg()">
+          <option value="center">Center</option>
+          <option value="top">Top</option>
+          <option value="bottom">Bottom</option>
+        </select>
+        <label style="display:flex;align-items:center;gap:8px;margin-top:12px">
+          <input type="checkbox" id="bg-image-overlay" onchange="saveBg()"> Dark overlay (improves text readability)
+        </label>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Accent color</div>
+      <div class="color-row" id="accent-swatches"></div>
+      <label style="margin-top:12px">Custom</label>
+      <input type="color" id="accent-color" value="#1a1a1a" oninput="applyTheme()">
+    </div>
+    <div class="card">
+      <div class="card-title">Button style</div>
+      <div class="radius-opts">
+        <div class="radius-opt active" onclick="setRadius('12px', this)">Rounded</div>
+        <div class="radius-opt" onclick="setRadius('100px', this)">Pill</div>
+        <div class="radius-opt" onclick="setRadius('4px', this)">Sharp</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETTINGS TAB -->
+  <div class="tab-panel" id="tab-settings">
+    <div class="card">
+      <div class="card-title">SEO & Meta</div>
+      <label>Page title</label>
+      <input type="text" id="meta-title" placeholder="My Links" oninput="saveSettings()">
+      <label>Meta description</label>
+      <input type="text" id="meta-desc-input" placeholder="Find all my links here" oninput="saveSettings()">
+      <label>Open Graph image URL</label>
+      <input type="url" id="og-image-input" placeholder="https://..." oninput="saveSettings()">
+      <label>Favicon URL</label>
+      <input type="url" id="favicon-input" placeholder="https://..." oninput="saveSettings()">
+    </div>
+
+    <div class="card">
+      <div class="card-title">Analytics</div>
+      <label>Analytics script tag</label>
+      <textarea id="analytics-script" placeholder="Paste your Plausible or Umami <script> tag here..." oninput="saveSettings()"></textarea>
+      <p style="font-size:11px;color:var(--text-muted);margin-top:6px">Paste your full script tag. It will be injected into the page on save.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Page protection</div>
+      <label style="display:flex;align-items:center;gap:8px">
+        <input type="checkbox" id="pw-enabled" onchange="saveSettings()"> Password protect public page
+      </label>
+      <label style="margin-top:12px">Password</label>
+      <input type="password" id="pw-value" placeholder="Set a password" oninput="saveSettings()">
+    </div>
+
+    <div class="card">
+      <div class="card-title">Admin password</div>
+      <label>Change admin password</label>
+      <input type="password" id="admin-pw-input" placeholder="New admin password">
+      <div class="flex-end" style="margin-top:10px">
+        <button class="btn btn-primary btn-sm" onclick="saveAdminPassword()">Save</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">QR Code</div>
+      <p style="font-size:12px;color:var(--text-muted);margin-bottom:10px">QR code for your page URL</p>
+      <input type="text" id="qr-url-input" placeholder="https://yourpage.com" oninput="generateQR()">
+      <div id="qr-container" style="margin-top:14px"></div>
+      <div class="flex-end" style="margin-top:10px">
+        <button class="btn btn-ghost btn-sm" onclick="downloadQR()">↓ Download QR</button>
+      </div>
+    </div>
+
+    <div class="card" style="border-color:#fdd">
+      <div class="card-title" style="color:#e03">Danger zone</div>
+      <button class="btn btn-danger btn-sm" onclick="resetAll()">Reset all data</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div id="modal-overlay">
+  <div class="modal">
+    <h2 id="modal-title">Admin Access</h2>
+    <p id="modal-desc">Enter your admin password to continue.</p>
+    <input type="password" id="admin-pw-check" placeholder="Password">
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="verifyAdmin()">Enter</button>
+    </div>
+    <p id="modal-error" style="color:#e03;font-size:12px;margin-top:8px;display:none;">Incorrect password.</p>
+  </div>
+</div>
+
+<div id="edit-modal-overlay">
+  <div class="modal" style="max-width:400px">
+    <h2>Edit link</h2>
+    <div class="form-row" style="margin-top:16px">
+      <div>
+        <label>Icon</label>
+        <input type="text" id="edit-icon" maxlength="4" style="text-align:center;font-size:20px">
+      </div>
+      <div style="flex:3">
+        <label>Title</label>
+        <input type="text" id="edit-title">
+      </div>
+    </div>
+    <label>URL</label>
+    <input type="url" id="edit-url">
+    <label style="display:flex;align-items:center;gap:8px;margin-top:14px">
+      <input type="checkbox" id="edit-pinned"> Pin to top
+    </label>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeEditModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveEdit()">Save</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ── QR lib (tiny inline QR generator) ──
+// Using a CDN for QR
+const QR_SCRIPT = document.createElement('script');
+QR_SCRIPT.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+document.head.appendChild(QR_SCRIPT);
+
+// ── STATE ──
+let data = {
+  profile: { photo: '', name: '', tagline: '', bio: '' },
+  links: [],
+  appearance: { bg: '#f5f3ef', accent: '#1a1a1a', radius: '12px' },
+  settings: { title: '', desc: '', ogImage: '', favicon: '', analytics: '', pwEnabled: false, pw: '', adminPw: '' },
+  qrUrl: ''
+};
+
+let editingIndex = -1;
+let dragSrc = null;
+
+const ACCENT_PRESETS = ['#1a1a1a','#2d6a4f','#1d3557','#9b2226','#6d6875','#e07a5f','#3d405b','#81b29a'];
+
+const SOCIAL_MAP = {
+  'twitter.com': '𝕏', 'x.com': '𝕏',
+  'github.com': '🐙', 'instagram.com': '📸',
+  'linkedin.com': '💼', 'youtube.com': '▶️',
+  'tiktok.com': '🎵', 'spotify.com': '🎧',
+  'discord.gg': '💬', 'twitch.tv': '🎮',
+  'mailto:': '✉️', 'tel:': '📞',
+  'substack.com': '📰', 'medium.com': '📝'
+};
+
+// ── INIT ──
+function init() {
+  load();
+  renderAccentSwatches();
+  checkRoute();
+  window.addEventListener('hashchange', checkRoute);
+}
+
+function checkRoute() {
+  const hash = window.location.hash;
+  if (hash === '#admin') {
+    const adminPw = data.settings.adminPw;
+    if (adminPw) {
+      openModal();
+    } else {
+      showAdmin();
+    }
+  } else {
+    // check public password
+    const pwEnabled = data.settings.pwEnabled;
+    const pw = data.settings.pw;
+    if (pwEnabled && pw) {
+      const unlocked = sessionStorage.getItem('page-unlocked');
+      if (unlocked !== 'yes') {
+        showPasswordPage();
+        return;
+      }
+    }
+    showPublic();
+  }
+}
+
+function showPublic() {
+  document.body.classList.remove('admin-mode');
+  document.getElementById('password-page').classList.remove('active');
+  document.getElementById('public-page').style.display = 'block';
+  document.getElementById('admin-page').style.display = 'none';
+  applyTheme();
+  renderPublic();
+}
+
+function showPasswordPage() {
+  document.body.classList.remove('admin-mode');
+  document.getElementById('password-page').classList.add('active');
+  document.getElementById('public-page').style.display = 'none';
+  document.getElementById('admin-page').style.display = 'none';
+  applyTheme();
+}
+
+function checkPassword() {
+  const val = document.getElementById('pw-input').value;
+  if (val === data.settings.pw) {
+    sessionStorage.setItem('page-unlocked', 'yes');
+    document.getElementById('pw-error').style.display = 'none';
+    showPublic();
+  } else {
+    document.getElementById('pw-error').style.display = 'block';
+  }
+}
+
+function showAdmin() {
+  document.body.classList.add('admin-mode');
+  // Reset body background so public bg doesn't bleed into admin
+  document.body.style.backgroundImage = 'none';
+  document.body.style.backgroundColor = '#f0ede8';
+  document.getElementById('password-page').classList.remove('active');
+  document.getElementById('public-page').style.display = 'none';
+  document.getElementById('admin-page').style.display = 'block';
+  loadAdminFields();
+  renderAdminLinks();
+}
+
+function goPublic() {
+  window.location.hash = '';
+}
+
+// ── STORAGE ──
+function save() {
+  // Sync accent input value into data before saving
+  const acEl = document.getElementById('accent-color');
+  if (acEl) data.appearance.accent = acEl.value;
+  localStorage.setItem('linkinbio', JSON.stringify(data));
+  applyTheme();
+  applyMeta();
+}
+
+function load() {
+  const raw = localStorage.getItem('linkinbio');
+  if (raw) {
+    try { data = { ...data, ...JSON.parse(raw) }; } catch(e) {}
+  }
+  applyTheme();
+  applyMeta();
+}
+
+function exportData() {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'linkinbio-backup.json';
+  a.click();
+  toast('Exported!');
+}
+
+function importData(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      data = JSON.parse(ev.target.result);
+      save();
+      loadAdminFields();
+      renderAdminLinks();
+      toast('Imported!');
+    } catch { toast('Invalid file'); }
+  };
+  reader.readAsText(file);
+}
+
+function resetAll() {
+  if (!confirm('Reset all data? This cannot be undone.')) return;
+  localStorage.removeItem('linkinbio');
+  location.reload();
+}
+
+// ── META / THEME ──
+function applyMeta() {
+  document.getElementById('page-title').textContent = data.settings.title || 'My Links';
+  document.getElementById('meta-desc').content = data.settings.desc || '';
+  document.getElementById('og-title').content = data.settings.title || 'My Links';
+  document.getElementById('og-image').content = data.settings.ogImage || '';
+  if (data.settings.favicon) {
+    document.getElementById('favicon').href = data.settings.favicon;
+  }
+}
+
+function applyTheme() {
+  const a = data.appearance;
+  document.documentElement.style.setProperty('--accent', a.accent || '#1a1a1a');
+  document.documentElement.style.setProperty('--accent-fg', isLight(a.accent || '#1a1a1a') ? '#1a1a1a' : '#ffffff');
+  document.documentElement.style.setProperty('--btn-radius', a.radius || '12px');
+  applyBg();
+}
+
+function applyBg() {
+  const a = data.appearance;
+  const bgType = a.bgType || 'solid';
+
+  // We apply background to a dedicated full-screen div behind public page
+  // so admin always looks clean on its own neutral bg
+  let bgEl = document.getElementById('public-bg-layer');
+  if (!bgEl) {
+    bgEl = document.createElement('div');
+    bgEl.id = 'public-bg-layer';
+    bgEl.style.cssText = 'position:fixed;inset:0;z-index:-2;pointer-events:none;';
+    document.body.insertBefore(bgEl, document.body.firstChild);
+  }
+
+  const overlay = document.getElementById('bg-overlay');
+
+  // Reset
+  bgEl.style.background = '';
+  bgEl.style.backgroundImage = '';
+  bgEl.style.backgroundSize = '';
+  bgEl.style.backgroundPosition = '';
+  bgEl.style.backgroundRepeat = '';
+  bgEl.style.backgroundAttachment = '';
+  bgEl.style.backgroundColor = '';
+  if (overlay) overlay.style.display = 'none';
+
+  // Only show public bg when not in admin mode
+  const isAdmin = document.body.classList.contains('admin-mode');
+  bgEl.style.display = isAdmin ? 'none' : 'block';
+  if (isAdmin) return;
+
+  if (bgType === 'solid') {
+    bgEl.style.backgroundColor = a.bg || '#f5f3ef';
+  } else if (bgType === 'gradient') {
+    const from = a.bgGradFrom || '#f5f3ef';
+    const to   = a.bgGradTo   || '#dce8f0';
+    const dir  = a.bgGradDir  || 'to bottom';
+    bgEl.style.backgroundImage = `linear-gradient(${dir}, ${from}, ${to})`;
+  } else if (bgType === 'image') {
+    const url = a.bgImageUrl || '';
+    if (url) {
+      bgEl.style.backgroundImage    = `url(${url})`;
+      bgEl.style.backgroundSize     = a.bgImageSize || 'cover';
+      bgEl.style.backgroundPosition = a.bgImagePos  || 'center';
+      bgEl.style.backgroundRepeat   = 'no-repeat';
+      bgEl.style.backgroundColor    = '#555';
+    } else {
+      bgEl.style.backgroundColor = '#f5f3ef';
+    }
+    if (overlay) overlay.style.display = a.bgImageOverlay ? 'block' : 'none';
+  }
+}
+
+function isLight(hex) {
+  const c = hex.replace('#','');
+  const r = parseInt(c.substr(0,2),16), g = parseInt(c.substr(2,2),16), b = parseInt(c.substr(4,2),16);
+  return (r*299 + g*587 + b*114) / 1000 > 160;
+}
+
+// ── PUBLIC RENDER ──
+function renderPublic() {
+  const p = data.profile;
+  const wrap = document.getElementById('profile-photo-wrap');
+  if (p.photo) {
+    wrap.innerHTML = `<img class="profile-photo" src="${p.photo}" alt="Profile photo" onerror="this.style.display='none'">`;
+  } else {
+    wrap.innerHTML = `<div class="profile-photo-placeholder">👤</div>`;
+  }
+  document.getElementById('pub-name').textContent = p.name || 'Your Name';
+  const tagEl = document.getElementById('pub-tagline');
+  tagEl.textContent = p.tagline || '';
+  tagEl.style.display = p.tagline ? 'block' : 'none';
+  const bioEl = document.getElementById('pub-bio');
+  bioEl.textContent = p.bio || '';
+  bioEl.style.display = p.bio ? 'block' : 'none';
+
+  const list = document.getElementById('pub-links');
+  list.innerHTML = '';
+
+  const sorted = [...data.links].sort((a,b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
+  sorted.filter(l => l.visible !== false).forEach(link => {
+    const a = document.createElement('a');
+    a.className = 'link-btn' + (link.pinned ? ' pinned' : '');
+    a.href = link.url || '#';
+    if (!link.url.startsWith('mailto:') && !link.url.startsWith('tel:')) a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    a.innerHTML = `
+      <span class="link-icon">${link.icon || '🔗'}</span>
+      <span class="link-title">${escHtml(link.title)}</span>
+    `;
+    list.appendChild(a);
+  });
+}
+
+// ── ADMIN: LINKS ──
+function renderAdminLinks() {
+  const list = document.getElementById('links-admin-list');
+  list.innerHTML = '';
+  if (data.links.length === 0) {
+    list.innerHTML = '<p style="text-align:center;color:var(--text-muted);font-size:13px;padding:24px">No links yet. Add one above!</p>';
+    return;
+  }
+  data.links.forEach((link, i) => {
+    const div = document.createElement('div');
+    div.className = 'link-item';
+    div.draggable = true;
+    div.dataset.index = i;
+    div.innerHTML = `
+      <span class="drag-handle">⠿</span>
+      <span class="link-item-icon">${link.icon || '🔗'}</span>
+      <div class="link-item-info">
+        <div class="link-item-title">${escHtml(link.title)} ${link.pinned ? '<span class="pin-badge">PIN</span>' : ''}</div>
+        <div class="link-item-url">${escHtml(link.url)}</div>
+      </div>
+      <div class="link-item-actions">
+        <label class="toggle-switch" title="Show/hide">
+          <input type="checkbox" ${link.visible !== false ? 'checked' : ''} onchange="toggleVisible(${i}, this.checked)">
+          <span class="toggle-slider"></span>
+        </label>
+        <button class="btn btn-ghost btn-sm" onclick="openEdit(${i})">Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteLink(${i})">✕</button>
+      </div>
+    `;
+    // Drag events
+    div.addEventListener('dragstart', e => { dragSrc = i; div.classList.add('dragging'); });
+    div.addEventListener('dragend', () => div.classList.remove('dragging'));
+    div.addEventListener('dragover', e => { e.preventDefault(); div.classList.add('drag-over'); });
+    div.addEventListener('dragleave', () => div.classList.remove('drag-over'));
+    div.addEventListener('drop', e => {
+      e.preventDefault();
+      div.classList.remove('drag-over');
+      if (dragSrc !== null && dragSrc !== i) {
+        const moved = data.links.splice(dragSrc, 1)[0];
+        data.links.splice(i, 0, moved);
+        save();
+        renderAdminLinks();
+      }
+    });
+    list.appendChild(div);
+  });
+}
+
+function toggleAddForm() {
+  const f = document.getElementById('add-link-form');
+  f.style.display = f.style.display === 'block' ? 'none' : 'block';
+  if (f.style.display === 'block') document.getElementById('new-title').focus();
+}
+
+function autoDetectIcon() {
+  const url = document.getElementById('new-url').value;
+  const iconInput = document.getElementById('new-icon');
+  if (iconInput.value) return;
+  for (const [domain, icon] of Object.entries(SOCIAL_MAP)) {
+    if (url.includes(domain)) { iconInput.value = icon; break; }
+  }
+}
+
+function addLink() {
+  const title = document.getElementById('new-title').value.trim();
+  const url = document.getElementById('new-url').value.trim();
+  const icon = document.getElementById('new-icon').value.trim() || '🔗';
+  const pinned = document.getElementById('new-pinned').checked;
+  if (!title || !url) { toast('Title and URL required'); return; }
+  data.links.push({ title, url, icon, pinned, visible: true });
+  save();
+  renderAdminLinks();
+  document.getElementById('new-title').value = '';
+  document.getElementById('new-url').value = '';
+  document.getElementById('new-icon').value = '';
+  document.getElementById('new-pinned').checked = false;
+  toggleAddForm();
+  toast('Link added!');
+}
+
+function deleteLink(i) {
+  if (!confirm('Delete this link?')) return;
+  data.links.splice(i, 1);
+  save();
+  renderAdminLinks();
+  toast('Link deleted');
+}
+
+function toggleVisible(i, val) {
+  data.links[i].visible = val;
+  save();
+}
+
+function openEdit(i) {
+  editingIndex = i;
+  const link = data.links[i];
+  document.getElementById('edit-icon').value = link.icon || '';
+  document.getElementById('edit-title').value = link.title || '';
+  document.getElementById('edit-url').value = link.url || '';
+  document.getElementById('edit-pinned').checked = link.pinned || false;
+  document.getElementById('edit-modal-overlay').classList.add('open');
+}
+
+function closeEditModal() {
+  document.getElementById('edit-modal-overlay').classList.remove('open');
+  editingIndex = -1;
+}
+
+function saveEdit() {
+  if (editingIndex < 0) return;
+  data.links[editingIndex] = {
+    ...data.links[editingIndex],
+    icon: document.getElementById('edit-icon').value.trim() || '🔗',
+    title: document.getElementById('edit-title').value.trim(),
+    url: document.getElementById('edit-url').value.trim(),
+    pinned: document.getElementById('edit-pinned').checked,
+  };
+  save();
+  renderAdminLinks();
+  closeEditModal();
+  toast('Saved!');
+}
+
+// ── ADMIN: PROFILE ──
+function saveProfile() {
+  data.profile = {
+    photo: document.getElementById('prof-photo').value,
+    name: document.getElementById('prof-name').value,
+    tagline: document.getElementById('prof-tagline').value,
+    bio: document.getElementById('prof-bio').value,
+  };
+  save();
+}
+
+// ── ADMIN: APPEARANCE ──
+function renderAccentSwatches() {
+  const row = document.getElementById('accent-swatches');
+  row.innerHTML = '';
+  ACCENT_PRESETS.forEach(color => {
+    const s = document.createElement('div');
+    s.className = 'color-swatch' + (color === data.appearance.accent ? ' active' : '');
+    s.style.background = color;
+    s.onclick = () => {
+      document.getElementById('accent-color').value = color;
+      data.appearance.accent = color;
+      save();
+      document.querySelectorAll('.color-swatch').forEach(x => x.classList.remove('active'));
+      s.classList.add('active');
+    };
+    row.appendChild(s);
+  });
+}
+
+function applyThemeFromInputs() {
+  data.appearance.accent = document.getElementById('accent-color').value;
+  save();
+  renderAccentSwatches();
+}
+
+function setBgType(type, el) {
+  document.querySelectorAll('#tab-appearance .radius-opt').forEach(x => x.classList.remove('active'));
+  el.classList.add('active');
+  data.appearance.bgType = type;
+  document.getElementById('bg-solid-opts').style.display = type === 'solid' ? 'block' : 'none';
+  document.getElementById('bg-gradient-opts').style.display = type === 'gradient' ? 'block' : 'none';
+  document.getElementById('bg-image-opts').style.display = type === 'image' ? 'block' : 'none';
+  saveBg();
+}
+
+function saveBg() {
+  const type = data.appearance.bgType || 'solid';
+  if (type === 'solid') {
+    data.appearance.bg = document.getElementById('bg-color').value;
+  } else if (type === 'gradient') {
+    data.appearance.bgGradFrom = document.getElementById('bg-grad-from').value;
+    data.appearance.bgGradTo   = document.getElementById('bg-grad-to').value;
+    data.appearance.bgGradDir  = document.getElementById('bg-grad-dir').value;
+  } else if (type === 'image') {
+    data.appearance.bgImageUrl     = document.getElementById('bg-image-url').value;
+    data.appearance.bgImageSize    = document.getElementById('bg-image-size').value;
+    data.appearance.bgImagePos     = document.getElementById('bg-image-pos').value;
+    data.appearance.bgImageOverlay = document.getElementById('bg-image-overlay').checked;
+  }
+  localStorage.setItem('linkinbio', JSON.stringify(data));
+  // No live preview in admin — bg applies when you view the public page
+}
+
+function setRadius(val, el) {
+  document.querySelectorAll('.radius-opt').forEach(x => x.classList.remove('active'));
+  el.classList.add('active');
+  data.appearance.radius = val;
+  save();
+}
+
+// ── ADMIN: SETTINGS ──
+function saveSettings() {
+  data.settings = {
+    ...data.settings,
+    title: document.getElementById('meta-title').value,
+    desc: document.getElementById('meta-desc-input').value,
+    ogImage: document.getElementById('og-image-input').value,
+    favicon: document.getElementById('favicon-input').value,
+    analytics: document.getElementById('analytics-script').value,
+    pwEnabled: document.getElementById('pw-enabled').checked,
+    pw: document.getElementById('pw-value').value,
+  };
+  save();
+}
+
+function saveAdminPassword() {
+  const pw = document.getElementById('admin-pw-input').value.trim();
+  if (!pw) { toast('Enter a password'); return; }
+  data.settings.adminPw = pw;
+  save();
+  document.getElementById('admin-pw-input').value = '';
+  toast('Admin password updated');
+}
+
+function loadAdminFields() {
+  const p = data.profile;
+  document.getElementById('prof-photo').value = p.photo || '';
+  document.getElementById('prof-name').value = p.name || '';
+  document.getElementById('prof-tagline').value = p.tagline || '';
+  document.getElementById('prof-bio').value = p.bio || '';
+
+  const a = data.appearance;
+  document.getElementById('bg-color').value = a.bg || '#f5f3ef';
+  document.getElementById('accent-color').value = a.accent || '#1a1a1a';
+
+  // Restore bg type
+  const bgType = a.bgType || 'solid';
+  ['solid','gradient','image'].forEach(t => {
+    const el = document.getElementById('bg-type-' + t);
+    if (el) el.classList.toggle('active', t === bgType);
+  });
+  document.getElementById('bg-solid-opts').style.display = bgType === 'solid' ? 'block' : 'none';
+  document.getElementById('bg-gradient-opts').style.display = bgType === 'gradient' ? 'block' : 'none';
+  document.getElementById('bg-image-opts').style.display = bgType === 'image' ? 'block' : 'none';
+  if (a.bgGradFrom) document.getElementById('bg-grad-from').value = a.bgGradFrom;
+  if (a.bgGradTo) document.getElementById('bg-grad-to').value = a.bgGradTo;
+  if (a.bgGradDir) document.getElementById('bg-grad-dir').value = a.bgGradDir;
+  if (a.bgImageUrl) document.getElementById('bg-image-url').value = a.bgImageUrl;
+  if (a.bgImageSize) document.getElementById('bg-image-size').value = a.bgImageSize;
+  if (a.bgImagePos) document.getElementById('bg-image-pos').value = a.bgImagePos;
+  document.getElementById('bg-image-overlay').checked = a.bgImageOverlay || false;
+
+  renderAccentSwatches();
+  // radius
+  const rMap = { '12px': 0, '100px': 1, '4px': 2 };
+  document.querySelectorAll('.radius-opt').forEach((el, i) => {
+    el.classList.toggle('active', i === (rMap[a.radius] ?? 0));
+  });
+
+  const s = data.settings;
+  document.getElementById('meta-title').value = s.title || '';
+  document.getElementById('meta-desc-input').value = s.desc || '';
+  document.getElementById('og-image-input').value = s.ogImage || '';
+  document.getElementById('favicon-input').value = s.favicon || '';
+  document.getElementById('analytics-script').value = s.analytics || '';
+  document.getElementById('pw-enabled').checked = s.pwEnabled || false;
+  document.getElementById('pw-value').value = s.pw || '';
+}
+
+// ── ADMIN: QR ──
+let qrInstance = null;
+function generateQR() {
+  const url = document.getElementById('qr-url-input').value.trim();
+  const container = document.getElementById('qr-container');
+  container.innerHTML = '';
+  if (!url) return;
+  if (typeof QRCode === 'undefined') { container.innerHTML = '<p style="font-size:12px;color:var(--text-muted)">QR library loading, try again in a moment</p>'; return; }
+  qrInstance = new QRCode(container, { text: url, width: 180, height: 180, colorDark: data.appearance.accent || '#1a1a1a', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M });
+  data.qrUrl = url;
+}
+
+function downloadQR() {
+  const canvas = document.querySelector('#qr-container canvas');
+  if (!canvas) { toast('Generate a QR first'); return; }
+  const a = document.createElement('a');
+  a.download = 'qr-code.png';
+  a.href = canvas.toDataURL();
+  a.click();
+}
+
+// ── MODAL ──
+function openModal() {
+  document.getElementById('modal-overlay').classList.add('open');
+  setTimeout(() => document.getElementById('admin-pw-check').focus(), 100);
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  document.getElementById('admin-pw-check').value = '';
+  document.getElementById('modal-error').style.display = 'none';
+  window.location.hash = '';
+}
+
+function verifyAdmin() {
+  const pw = document.getElementById('admin-pw-check').value;
+  if (pw === data.settings.adminPw) {
+    document.getElementById('modal-error').style.display = 'none';
+    document.getElementById('modal-overlay').classList.remove('open');
+    showAdmin();
+  } else {
+    document.getElementById('modal-error').style.display = 'block';
+  }
+}
+
+document.getElementById('admin-pw-check').addEventListener('keydown', e => { if (e.key === 'Enter') verifyAdmin(); });
+document.getElementById('pw-input').addEventListener('keydown', e => { if (e.key === 'Enter') checkPassword(); });
+
+// ── TABS ──
+function switchTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ── TOAST ──
+function toast(msg, duration = 2000) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), duration);
+}
+
+// ── UTILS ──
+function escHtml(s) {
+  return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── INJECT ANALYTICS ──
+function injectAnalytics() {
+  const script = data.settings.analytics;
+  if (!script) return;
+  const div = document.createElement('div');
+  div.innerHTML = script;
+  const sc = div.querySelector('script');
+  if (!sc) return;
+  const newSc = document.createElement('script');
+  if (sc.src) newSc.src = sc.src;
+  [...sc.attributes].forEach(a => newSc.setAttribute(a.name, a.value));
+  newSc.textContent = sc.textContent;
+  document.head.appendChild(newSc);
+}
+
+injectAnalytics();
+init();
+</script>
+</body>
+</html>

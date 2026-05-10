@@ -1,0 +1,1475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ScanSafe</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #F7F5F2;
+  --ink: #1C1917;
+  --ink-muted: #78716C;
+  --ink-faint: #C4BCB4;
+  --line: #E8E2DA;
+  --white: #FFFFFF;
+  --safe-color: #3D6B52;
+  --warn-color: #8B6914;
+  --danger-color: #7C2D12;
+  --safe-bg: #F0F4F1;
+  --warn-bg: #FAF5E8;
+  --danger-bg: #FDF0EC;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  font-weight: 300;
+  letter-spacing: 0.01em;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Navbar ── */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 40px;
+  background: rgba(247,245,242,0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.3s;
+}
+
+.navbar.scrolled { border-bottom-color: var(--line); }
+
+.nav-wordmark {
+  display: flex;
+  align-items: baseline;
+}
+
+.nav-wordmark span:first-child {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+.nav-wordmark span:last-child {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.hamburger {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 32px;
+  height: 32px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  position: relative;
+}
+
+.hamburger span {
+  display: block;
+  height: 1px;
+  background: var(--ink);
+  border-radius: 999px;
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s, width 0.3s;
+  transform-origin: center;
+}
+
+.hamburger span:nth-child(1) { width: 22px; }
+.hamburger span:nth-child(2) { width: 16px; }
+.hamburger span:nth-child(3) { width: 22px; }
+
+.hamburger.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); width: 22px; }
+.hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.hamburger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); width: 22px; }
+
+/* Key indicator dot */
+.key-dot {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--safe-color);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.key-dot.visible { opacity: 1; }
+
+/* ── Settings Modal ── */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(28,25,23,0);
+  pointer-events: none;
+  transition: background 0.35s;
+}
+
+.modal-backdrop.open {
+  background: rgba(28,25,23,0.45);
+  pointer-events: all;
+}
+
+.settings-modal {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 201;
+  width: 360px;
+  max-width: 100vw;
+  background: var(--bg);
+  border-left: 1px solid var(--line);
+  padding: 0;
+  transform: translateX(100%);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+.settings-modal.open { transform: translateX(0); }
+
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 32px;
+  border-bottom: 1px solid var(--line);
+  flex-shrink: 0;
+}
+
+.modal-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px;
+  font-weight: 400;
+  color: var(--ink);
+  letter-spacing: 0.01em;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 10px;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  transition: color 0.2s;
+  padding: 0;
+}
+
+.modal-close:hover { color: var(--ink); }
+
+.modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 36px 32px;
+}
+
+.modal-section { margin-bottom: 40px; }
+
+.modal-field-label {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  margin-bottom: 14px;
+  display: block;
+}
+
+.modal-input-row {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--ink);
+  padding-bottom: 12px;
+  gap: 12px;
+}
+
+.modal-input-row input[type="password"],
+.modal-input-row input[type="text"] {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  font-weight: 300;
+  color: var(--ink);
+  letter-spacing: 0.05em;
+}
+
+.modal-note {
+  margin-top: 10px;
+  font-size: 11px;
+  color: var(--ink-faint);
+  letter-spacing: 0.03em;
+  line-height: 1.7;
+}
+
+.modal-save-btn {
+  width: 100%;
+  background: var(--ink);
+  color: var(--white);
+  border: none;
+  padding: 16px 32px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 1px;
+  margin-top: 8px;
+  transition: opacity 0.2s;
+}
+
+.modal-save-btn:hover { opacity: 0.85; }
+
+.modal-footer {
+  padding: 24px 32px;
+  border-top: 1px solid var(--line);
+  flex-shrink: 0;
+}
+
+.key-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--ink-faint);
+  letter-spacing: 0.04em;
+}
+
+.key-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ink-faint);
+  flex-shrink: 0;
+  transition: background 0.3s;
+}
+
+.key-status-dot.set { background: var(--safe-color); }
+.key-status-text { transition: color 0.3s; }
+.key-status-dot.set ~ .key-status-text { color: var(--safe-color); }
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.025;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-size: 200px;
+}
+
+.page {
+  position: relative;
+  z-index: 1;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 120px 40px 160px;
+}
+
+/* Header */
+header {
+  margin-bottom: 96px;
+  animation: rise 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.wordmark {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 36px;
+}
+
+.wordmark-scan {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+.wordmark-safe {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.hero-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(42px, 7vw, 62px);
+  font-weight: 300;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  max-width: 500px;
+}
+
+.hero-text em { font-style: italic; }
+
+.hero-sub {
+  margin-top: 20px;
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--ink-muted);
+  letter-spacing: 0.02em;
+  line-height: 1.8;
+}
+
+/* Divider */
+.divider {
+  width: 100%;
+  height: 1px;
+  background: var(--line);
+  margin: 52px 0;
+}
+
+/* Field label */
+.field-label {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  margin-bottom: 14px;
+  display: block;
+}
+
+/* API Key */
+.api-section { animation: rise 0.9s 0.1s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+.input-row {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--ink);
+  padding-bottom: 12px;
+  gap: 12px;
+}
+
+input[type="password"], input[type="text"] {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  font-weight: 300;
+  color: var(--ink);
+  letter-spacing: 0.05em;
+}
+
+input::placeholder { color: var(--ink-faint); }
+
+.toggle-key {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'Outfit', sans-serif;
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  padding: 0;
+  transition: color 0.2s;
+}
+.toggle-key:hover { color: var(--ink); }
+
+.api-note {
+  margin-top: 10px;
+  font-size: 11px;
+  color: var(--ink-faint);
+  letter-spacing: 0.03em;
+}
+
+/* Upload */
+.upload-section { animation: rise 0.9s 0.2s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+.upload-zone {
+  border: 1px solid var(--line);
+  background: var(--white);
+  border-radius: 1px;
+  padding: 72px 40px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.3s, background 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.upload-zone:hover { border-color: var(--ink-muted); }
+.upload-zone.drag-over { border-color: var(--ink); }
+
+.upload-crosshair {
+  width: 32px;
+  height: 32px;
+  margin: 0 auto 20px;
+  position: relative;
+}
+
+.upload-crosshair::before,
+.upload-crosshair::after {
+  content: '';
+  position: absolute;
+  background: var(--ink-faint);
+  transition: background 0.3s;
+}
+
+.upload-crosshair::before { width: 1px; height: 100%; left: 50%; top: 0; transform: translateX(-50%); }
+.upload-crosshair::after { width: 100%; height: 1px; top: 50%; left: 0; transform: translateY(-50%); }
+.upload-zone:hover .upload-crosshair::before,
+.upload-zone:hover .upload-crosshair::after { background: var(--ink-muted); }
+
+.upload-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 21px;
+  font-weight: 400;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+
+.upload-sub {
+  font-size: 12px;
+  color: var(--ink-faint);
+  letter-spacing: 0.04em;
+  line-height: 1.9;
+}
+
+#fileInput { display: none; }
+
+.preview-wrap { position: relative; display: none; }
+
+#previewImg {
+  width: 100%;
+  max-height: 340px;
+  object-fit: cover;
+  display: block;
+}
+
+.preview-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(28,25,23,0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s;
+}
+
+.preview-wrap:hover .preview-overlay { background: rgba(28,25,23,0.5); }
+
+.change-photo-btn {
+  opacity: 0;
+  background: none;
+  border: 1px solid rgba(255,255,255,0.5);
+  color: white;
+  font-family: 'Outfit', sans-serif;
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: opacity 0.3s;
+  border-radius: 1px;
+}
+
+.preview-wrap:hover .change-photo-btn { opacity: 1; }
+
+/* Depth */
+.depth-section { animation: rise 0.9s 0.3s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+.depth-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.depth-opt {
+  background: var(--white);
+  padding: 24px 28px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.depth-opt.active { background: var(--ink); }
+
+.depth-opt-name {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  margin-bottom: 6px;
+  transition: color 0.2s;
+}
+
+.depth-opt.active .depth-opt-name { color: rgba(255,255,255,0.45); }
+
+.depth-opt-desc {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 19px;
+  font-weight: 300;
+  color: var(--ink);
+  transition: color 0.2s;
+  line-height: 1.3;
+}
+
+.depth-opt.active .depth-opt-desc { color: var(--white); }
+
+/* CTA */
+.cta-section { animation: rise 0.9s 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+.analyze-btn {
+  width: 100%;
+  background: var(--ink);
+  color: var(--white);
+  border: none;
+  padding: 20px 40px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 1px;
+  transition: opacity 0.2s;
+}
+
+.analyze-btn:hover { opacity: 0.88; }
+.analyze-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+.error-box {
+  display: none;
+  margin-top: 16px;
+  padding: 14px 0;
+  border-top: 1px solid #D4846A;
+  font-size: 13px;
+  color: var(--danger-color);
+  letter-spacing: 0.02em;
+}
+
+/* Loading */
+#loadingState {
+  display: none;
+  padding: 80px 0;
+  text-align: center;
+  animation: rise 0.5s ease both;
+}
+
+.loading-line {
+  width: 1px;
+  height: 56px;
+  background: linear-gradient(to bottom, transparent, var(--ink), transparent);
+  margin: 0 auto 28px;
+  animation: pulse-line 1.6s ease-in-out infinite;
+}
+
+@keyframes pulse-line {
+  0%,100% { opacity: 0.25; transform: scaleY(0.7); }
+  50% { opacity: 1; transform: scaleY(1.2); }
+}
+
+.loading-label {
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  margin-bottom: 20px;
+}
+
+.loading-steps-row {
+  display: flex;
+  justify-content: center;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+
+.lstep {
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  transition: color 0.4s;
+  position: relative;
+}
+
+.lstep.active { color: var(--ink); }
+
+.lstep.active::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--ink);
+}
+
+/* Results */
+#results {
+  display: none;
+  animation: rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.results-eyebrow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 80px;
+  margin-bottom: 52px;
+}
+
+.product-pill {
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  border: 1px solid var(--line);
+  padding: 7px 16px;
+  border-radius: 999px;
+}
+
+/* Score */
+.score-block {
+  display: flex;
+  align-items: flex-end;
+  gap: 48px;
+  padding: 52px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 64px;
+  flex-wrap: wrap;
+}
+
+.score-numeral {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(80px, 14vw, 112px);
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.score-denom {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.35em;
+  color: var(--ink-faint);
+  font-weight: 300;
+}
+
+.score-right { flex: 1; min-width: 200px; padding-bottom: 8px; }
+
+.score-verdict {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 26px;
+  font-weight: 400;
+  color: var(--ink);
+  margin-bottom: 10px;
+}
+
+.score-summary {
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--ink-muted);
+  line-height: 1.8;
+}
+
+.score-bar-wrap {
+  width: 100%;
+  height: 1px;
+  background: var(--line);
+  margin-top: 20px;
+  overflow: hidden;
+}
+
+.score-bar-fill {
+  height: 100%;
+  width: 0;
+  transition: width 1.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Flags */
+.flags-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 64px;
+}
+
+.flag-tag {
+  font-size: 11px;
+  font-weight: 300;
+  letter-spacing: 0.04em;
+  padding: 6px 14px;
+  border-radius: 1px;
+}
+
+.flag-green { background: var(--safe-bg); color: var(--safe-color); }
+.flag-red { background: var(--danger-bg); color: var(--danger-color); }
+
+/* Result blocks */
+.result-block { margin-bottom: 0; }
+
+.block-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 0;
+  border-top: 1px solid var(--line);
+  cursor: pointer;
+  user-select: none;
+}
+
+.block-header-left {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+}
+
+.block-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--ink-faint);
+  letter-spacing: 0.05em;
+}
+
+.block-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px;
+  font-weight: 400;
+  color: var(--ink);
+}
+
+.block-toggle {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  transition: color 0.2s;
+}
+
+.block-header:hover .block-toggle { color: var(--ink); }
+
+.block-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.block-body.open { max-height: 3000px; }
+
+/* Ingredients table */
+.ing-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 24px;
+  margin-bottom: 24px;
+}
+
+.ing-table th {
+  text-align: left;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  padding: 0 16px 14px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.ing-table td {
+  padding: 14px 16px 14px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 13px;
+  font-weight: 300;
+  vertical-align: top;
+  line-height: 1.5;
+}
+
+.ing-table tr:last-child td { border-bottom: none; }
+
+.ing-name { font-weight: 400; color: var(--ink); min-width: 130px; }
+
+.ewg-dot {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.ewg-circle {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.ewg-safe-c { background: var(--safe-color); }
+.ewg-mod-c { background: #B08A2C; }
+.ewg-caut-c { background: #C8622A; }
+.ewg-con-c { background: #A83222; }
+
+.ing-purpose { color: var(--ink-muted); }
+.ing-flag { color: var(--danger-color); font-size: 12px; }
+
+/* Skin grid */
+.skin-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  margin: 24px 0;
+}
+
+.skin-cell {
+  background: var(--white);
+  padding: 20px;
+}
+
+.skin-cell-type {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  margin-bottom: 6px;
+}
+
+.skin-cell-status {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 16px;
+  font-weight: 400;
+  margin-bottom: 5px;
+}
+
+.status-yes { color: var(--safe-color); }
+.status-warn { color: var(--warn-color); }
+.status-no { color: var(--danger-color); }
+
+.skin-cell-reason {
+  font-size: 11px;
+  color: var(--ink-faint);
+  line-height: 1.6;
+}
+
+/* Formula intel */
+.intel-list { margin: 24px 0; }
+
+.intel-item {
+  display: grid;
+  grid-template-columns: 16px 1fr;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--line);
+  align-items: start;
+}
+
+.intel-item:last-child { border-bottom: none; }
+
+.intel-marker {
+  width: 1px;
+  height: 16px;
+  margin-top: 3px;
+  border-radius: 999px;
+}
+
+.intel-text {
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--ink-muted);
+  line-height: 1.8;
+}
+
+/* Actions */
+.actions-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 0;
+  border-top: 1px solid var(--line);
+  margin-top: 8px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.text-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'Outfit', sans-serif;
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.text-btn:hover { color: var(--ink); }
+
+/* Disclaimer */
+.disclaimer {
+  margin-top: 80px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+  font-size: 11px;
+  color: var(--ink-faint);
+  letter-spacing: 0.04em;
+  line-height: 2;
+  text-align: center;
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 560px) {
+  .page { padding: 96px 24px 100px; }
+  header { margin-bottom: 64px; }
+  .depth-options { grid-template-columns: 1fr; }
+  .skin-grid { grid-template-columns: repeat(2, 1fr); }
+  .score-block { gap: 20px; }
+  .ing-table th:nth-child(3),
+  .ing-table td:nth-child(3) { display: none; }
+}
+</style>
+</head>
+<body>
+<!-- Settings Modal Backdrop -->
+<div class="modal-backdrop" id="modalBackdrop" onclick="closeSettings()"></div>
+
+<!-- Settings Modal -->
+<div class="settings-modal" id="settingsModal">
+  <div class="modal-head">
+    <span class="modal-title">Settings</span>
+    <button class="modal-close" onclick="closeSettings()">Close</button>
+  </div>
+  <div class="modal-body">
+    <div class="modal-section">
+      <span class="modal-field-label">Groq API Key</span>
+      <div class="modal-input-row">
+        <input type="password" id="apiKey" placeholder="gsk_···" />
+        <button class="toggle-key" onclick="toggleKey()">Show</button>
+      </div>
+      <p class="modal-note">Your key is never stored locally or transmitted anywhere except directly to Groq's API to perform the analysis.</p>
+      <button class="modal-save-btn" onclick="saveKey()">Save Key</button>
+    </div>
+    <div class="modal-section">
+      <span class="modal-field-label">Model</span>
+      <p class="modal-note" style="margin-top:0">meta-llama/llama-4-scout-17b-16e-instruct<br>Vision-capable · Groq hosted</p>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <div class="key-status">
+      <div class="key-status-dot" id="keyStatusDot"></div>
+      <span class="key-status-text" id="keyStatusText">No API key set</span>
+    </div>
+  </div>
+</div>
+
+<!-- Navbar -->
+<nav class="navbar" id="navbar">
+  <div class="nav-wordmark">
+    <span>Scan</span><span>Safe</span>
+  </div>
+  <button class="hamburger" id="hamburger" onclick="toggleSettings()" aria-label="Settings">
+    <span></span>
+    <span></span>
+    <span></span>
+    <div class="key-dot" id="keyDot"></div>
+  </button>
+</nav>
+
+<div class="page">
+
+  <header>
+    <div class="wordmark">
+      <span class="wordmark-scan">Scan</span>
+      <span class="wordmark-safe">Safe</span>
+    </div>
+    <h1 class="hero-text">Know what's <em>inside</em> everything you use.</h1>
+    <p class="hero-sub">Upload any product label — skincare, food, haircare, supplements.<br>Powered by Groq AI.</p>
+  </header>
+
+  <div class="divider"></div>
+
+  <section class="upload-section">
+    <span class="field-label">Label Photo</span>
+    <div class="upload-zone" id="uploadZone"
+         onclick="document.getElementById('fileInput').click()"
+         ondragover="handleDragOver(event)"
+         ondrop="handleDrop(event)"
+         ondragleave="handleDragLeave(event)">
+      <div id="uploadPrompt">
+        <div class="upload-crosshair"></div>
+        <div class="upload-title">Place label here</div>
+        <p class="upload-sub">Click to browse &nbsp;·&nbsp; or drag & drop<br>JPG · PNG · WEBP</p>
+      </div>
+      <div class="preview-wrap" id="previewWrap">
+        <img id="previewImg" alt="Label preview" />
+        <div class="preview-overlay">
+          <button class="change-photo-btn" onclick="event.stopPropagation(); document.getElementById('fileInput').click()">Change Photo</button>
+        </div>
+      </div>
+    </div>
+    <input type="file" id="fileInput" accept="image/*" onchange="handleFile(event)" />
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="depth-section">
+    <span class="field-label">Analysis Depth</span>
+    <div class="depth-options">
+      <div class="depth-opt active" id="depth-quick" onclick="setDepth('quick')">
+        <div class="depth-opt-name">Quick</div>
+        <div class="depth-opt-desc">Safety ratings & key concerns</div>
+      </div>
+      <div class="depth-opt" id="depth-deep" onclick="setDepth('deep')">
+        <div class="depth-opt-name">Deep</div>
+        <div class="depth-opt-desc">Full breakdown & formula intelligence</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="cta-section">
+    <button class="analyze-btn" id="analyzeBtn" onclick="analyze()">Analyze Ingredients</button>
+    <div class="error-box" id="errorBox"></div>
+  </section>
+
+  <div id="loadingState">
+    <div class="loading-line"></div>
+    <div class="loading-label">Analyzing</div>
+    <div class="loading-steps-row">
+      <span class="lstep active" id="step1">Reading</span>
+      <span class="lstep" id="step2">Identifying</span>
+      <span class="lstep" id="step3">Scoring</span>
+      <span class="lstep" id="step4">Compiling</span>
+    </div>
+  </div>
+
+  <div id="results"></div>
+
+  <p class="disclaimer">
+    For informational purposes only. Not medical or dermatological advice.<br>
+    Consult a qualified professional before making health decisions based on this analysis.
+  </p>
+
+</div>
+
+<script>
+let selectedDepth = 'quick';
+let selectedFile = null;
+let groqApiKey = '';
+
+// ── Modal ──
+function toggleSettings() {
+  const modal = document.getElementById('settingsModal');
+  const backdrop = document.getElementById('modalBackdrop');
+  const burger = document.getElementById('hamburger');
+  const isOpen = modal.classList.contains('open');
+  modal.classList.toggle('open', !isOpen);
+  backdrop.classList.toggle('open', !isOpen);
+  burger.classList.toggle('open', !isOpen);
+}
+
+function closeSettings() {
+  document.getElementById('settingsModal').classList.remove('open');
+  document.getElementById('modalBackdrop').classList.remove('open');
+  document.getElementById('hamburger').classList.remove('open');
+}
+
+function saveKey() {
+  const val = document.getElementById('apiKey').value.trim();
+  groqApiKey = val;
+  updateKeyStatus();
+  closeSettings();
+}
+
+function updateKeyStatus() {
+  const dot = document.getElementById('keyStatusDot');
+  const text = document.getElementById('keyStatusText');
+  const navDot = document.getElementById('keyDot');
+  if (groqApiKey) {
+    dot.classList.add('set');
+    text.textContent = 'API key set';
+    navDot.classList.add('visible');
+  } else {
+    dot.classList.remove('set');
+    text.textContent = 'No API key set';
+    navDot.classList.remove('visible');
+  }
+}
+
+function toggleKey() {
+  const k = document.getElementById('apiKey');
+  const btn = document.querySelector('.toggle-key');
+  const hidden = k.type === 'password';
+  k.type = hidden ? 'text' : 'password';
+  btn.textContent = hidden ? 'Hide' : 'Show';
+}
+
+// Navbar scroll shadow
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 10);
+});
+
+function setDepth(d) {
+  selectedDepth = d;
+  document.getElementById('depth-quick').classList.toggle('active', d === 'quick');
+  document.getElementById('depth-deep').classList.toggle('active', d === 'deep');
+}
+
+function handleFile(e) {
+  const file = e.target.files[0];
+  if (file) loadFile(file);
+}
+
+function loadFile(file) {
+  selectedFile = file;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    document.getElementById('previewImg').src = e.target.result;
+    document.getElementById('uploadPrompt').style.display = 'none';
+    document.getElementById('previewWrap').style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+function handleDragOver(e) {
+  e.preventDefault();
+  document.getElementById('uploadZone').classList.add('drag-over');
+}
+function handleDragLeave() {
+  document.getElementById('uploadZone').classList.remove('drag-over');
+}
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('uploadZone').classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) loadFile(file);
+}
+
+function stepProgress(n) {
+  for (let i = 1; i <= 4; i++)
+    document.getElementById('step' + i).classList.toggle('active', i <= n);
+}
+
+async function analyze() {
+  const errorBox = document.getElementById('errorBox');
+  errorBox.style.display = 'none';
+
+  if (!groqApiKey) { showError('Please set your Groq API key in Settings (top right).'); return; }
+  if (!selectedFile) { showError('Please upload a label photo.'); return; }
+
+  document.getElementById('analyzeBtn').disabled = true;
+  document.getElementById('loadingState').style.display = 'block';
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('results').innerHTML = '';
+
+  const base64 = await fileToBase64(selectedFile);
+  const mimeType = selectedFile.type || 'image/jpeg';
+
+  stepProgress(1);
+  setTimeout(() => stepProgress(2), 900);
+  setTimeout(() => stepProgress(3), 1900);
+  setTimeout(() => stepProgress(4), 2900);
+
+  const depthInstructions = selectedDepth === 'quick'
+    ? 'QUICK analysis: identify product type, list each ingredient with EWG rating (1–10) and one-line purpose, flag any concerns, give overall safety score.'
+    : 'DEEP DIVE: identify product type, each ingredient with EWG rating and full purpose, skin/dietary suitability, formula intelligence insights (actives, notable omissions, fragrance/alcohol presence), overall safety score.';
+
+  const prompt = `You are ScanSafe, a world-class ingredient analyst. Analyze the ingredient label in this image.
+
+The product may be skincare, food, haircare, supplements, or any consumer product.
+
+${depthInstructions}
+
+Return ONLY a valid JSON object — no markdown, no preamble, no extra text:
+
+{
+  "productType": "e.g. Facial Toner",
+  "productTypeEmoji": "single emoji",
+  "safetyScore": <1-10>,
+  "safetyVerdict": "e.g. Highly Safe",
+  "safetySummary": "2 clear sentences summarizing the safety profile",
+  "ingredients": [
+    {
+      "name": "Ingredient name",
+      "ewgRating": <1-10>,
+      "ewgLabel": "Safe|Moderate|Caution|Concern",
+      "purpose": "What it does in this formula",
+      "flag": "concern note or null"
+    }
+  ],
+  "skinSuitability": [
+    { "type": "Normal", "compatible": "yes|warn|no", "reason": "brief reason" },
+    { "type": "Dry", "compatible": "yes|warn|no", "reason": "brief reason" },
+    { "type": "Oily", "compatible": "yes|warn|no", "reason": "brief reason" },
+    { "type": "Sensitive", "compatible": "yes|warn|no", "reason": "brief reason" },
+    { "type": "Acne-prone", "compatible": "yes|warn|no", "reason": "brief reason" },
+    { "type": "Mature", "compatible": "yes|warn|no", "reason": "brief reason" }
+  ],
+  "formulaIntel": [
+    { "insight": "Specific formula insight", "color": "#hex" }
+  ],
+  "topFlags": ["concern string"],
+  "greenFlags": ["positive string"]
+}
+
+For food products: replace skinSuitability with dietary suitability (Vegan, Gluten-Free, Diabetic-friendly, Nut-free, etc.).
+If no ingredient list is visible, set safetyScore to 0 and explain in safetySummary.`;
+
+  try {
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${groqApiKey}`
+      },
+      body: JSON.stringify({
+        model: 'meta-llama/llama-4-scout-17b-16e-instruct',
+        max_tokens: 4000,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'text', text: prompt },
+            { type: 'image_url', image_url: { url: `data:${mimeType};base64,${base64}` } }
+          ]
+        }]
+      })
+    });
+
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.error?.message || `API error ${response.status}`);
+    }
+
+    const data = await response.json();
+    const rawText = data.choices[0].message.content;
+    const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('Could not parse response. Please try again.');
+    const result = JSON.parse(jsonMatch[0]);
+
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('analyzeBtn').disabled = false;
+    renderResults(result);
+
+  } catch (err) {
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('analyzeBtn').disabled = false;
+    showError(err.message);
+  }
+}
+
+function renderResults(r) {
+  const el = document.getElementById('results');
+  el.style.display = 'block';
+
+  const scoreColor = r.safetyScore >= 8 ? 'var(--safe-color)' : r.safetyScore >= 5 ? 'var(--warn-color)' : 'var(--danger-color)';
+  const barColor = r.safetyScore >= 8 ? '#3D6B52' : r.safetyScore >= 5 ? '#8B6914' : '#7C2D12';
+  const barWidth = (r.safetyScore / 10) * 100;
+
+  const ewgDotClass = (label) => ({ 'Safe': 'ewg-safe-c', 'Moderate': 'ewg-mod-c', 'Caution': 'ewg-caut-c', 'Concern': 'ewg-con-c' }[label] || 'ewg-mod-c');
+
+  const ingredientRows = (r.ingredients || []).map(ing => `
+    <tr>
+      <td class="ing-name">${ing.name}</td>
+      <td><span class="ewg-dot"><span class="ewg-circle ${ewgDotClass(ing.ewgLabel)}"></span>${ing.ewgLabel || '–'} ${ing.ewgRating}</span></td>
+      <td class="ing-purpose">${ing.purpose || ''}</td>
+      ${selectedDepth === 'deep' ? `<td class="ing-flag">${ing.flag || ''}</td>` : ''}
+    </tr>`).join('');
+
+  const statusLabel = { yes: 'Suitable', warn: 'Use with care', no: 'Avoid' };
+  const statusClass = { yes: 'status-yes', warn: 'status-warn', no: 'status-no' };
+
+  const skinCells = (r.skinSuitability || []).map(s => `
+    <div class="skin-cell">
+      <div class="skin-cell-type">${s.type}</div>
+      <div class="skin-cell-status ${statusClass[s.compatible] || 'status-warn'}">${statusLabel[s.compatible] || 'Review'}</div>
+      <div class="skin-cell-reason">${s.reason || ''}</div>
+    </div>`).join('');
+
+  const intelItems = (r.formulaIntel || []).map(f => `
+    <div class="intel-item">
+      <div class="intel-marker" style="background:${f.color || '#C4BCB4'}"></div>
+      <div class="intel-text">${f.insight}</div>
+    </div>`).join('');
+
+  const greenFlags = (r.greenFlags || []).map(f => `<span class="flag-tag flag-green">${f}</span>`).join('');
+  const redFlags = (r.topFlags || []).map(f => `<span class="flag-tag flag-red">${f}</span>`).join('');
+
+  let idx = 1;
+
+  el.innerHTML = `
+    <div class="results-eyebrow">
+      <span class="field-label" style="margin:0">Analysis Complete</span>
+      <span class="product-pill">${r.productTypeEmoji || ''} ${r.productType || 'Product'}</span>
+    </div>
+
+    <div class="score-block">
+      <div class="score-numeral" style="color:${scoreColor}">${r.safetyScore}<span class="score-denom">/10</span></div>
+      <div class="score-right">
+        <div class="score-verdict">${r.safetyVerdict || ''}</div>
+        <div class="score-summary">${r.safetySummary || ''}</div>
+        <div class="score-bar-wrap">
+          <div class="score-bar-fill" id="scoreBar" style="background:${barColor}"></div>
+        </div>
+      </div>
+    </div>
+
+    ${(greenFlags || redFlags) ? `<div class="flags-row">${greenFlags}${redFlags}</div>` : ''}
+
+    <div class="result-block">
+      <div class="block-header" onclick="toggleBlock('ing')">
+        <div class="block-header-left">
+          <span class="block-num">0${idx++}</span>
+          <span class="block-title">Ingredient Breakdown</span>
+        </div>
+        <span class="block-toggle" id="toggle-ing">Collapse</span>
+      </div>
+      <div class="block-body open" id="body-ing">
+        <table class="ing-table">
+          <thead><tr>
+            <th>Ingredient</th><th>EWG</th><th>Purpose</th>
+            ${selectedDepth === 'deep' ? '<th>Flag</th>' : ''}
+          </tr></thead>
+          <tbody>${ingredientRows}</tbody>
+        </table>
+      </div>
+    </div>
+
+    ${skinCells ? `
+    <div class="result-block">
+      <div class="block-header" onclick="toggleBlock('skin')">
+        <div class="block-header-left">
+          <span class="block-num">0${idx++}</span>
+          <span class="block-title">Suitability</span>
+        </div>
+        <span class="block-toggle" id="toggle-skin">Expand</span>
+      </div>
+      <div class="block-body" id="body-skin">
+        <div class="skin-grid">${skinCells}</div>
+      </div>
+    </div>` : ''}
+
+    ${selectedDepth === 'deep' && intelItems ? `
+    <div class="result-block">
+      <div class="block-header" onclick="toggleBlock('intel')">
+        <div class="block-header-left">
+          <span class="block-num">0${idx++}</span>
+          <span class="block-title">Formula Intelligence</span>
+        </div>
+        <span class="block-toggle" id="toggle-intel">Expand</span>
+      </div>
+      <div class="block-body" id="body-intel">
+        <div class="intel-list">${intelItems}</div>
+      </div>
+    </div>` : ''}
+
+    <div class="actions-bar">
+      <button class="text-btn" onclick="copyResults()">Copy Report</button>
+      <button class="text-btn" onclick="resetApp()">Scan Another</button>
+    </div>`;
+
+  setTimeout(() => {
+    const bar = document.getElementById('scoreBar');
+    if (bar) bar.style.width = barWidth + '%';
+  }, 100);
+}
+
+function toggleBlock(id) {
+  const body = document.getElementById('body-' + id);
+  const toggle = document.getElementById('toggle-' + id);
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  if (toggle) toggle.textContent = isOpen ? 'Expand' : 'Collapse';
+}
+
+function copyResults() {
+  navigator.clipboard.writeText(document.getElementById('results').innerText).then(() => {
+    const btns = document.querySelectorAll('.text-btn');
+    const orig = btns[0].textContent;
+    btns[0].textContent = 'Copied';
+    setTimeout(() => btns[0].textContent = orig, 2000);
+  });
+}
+
+function resetApp() {
+  selectedFile = null;
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('results').innerHTML = '';
+  document.getElementById('previewImg').src = '';
+  document.getElementById('uploadPrompt').style.display = 'block';
+  document.getElementById('previewWrap').style.display = 'none';
+  document.getElementById('fileInput').value = '';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showError(msg) {
+  const box = document.getElementById('errorBox');
+  box.style.display = 'block';
+  box.textContent = msg;
+}
+
+function fileToBase64(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result.split(',')[1]);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+}
+</script>
+</body>
+</html>

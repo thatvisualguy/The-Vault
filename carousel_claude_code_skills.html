@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1080">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Mono:ital,wght@1,400;1,700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <title>Best 7 Claude Code Skills</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #e8e8e8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 28px;
+      padding: 28px;
+    }
+
+    /* ─── BASE SLIDE ─── */
+    .slide {
+      width: 1080px;
+      height: 1440px;
+      position: relative;
+      overflow: hidden;
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* ─── GRID OVERLAY (content slides) ─── */
+    .grid-overlay {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(26,26,255,0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(26,26,255,0.06) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* ─── SLIDE NUMBER BADGE ─── */
+    .num-badge {
+      position: absolute;
+      top: -18px;
+      left: -18px;
+      width: 100px;
+      height: 100px;
+      background: #111;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+    .num-badge span {
+      font-family: 'Space Mono', monospace;
+      font-style: italic;
+      font-size: 28px;
+      font-weight: 700;
+      color: #fff;
+      margin-top: 12px;
+      margin-left: 12px;
+    }
+
+    /* ─── CREATOR HANDLE BADGE ─── */
+    .handle-badge {
+      position: absolute;
+      bottom: 64px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      background: #fff;
+      border: 2px solid #e0e0e0;
+      border-radius: 100px;
+      padding: 16px 36px 16px 20px;
+      z-index: 10;
+      white-space: nowrap;
+    }
+    .handle-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1A1AFF, #FFD700);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: 900;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .handle-text {
+      font-family: 'Inter', sans-serif;
+      font-size: 26px;
+      font-weight: 700;
+      color: #111;
+      letter-spacing: -0.3px;
+    }
+    .handle-sub {
+      font-size: 20px;
+      font-weight: 400;
+      color: #888;
+    }
+
+    /* ─── CIRCULAR ARROW (cover) ─── */
+    .swipe-icon {
+      position: absolute;
+      top: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 80px;
+      z-index: 5;
+    }
+
+    /* ════════════════════════════════════
+       SLIDE 1 — COVER
+    ════════════════════════════════════ */
+    #s1 {
+      background: radial-gradient(ellipse at 50% 40%, #4444FF 0%, #1A1AFF 45%, #0000AA 100%);
+    }
+    #s1 .inner {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 80px;
+      z-index: 5;
+    }
+    #s1 .accent-label {
+      font-family: 'Instrument Serif', serif;
+      font-style: italic;
+      font-size: 38px;
+      color: #FFD700;
+      margin-bottom: 28px;
+      letter-spacing: 0.5px;
+    }
+    #s1 .main-heading {
+      font-family: 'Inter', sans-serif;
+      font-size: 120px;
+      font-weight: 900;
+      line-height: 0.92;
+      color: #fff;
+      letter-spacing: -4px;
+      margin-bottom: 40px;
+    }
+    #s1 .main-heading em {
+      font-style: normal;
+      color: #FFD700;
+    }
+    #s1 .sub {
+      font-size: 34px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.75);
+      line-height: 1.5;
+      max-width: 760px;
+      margin-bottom: 60px;
+    }
+    #s1 .swipe-hint {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      color: rgba(255,255,255,0.6);
+      font-size: 24px;
+      font-weight: 500;
+    }
+    /* decorative rings */
+    #s1 .ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255,255,255,0.08);
+      z-index: 2;
+    }
+    /* handle badge variant for cover */
+    #s1 .handle-badge {
+      background: rgba(255,255,255,0.12);
+      border-color: rgba(255,255,255,0.25);
+    }
+    #s1 .handle-badge .handle-text { color: #fff; }
+    #s1 .handle-badge .handle-sub { color: rgba(255,255,255,0.6); }
+
+    /* ════════════════════════════════════
+       SKILL SLIDES (2–8) BASE
+    ════════════════════════════════════ */
+    .skill-slide {
+      background: #FFFFFF;
+    }
+    .skill-slide .content {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 100px 90px 180px;
+      text-align: center;
+      z-index: 5;
+    }
+    /* skill icon box */
+    .skill-icon {
+      width: 160px;
+      height: 160px;
+      border-radius: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 76px;
+      margin-bottom: 48px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+    }
+    /* install pill */
+    .install-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: #111;
+      color: #fff;
+      font-family: 'Space Mono', monospace;
+      font-size: 22px;
+      padding: 14px 30px;
+      border-radius: 100px;
+      margin-bottom: 44px;
+      letter-spacing: -0.3px;
+    }
+    .install-pill .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #FFD700;
+      flex-shrink: 0;
+    }
+    /* accent italic above title */
+    .skill-accent {
+      font-family: 'Instrument Serif', serif;
+      font-style: italic;
+      font-size: 34px;
+      color: #888;
+      margin-bottom: 16px;
+    }
+    /* skill title */
+    .skill-title {
+      font-size: 78px;
+      font-weight: 900;
+      color: #111;
+      line-height: 1.0;
+      letter-spacing: -2.5px;
+      margin-bottom: 32px;
+    }
+    /* stats row */
+    .stats-row {
+      display: flex;
+      gap: 0;
+      margin-bottom: 44px;
+    }
+    .stat-chip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #F5F5F5;
+      border: 1.5px solid #e8e8e8;
+      font-size: 22px;
+      font-weight: 600;
+      color: #555;
+      padding: 10px 22px;
+      border-radius: 0;
+    }
+    .stat-chip:first-child { border-radius: 12px 0 0 12px; }
+    .stat-chip:last-child  { border-radius: 0 12px 12px 0; border-left: none; }
+    .stat-chip .chip-icon { font-size: 20px; }
+    /* body description */
+    .skill-body {
+      font-size: 34px;
+      font-weight: 400;
+      color: #444;
+      line-height: 1.65;
+      max-width: 840px;
+      margin-bottom: 52px;
+    }
+    .skill-body strong {
+      color: #1A1AFF;
+      font-weight: 700;
+    }
+    /* feature chips */
+    .feature-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      justify-content: center;
+    }
+    .f-chip {
+      background: #EEF0FF;
+      color: #1A1AFF;
+      font-size: 22px;
+      font-weight: 600;
+      padding: 10px 24px;
+      border-radius: 100px;
+      border: 1.5px solid #C8CCFF;
+    }
+
+    /* tint variants */
+    .tint-pink  { background: #FDE8E8; }
+    .tint-blue  { background: #E8F4FD; }
+    .tint-yellow{ background: #FFFBE6; }
+
+    /* icon bg variants */
+    .icon-blue   { background: #1A1AFF; }
+    .icon-pink   { background: #FF4466; }
+    .icon-green  { background: #00C080; }
+    .icon-purple { background: #7C3AED; }
+    .icon-orange { background: #FF6B00; }
+    .icon-teal   { background: #0891B2; }
+    .icon-gold   { background: #D97706; }
+
+    /* ════════════════════════════════════
+       SLIDE 9 — CTA
+    ════════════════════════════════════ */
+    #s9 {
+      background: radial-gradient(ellipse at 50% 45%, #4444FF 0%, #1A1AFF 45%, #0000AA 100%);
+    }
+    #s9 .inner {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 80px;
+      z-index: 5;
+    }
+    #s9 .accent-label {
+      font-family: 'Instrument Serif', serif;
+      font-style: italic;
+      font-size: 38px;
+      color: #FFD700;
+      margin-bottom: 30px;
+    }
+    #s9 .cta-heading {
+      font-size: 112px;
+      font-weight: 900;
+      color: #fff;
+      line-height: 0.92;
+      letter-spacing: -4px;
+      margin-bottom: 44px;
+    }
+    #s9 .cta-heading em {
+      font-style: normal;
+      color: #FFD700;
+    }
+    #s9 .cta-body {
+      font-size: 34px;
+      font-weight: 400;
+      color: rgba(255,255,255,0.75);
+      line-height: 1.6;
+      max-width: 780px;
+      margin-bottom: 60px;
+    }
+    .cta-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      width: 100%;
+      max-width: 760px;
+      margin-bottom: 60px;
+    }
+    .cta-step {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 20px;
+      padding: 26px 34px;
+      text-align: left;
+    }
+    .cta-step-num {
+      font-family: 'Space Mono', monospace;
+      font-style: italic;
+      font-size: 32px;
+      font-weight: 700;
+      color: #FFD700;
+      flex-shrink: 0;
+      width: 44px;
+    }
+    .cta-step-text {
+      font-size: 28px;
+      font-weight: 500;
+      color: #fff;
+      line-height: 1.4;
+    }
+    .cta-step-text code {
+      font-family: 'Space Mono', monospace;
+      font-size: 24px;
+      background: rgba(255,215,0,0.2);
+      color: #FFD700;
+      padding: 2px 10px;
+      border-radius: 6px;
+    }
+    #s9 .handle-badge {
+      background: rgba(255,255,255,0.12);
+      border-color: rgba(255,255,255,0.25);
+    }
+    #s9 .handle-badge .handle-text { color: #fff; }
+    #s9 .handle-badge .handle-sub  { color: rgba(255,255,255,0.6); }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════
+     SLIDE 1 — COVER
+═══════════════════════════════════════ -->
+<div class="slide" id="s1">
+  <!-- decorative rings -->
+  <div class="ring" style="width:700px;height:700px;top:-200px;right:-200px;"></div>
+  <div class="ring" style="width:500px;height:500px;top:-100px;right:-100px;"></div>
+  <div class="ring" style="width:800px;height:800px;bottom:-300px;left:-300px;"></div>
+
+  <!-- swipe icon -->
+  <div class="swipe-icon">
+    <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="40" cy="40" r="38" stroke="rgba(255,255,255,0.35)" stroke-width="3"/>
+      <path d="M28 40 C28 30 52 30 52 40 C52 50 36 52 28 48" stroke="#FFD700" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+      <polyline points="24,44 28,48 32,44" stroke="#FFD700" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    </svg>
+  </div>
+
+  <div class="inner">
+    <div class="accent-label">The Ultimate List</div>
+    <div class="main-heading">7 Claude<br>Code <em>Skills</em><br>You Need.</div>
+    <div class="sub">The most powerful SKILL.md files to supercharge your AI coding workflow in 2026.</div>
+    <div class="swipe-hint">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M6 14h16M16 8l6 6-6 6" stroke="rgba(255,255,255,0.6)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Swipe to explore all 7
+    </div>
+  </div>
+
+  <div class="handle-badge">
+    <div class="handle-avatar">C</div>
+    <div>
+      <div class="handle-text">@claudecode</div>
+      <div class="handle-sub">Skills &amp; Tips</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SLIDE 2 — Skill #1: Frontend Design
+═══════════════════════════════════════ -->
+<div class="slide skill-slide" id="s2">
+  <div class="grid-overlay"></div>
+  <div class="num-badge"><span>01</span></div>
+
+  <div class="content">
+    <div class="skill-icon icon-blue">🎨</div>
+    <div class="install-pill">
+      <div class="dot"></div>
+      npx skills add anthropics/frontend-design
+    </div>
+    <div class="skill-accent">Official Anthropic · 65K+ ⭐</div>
+    <div class="skill-title">Frontend<br>Design</div>
+    <div class="stats-row">
+      <div class="stat-chip"><span class="chip-icon">⬇️</span> 277K+ installs</div>
+      <div class="stat-chip"><span class="chip-icon">✅</span> Verified</div>
+      <div class="stat-chip"><span class="chip-icon">📅</span> Feb 2026</div>
+    </div>
+    <div class="skill-body">
+      Stops Claude from generating <strong>generic AI slop</strong>. Forces a bold aesthetic direction — brutalist, editorial, retro-futuristic — before writing a single line of code.
+    </div>
+    <div class="feature-chips">
+      <div class="f-chip">Distinctive typography</div>
+      <div class="f-chip">No Inter/Roboto</div>
+      <div class="f-chip">Purposeful color</div>
+      <div class="f-chip">Auto-triggers</div>
+    </div>
+  </div>
+
+  <div class="handle-badge">
+    <div class="handle-avatar">C</div>
+    <div>
+      <div class="handle-text">@claudecode</div>
+      <div class="handle-sub">Skills &amp; Tips</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SLIDE 3 — Skill #2: PDF
+═══════════════════════════════════════ -->
+<div class="slide skill-slide tint-blue" id="s3">
+  <div class="grid-overlay"></div>
+  <div class="num-badge"><span>02</span></div>
+
+  <div class="content">
+    <div class="skill-icon icon-teal">📄</div>
+    <div class="install-pill">
+      <div class="dot"></div>
+      npx skills add anthropics/pdf
+    </div>
+    <div class="skill-accent">Official Anthropic · Document Suite</div>
+    <div class="skill-title">PDF<br>Toolkit</div>
+    <div class="stats-row">
+      <div class="stat-chip"><span class="chip-icon">📦</span> Part of Doc Suite</div>
+      <div class="stat-chip"><span class="chip-icon">🔒</span> Works offline</div>
+      <div class="stat-chip"><span class="chip-icon">⚡</span> No API key</div>
+    </div>
+    <div class="skill-body">
+      The <strong>highest-utility skill</strong> for knowledge workers. Extract text, merge files, fill forms, add watermarks, and OCR scanned docs — all from a prompt.
+    </div>
+    <div class="feature-chips">
+      <div class="f-chip">Text extraction</div>
+      <div class="f-chip">Merge &amp; split</div>
+      <div class="f-chip">Form filling</div>
+      <div class="f-chip">OCR support</div>
+    </div>
+  </div>
+
+  <div class="handle-badge">
+    <div class="handle-avatar">C</div>
+    <div>
+      <div class="handle-text">@claudecode</div>
+      <div class="handle-sub">Skills &amp; Tips</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SLIDE 4 — Skill #3: Remotion Best Practices
+═══════════════════════════════════════ -->
+<div class="slide skill-slide" id="s4">
+  <div class="grid-overlay"></div>
+  <div class="num-badge"><span>03</span></div>
+
+  <div class="content">
+    <div class="skill-icon icon-pink">🎬</div>
+    <div class="install-pill">
+      <div class="dot"></div>
+      npx skills add remotion-dev/remotion-best-practices
+    </div>
+    <div class="skill-accent">remotion-dev · 117K+ installs/week</div>
+    <div class="skill-title">Remotion<br>Best Practices</div>
+    <div class="stats-row">
+      <div class="stat-chip"><span class="chip-icon">🔥</span> 117K+ wkly installs</div>
+      <div class="stat-chip"><span class="chip-icon">🛡️</span> Security audited</div>
+      <div class="stat-chip"><span class="chip-icon">⚡</span> Auto-triggers</div>
+    </div>
+    <div class="skill-body">
+      Gives Claude <strong>deep video expertise</strong> — animations, timing, audio sync, captions, and 3D. Activates automatically on any Remotion task, loading only relevant rules.
+    </div>
+    <div class="feature-chips">
+      <div class="f-chip">Animations &amp; timing</div>
+      <div class="f-chip">Audio sync</div>
+      <div class="f-chip">3D compositing</div>
+      <div class="f-chip">Context-efficient</div>
+    </div>
+  </div>
+
+  <div class="handle-badge">
+    <div class="handle-avatar">C</div>
+    <div>
+      <div class="handle-text">@claudecode</div>
+      <div class="handle-sub">Skills &amp; Tips</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SLIDE 5 — Skill #4: Skill Creator
+═══════════════════════════════════════ -->
+<div class="slide skill-slide tint-pink" id="s5">
+  <div class="grid-overlay"></div>
+  <div class="num-badge"><span>04</span></div>
+
+  <div class="content">
+    <div class="skill-icon icon-purple">🧠</div>
+    <div class="install-pill">
+      <div class="dot"></div>
+      npx skills add anthropics/skill-creator
+    </div>
+    <div class="skill-accent">Official Anthropic · Meta-skill</div>
+    <div class="skill-title">Skill<br>Creator</div>
+    <div class="stats-row">
+      <div class="stat-chip"><span class="chip-icon">🏗️</span> Build your own</div>
+      <div class="stat-chip"><span class="chip-icon">💬</span> Interactive Q&amp;A</div>
+      <div class="stat-chip"><span class="chip-icon">⏱️</span> ~5 min setup</div>
+    </div>
+    <div class="skill-body">
+      The <strong>meta-skill</strong>: turns your own expertise into reusable SKILL.md files. Describe a workflow in plain language — it generates a complete, structured skill in minutes.
+    </div>
+    <div class="feature-chips">
+      <div class="f-chip">No coding required</div>
+      <div class="f-chip">YAML frontmatter</div>
+      <div class="f-chip">Edge case handling</div>
+      <div class="f-chip">Portable format</div>
+    </div>
+  </div>
+
+  <div class="handle-badge">
+    <div class="handle-avatar">C</div>
+    <div>
+      <div class="handle-text">@claudecode</div>
+      <div class="handle-sub">Skills &amp; Tips</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SLIDE 6 — Skill #5: Awesome Skills Library
+═══════════════════════════════════════ -->
+<div class="slide skill-slide" id="s6">
+  <div class="grid-overlay"></div>
+  <div class="num-badge"><span>05</span></div>
+
+  <div class="content">
+    <div class="skill-icon icon-green">📚</div>
+    <div class="install-pill">
+      <div class="dot"></div>
+      npx antigravity-awesome-skills --claude
+    </div>
+    <div class="skill-accent">Community · 22K+ ⭐ on GitHub</div>
+    <div class="skill-title">Awesome<br>Skills Library</div>
+    <div class="stats-row">
+      <div class="stat-chip"><span class="chip-icon">📦</span> 1,234+ skills</div>
+      <div class="stat-chip"><span class="chip-icon">🍴</span> 3,800+ forks</div>
+      <div class="stat-chip"><span class="chip-icon">🔄</span> v7.3.0 updated</div>
+    </div>
+    <div class="skill-body">
+      The <strong>largest skill collection in the ecosystem</strong> — works across Claude Code, Cursor, Gemini CLI, Copilot & more. One install command drops 1,234 skills instantly.
+    </div>
+    <div class="feature-chips">
+      <div class="f-chip">Architecture</div>
+      <div class="f-chip">Debugging</div>
+      <div class="f-chip">Security audits</div>
+      <div class="f-chip">Cross-tool</div>
+    </div>
+  </div>
+
+  <div class="handle-badge">
+    <div class="handle-avatar">C</div>
+    <div>
+      <div class="handle-text">@claudecode</div>
+      <div class="handle-sub">Skills &amp; Tips</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SLIDE 7 — Skill #6: Marketing Stack (OpenClaw)
+═══════════════════════════════════════ -->
+<div class="slide skill-slide tint-yellow" id="s7">
+  <div class="grid-overlay"></div>
+  <div class="num-badge"><span>06</span></div>
+
+  <div class="content">
+    <div class="skill-icon icon-orange">📈</div>
+    <div class="install-pill">
+      <div class="dot"></div>
+      npx skills add coreyhaines/marketing-stack
+    </div>
+    <div class="skill-accent">Corey Haines · 12.9K ⭐</div>
+    <div class="skill-title">Marketing<br>Stack</div>
+    <div class="stats-row">
+      <div class="stat-chip"><span class="chip-icon">🗂️</span> 32 sub-skills</div>
+      <div class="stat-chip"><span class="chip-icon">🔗</span> Cross-referenced</div>
+      <div class="stat-chip"><span class="chip-icon">🎯</span> Full funnel</div>
+    </div>
+    <div class="skill-body">
+      The most comprehensive marketing skill library. <strong>32 skills</strong> covering SEO, copywriting, CRO, paid ads, email sequences, churn prevention — all cross-referenced with shared product context.
+    </div>
+    <div class="feature-chips">
+      <div class="f-chip">seo-audit</div>
+      <div class="f-chip">page-cro</div>
+      <div class="f-chip">email-sequence</div>
+      <div class="f-chip">ai-seo</div>
+    </div>
+  </div>
+
+  <div class="handle-badge">
+    <div class="handle-avatar">C</div>
+    <div>
+      <div class="handle-text">@claudecode</div>
+      <div class="handle-sub">Skills &amp; Tips</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SLIDE 8 — Skill #7: Vercel React Best Practices
+═══════════════════════════════════════ -->
+<div class="slide skill-slide tint-blue" id="s8">
+  <div class="grid-overlay"></div>
+  <div class="num-badge"><span>07</span></div>
+
+  <div class="content">
+    <div class="skill-icon icon-gold">⚛️</div>
+    <div class="install-pill">
+      <div class="dot"></div>
+      npx skills add vercel-labs/react-best-practices
+    </div>
+    <div class="skill-accent">Vercel Labs · 19.4K ⭐</div>
+    <div class="skill-title">React Best<br>Practices</div>
+    <div class="stats-row">
+      <div class="stat-chip"><span class="chip-icon">⚛️</span> React patterns</div>
+      <div class="stat-chip"><span class="chip-icon">🔒</span> Security tested</div>
+      <div class="stat-chip"><span class="chip-icon">📐</span> Design systems</div>
+    </div>
+    <div class="skill-body">
+      Teaches Claude <strong>composition patterns that scale</strong> — compound components, context providers, explicit variants. Ends boolean-prop hell and keeps components testable.
+    </div>
+    <div class="feature-chips">
+      <div class="f-chip">Compound components</div>
+      <div class="f-chip">State management</div>
+      <div class="f-chip">No prop bloat</div>
+      <div class="f-chip">Accessible code</div>
+    </div>
+  </div>
+
+  <div class="handle-badge">
+    <div class="handle-avatar">C</div>
+    <div>
+      <div class="handle-text">@claudecode</div>
+      <div class="handle-sub">Skills &amp; Tips</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SLIDE 9 — CTA
+═══════════════════════════════════════ -->
+<div class="slide" id="s9">
+  <!-- decorative rings -->
+  <div class="ring" style="position:absolute;border-radius:50%;border:1.5px solid rgba(255,255,255,0.08);width:700px;height:700px;top:-200px;right:-200px;z-index:2;"></div>
+  <div class="ring" style="position:absolute;border-radius:50%;border:1.5px solid rgba(255,255,255,0.05);width:900px;height:900px;bottom:-400px;left:-300px;z-index:2;"></div>
+
+  <div class="inner">
+    <div class="accent-label">Start Today</div>
+    <div class="cta-heading">Install Your<br>First <em>Skill.</em></div>
+    <div class="cta-body">Three steps to go from zero to a supercharged Claude Code workflow — right now.</div>
+
+    <div class="cta-steps">
+      <div class="cta-step">
+        <div class="cta-step-num">01</div>
+        <div class="cta-step-text">Open your terminal in any project folder</div>
+      </div>
+      <div class="cta-step">
+        <div class="cta-step-num">02</div>
+        <div class="cta-step-text">Run <code>npx skills add anthropics/frontend-design</code></div>
+      </div>
+      <div class="cta-step">
+        <div class="cta-step-num">03</div>
+        <div class="cta-step-text">Ask Claude to build a UI — watch the difference</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="handle-badge" style="position:absolute;bottom:64px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:18px;background:rgba(255,255,255,0.12);border:2px solid rgba(255,255,255,0.25);border-radius:100px;padding:16px 36px 16px 20px;z-index:10;white-space:nowrap;">
+    <div class="handle-avatar">C</div>
+    <div>
+      <div class="handle-text" style="color:#fff;">@claudecode</div>
+      <div class="handle-sub" style="color:rgba(255,255,255,0.6);">Skills &amp; Tips</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

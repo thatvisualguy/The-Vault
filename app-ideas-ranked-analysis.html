@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>App Ideas Ranked — Strategic Viability Analysis</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;900&family=Outfit:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f2eb;--card:#fff;--ink:#1a1a1a;--muted:#7a756d;--border:#e2ddd4;--s-tier:#1a6b4a;--a-tier:#2956a3;--b-tier:#c47f17;--c-tier:#b04a3a;--gold:#c49a2a;--surface:#faf8f4}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);line-height:1.65}
+.container{max-width:940px;margin:0 auto;padding:48px 24px 100px}
+.hero{text-align:center;padding:60px 0 48px;border-bottom:3px double var(--ink);margin-bottom:48px}
+.hero-tag{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--gold)}
+.hero h1{font-family:'Fraunces',serif;font-size:clamp(28px,4.5vw,46px);font-weight:900;line-height:1.15;margin:16px 0}
+.hero p{font-size:16px;color:var(--muted);max-width:600px;margin:0 auto}
+
+.section{margin-bottom:56px}
+.sl{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}
+.section h2{font-family:'Fraunces',serif;font-size:26px;margin-bottom:18px;padding-bottom:12px;border-bottom:2px solid var(--border)}
+.section p{font-size:15px;margin-bottom:12px}
+
+.tier-label{display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1px;padding:3px 10px;border-radius:3px;color:#fff;margin-bottom:16px}
+.tier-s{background:var(--s-tier)}.tier-a{background:var(--a-tier)}.tier-b{background:var(--b-tier)}.tier-c{background:var(--c-tier)}
+
+.app{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:24px;margin-bottom:18px;position:relative}
+.app .rank-badge{position:absolute;top:-1px;right:20px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;padding:4px 12px;border-radius:0 0 6px 6px;color:#fff}
+.app h3{font-family:'Fraunces',serif;font-size:19px;margin-bottom:4px;padding-right:60px}
+.app .meta{font-size:13px;color:var(--muted);margin-bottom:10px}
+.app .desc{font-size:14px;margin-bottom:14px;color:#444}
+.app .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.app .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.metric{background:var(--surface);border-radius:6px;padding:10px;text-align:center}
+.metric .v{font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600}
+.metric .l{font-size:10px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.3px}
+.bar{height:6px;border-radius:3px;background:#eee;margin:3px 0}
+.bar-fill{height:100%;border-radius:3px}
+.bar-high .bar-fill{background:var(--s-tier);width:85%}
+.bar-med .bar-fill{background:var(--b-tier);width:55%}
+.bar-low .bar-fill{background:var(--c-tier);width:30%}
+.bar-vhigh .bar-fill{background:var(--s-tier);width:95%}
+.rev{font-size:13px;color:#555;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+.rev strong{color:var(--ink)}
+.missing{background:linear-gradient(135deg,#fef9ef,#f5f0e5);border-left:4px solid var(--gold);padding:16px 20px;border-radius:0 8px 8px 0;margin:18px 0;font-size:14px}
+.missing strong{color:var(--gold)}
+.insight{background:linear-gradient(135deg,#eef5ee,#e8f0e8);border-left:4px solid var(--s-tier);padding:16px 20px;border-radius:0 8px 8px 0;margin:18px 0;font-size:14px}
+.insight strong{color:var(--s-tier)}
+
+table.rank{width:100%;border-collapse:collapse;margin:20px 0;font-size:13px}
+table.rank th{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.5px;text-align:left;padding:10px 12px;background:var(--ink);color:#fff}
+table.rank th:first-child{border-radius:6px 0 0 0}table.rank th:last-child{border-radius:0 6px 0 0}
+table.rank td{padding:10px 12px;border-bottom:1px solid var(--border)}
+table.rank tr:hover td{background:#faf8f4}
+.score{font-family:'IBM Plex Mono',monospace;font-weight:700}
+.score-s{color:var(--s-tier)}.score-a{color:var(--a-tier)}.score-b{color:var(--b-tier)}.score-c{color:var(--c-tier)}
+
+@media(max-width:640px){.app .grid3,.app .grid4{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="hero">
+  <div class="hero-tag">Strategic Product Analysis · April 2026</div>
+  <h1>Your 26 Ideas: Ranked by Viability, Demand & Revenue Potential</h1>
+  <p>Comprehensive analysis with scoring, competitive landscape, revenue maximization strategies, and what you're missing. Now including 9 new service/digital product ideas.</p>
+</div>
+
+<!-- MASTER RANKING TABLE -->
+<div class="section">
+  <div class="sl" style="color:var(--s-tier)">Overview</div>
+  <h2>Master Ranking: All 26 Ideas Scored</h2>
+  <p>Each idea scored on Demand (1-10), Competition (10=low, 1=saturated), and Earning Potential (1-10). Composite = weighted average (Demand×0.35 + Low Comp×0.30 + Earning×0.35).</p>
+
+  <table class="rank">
+    <tr><th>#</th><th>App / Product Idea</th><th>Demand</th><th>Comp ↓</th><th>Earning</th><th>Score</th><th>Tier</th></tr>
+    <tr><td>1</td><td><strong>$500 AI Website Service for Local Biz</strong> 🆕</td><td>9</td><td>7</td><td>9</td><td class="score score-s">8.4</td><td>S+</td></tr>
+    <tr><td>2</td><td><strong>Freelancer/SMB All-in-One Platform</strong> 🆕</td><td>9</td><td>4</td><td>9</td><td class="score score-s">7.5</td><td>S</td></tr>
+    <tr><td>3</td><td><strong>Screen Recording → SOP Generator</strong> 🆕</td><td>7</td><td>9</td><td>8</td><td class="score score-s">7.9</td><td>S</td></tr>
+    <tr><td>4</td><td><strong>AI Niche Market Research Reports</strong> 🆕</td><td>7</td><td>8</td><td>9</td><td class="score score-s">8.0</td><td>S</td></tr>
+    <tr><td>5</td><td><strong>Profession-Specific AI Micro-Courses</strong> 🆕</td><td>8</td><td>8</td><td>9</td><td class="score score-s">8.3</td><td>S</td></tr>
+    <tr><td>6</td><td><strong>Restaurant Mgmt + Thermal Printer</strong></td><td>8</td><td>7</td><td>8</td><td class="score score-s">7.7</td><td>S</td></tr>
+    <tr><td>7</td><td><strong>Pocketshoot: AI Product Image Gen</strong></td><td>9</td><td>5</td><td>9</td><td class="score score-s">7.8</td><td>S</td></tr>
+    <tr><td>8</td><td><strong>Instagram Tools Suite</strong></td><td>9</td><td>4</td><td>9</td><td class="score score-s">7.5</td><td>S</td></tr>
+    <tr><td>9</td><td><strong>AI Carousel Creator</strong></td><td>8</td><td>6</td><td>8</td><td class="score score-s">7.4</td><td>S</td></tr>
+    <tr><td>10</td><td><strong>AI Content Reformatter</strong> 🆕</td><td>7</td><td>9</td><td>7</td><td class="score score-a">7.5</td><td>A</td></tr>
+    <tr><td>11</td><td><strong>AI Podcast Repurposing Engine</strong> 🆕</td><td>8</td><td>6</td><td>7</td><td class="score score-a">7.1</td><td>A</td></tr>
+    <tr><td>12</td><td><strong>Shop Mgmt + Thermal Printer</strong></td><td>8</td><td>7</td><td>7</td><td class="score score-a">7.4</td><td>A</td></tr>
+    <tr><td>13</td><td><strong>Product Chemical Analyzer</strong></td><td>7</td><td>8</td><td>7</td><td class="score score-a">7.3</td><td>A</td></tr>
+    <tr><td>14</td><td><strong>Role-Specific AI Prompt Kits</strong> 🆕</td><td>8</td><td>6</td><td>6</td><td class="score score-a">6.7</td><td>A</td></tr>
+    <tr><td>15</td><td><strong>Receipt/Cheque Scanner App</strong></td><td>7</td><td>5</td><td>8</td><td class="score score-a">6.8</td><td>A</td></tr>
+    <tr><td>16</td><td><strong>Voice-Based Recipe App</strong></td><td>8</td><td>6</td><td>6</td><td class="score score-a">6.7</td><td>A</td></tr>
+    <tr><td>17</td><td><strong>Prompt Vault App</strong> 🆕</td><td>7</td><td>5</td><td>5</td><td class="score score-b">5.7</td><td>B</td></tr>
+    <tr><td>18</td><td><strong>Link Vault (MyMind-like)</strong></td><td>6</td><td>5</td><td>7</td><td class="score score-b">6.1</td><td>B</td></tr>
+    <tr><td>19</td><td><strong>Voice Notes Capture: AudioSpark</strong></td><td>6</td><td>6</td><td>6</td><td class="score score-b">6.0</td><td>B</td></tr>
+    <tr><td>20</td><td><strong>Travel Itinerary App</strong></td><td>8</td><td>2</td><td>6</td><td class="score score-b">5.5</td><td>B</td></tr>
+    <tr><td>21</td><td><strong>Design System Generator</strong></td><td>5</td><td>4</td><td>7</td><td class="score score-b">5.4</td><td>B</td></tr>
+    <tr><td>22</td><td><strong>Image Splitter (Insta Grid)</strong></td><td>7</td><td>3</td><td>4</td><td class="score score-b">4.7</td><td>B</td></tr>
+    <tr><td>23</td><td><strong>Gita GPT / Puran, Ved GPT</strong></td><td>6</td><td>3</td><td>4</td><td class="score score-b">4.4</td><td>B</td></tr>
+    <tr><td>24</td><td><strong>Box Cricket Scoring App</strong></td><td>5</td><td>7</td><td>4</td><td class="score score-c">5.2</td><td>C</td></tr>
+    <tr><td>25</td><td><strong>Party Games App</strong></td><td>5</td><td>4</td><td>5</td><td class="score score-c">4.7</td><td>C</td></tr>
+    <tr><td>26</td><td><strong>Instagram Downloader</strong></td><td>9</td><td>1</td><td>3</td><td class="score score-c">4.4</td><td>C</td></tr>
+  </table>
+</div>
+
+<!-- S-TIER -->
+<div class="section">
+  <div class="tier-label tier-s">S-TIER — BUILD THESE FIRST</div>
+  <h2>Highest ROI Opportunities</h2>
+
+  <div class="app" style="border:2px solid var(--s-tier)">
+    <div class="rank-badge" style="background:var(--s-tier)">#1 🆕</div>
+    <h3>$500 Flat-Rate AI Website Service</h3>
+    <div class="meta">Service Business · $500 setup + $75/mo · 27% of SMBs have NO website</div>
+    <div class="desc">This isn't an app — it's your highest-conviction business. 27% of small businesses (9M+ in the US alone) still have no website in 2026. Google Maps scraping identifies them instantly with phone, email, reviews. AI builds 80% of the site in 1–2 hours. Sales cycle: 3–10 days (trades owners decide fast). LTV per client: $2,300–$3,220. LTV:CAC ratio: 57:1+. The $500 setup is customer acquisition — the $75/mo recurring is the real business. Build 100 clients in Year 1 = $7,500/mo passive. Full BCG analysis in your separate masterplan report.</div>
+    <div class="grid4">
+      <div class="metric"><div class="v">9M+</div><div class="l">US Biz w/o site</div></div>
+      <div class="metric"><div class="v">$2,300+</div><div class="l">LTV per client</div></div>
+      <div class="metric"><div class="v">57:1</div><div class="l">LTV:CAC ratio</div></div>
+      <div class="metric"><div class="v">$7,500/mo</div><div class="l">@ 100 clients</div></div>
+    </div>
+    <div class="rev"><strong>Revenue Max:</strong> $500 setup + $75/mo hosting → upsell GBP optimization ($150/mo), review management ($29/mo), local SEO ($300/mo). Stack all 4 and LTV jumps to $10K+. Hire VAs for lead scraping ($5/hr) and scale to 20 clients/mo. This is a proven, repeatable machine.</div>
+  </div>
+
+  <div class="app" style="border:2px solid var(--s-tier)">
+    <div class="rank-badge" style="background:var(--s-tier)">#2 🆕</div>
+    <h3>Profession-Specific AI Micro-Courses</h3>
+    <div class="meta">Digital Product · $97–$497 per course · AI Market: $299B+ by 2026</div>
+    <div class="desc">General AI tutorials are flooded. But "ChatGPT for HVAC Business Owners," "AI for Financial Analysts," "AI Workflows for Wedding Photographers" — wide open. Under-2-hour courses solving one workflow problem win. 93% of IT leaders plan to deploy AI agents. Professionals fear displacement and will pay $197–$997. The key: you don't need to be an expert in HVAC — you need to be an expert in AI applied to HVAC. Interview 3 HVAC owners about their pain points, build the course in a week.</div>
+    <div class="grid3">
+      <div class="metric"><div class="v">$299B+</div><div class="l">AI Market 2026</div></div>
+      <div class="metric"><div class="v">$97–497</div><div class="l">Per course</div></div>
+      <div class="metric"><div class="v">90%</div><div class="l">Margin</div></div>
+    </div>
+    <div class="rev"><strong>Revenue Max:</strong> Sell on Gumroad/Teachable. Launch 1 course → validate → build 5 more for different professions. Bundle profession packs ($297). Add community tier ($49/mo). YouTube tutorials drive organic traffic. Each new profession = new course = new audience = compounding revenue. One $297 course selling 10 copies/week = $154K/year.</div>
+  </div>
+
+  <div class="app" style="border:2px solid var(--s-tier)">
+    <div class="rank-badge" style="background:var(--s-tier)">#3 🆕</div>
+    <h3>AI Niche Market Research Reports</h3>
+    <div class="meta">Digital Product · $99–$199 per report · Premium Buyers</div>
+    <div class="desc">Businesses pay premium for research they can't find elsewhere. Use AI + Google Trends + Reddit + public data to compile industry-specific trend reports for underserved verticals (pet tech, sustainable fashion, Indian D2C brands). Professionals will pay $99–$199 for a 30-page report that saves them days of research. Market Clarity and BigIdeasDB have validated this model. Your moat: depth of analysis + vertical specificity + regular updates.</div>
+    <div class="grid3">
+      <div class="metric"><div class="v">$99–199</div><div class="l">Per report</div></div>
+      <div class="metric"><div class="v">90%+</div><div class="l">Margin</div></div>
+      <div class="metric"><div class="v">Recurring</div><div class="l">Subscription model</div></div>
+    </div>
+    <div class="rev"><strong>Revenue Max:</strong> Individual reports ($99–$199) → Monthly subscription ($49/mo for 2 reports + data access) → Enterprise tier ($499/mo custom research). Sell on Gumroad. Promote via LinkedIn + Twitter. 50 reports/mo × $149 = $89,400/year. Add subscription layer and revenue compounds. AI does 80% of the research — your time investment per report: 3–5 hours.</div>
+  </div>
+
+  <div class="app" style="border:2px solid var(--s-tier)">
+    <div class="rank-badge" style="background:var(--s-tier)">#4 🆕</div>
+    <h3>Screen Recording → SOP Document Generator</h3>
+    <div class="meta">Micro-SaaS · $15/user/mo · Near-Zero Competition</div>
+    <div class="desc">Nobody wants to watch a 15-minute screen recording to find one step. Multi-modal AI "watches" a video, screenshots key clicks, writes a formatted step-by-step manual with numbered screenshots. Turns raw video into structured corporate knowledge. Every company with processes needs this. Scribe and Tango exist but are screenshot-based — a VIDEO-to-SOP tool using AI is genuinely differentiated. B2B buyers pay $15–25/user/mo without blinking because it replaces hours of manual documentation.</div>
+    <div class="grid3">
+      <div class="metric"><div class="v">$15/user</div><div class="l">Monthly</div></div>
+      <div class="metric"><div class="v">Near zero</div><div class="l">Direct competition</div></div>
+      <div class="metric"><div class="v">B2B</div><div class="l">High willingness</div></div>
+    </div>
+    <div class="rev"><strong>Revenue Max:</strong> Solo $15/mo → Team $12/user/mo (5+ users) → Enterprise $25/user/mo (SSO, custom branding, API). Upsell: AI knowledge base that organizes all SOPs + search. Even 200 paying users at $15/mo = $36K/year. Land one 50-person team = $9K/year from a single deal. Product-led growth: free tier (3 SOPs/mo) drives word-of-mouth inside companies.</div>
+  </div>
+
+  <div class="app">
+    <div class="rank-badge" style="background:var(--s-tier)">#1</div>
+    <h3>Pocketshoot: AI Product Image Generator</h3>
+    <div class="meta">SaaS / App · $19–$99/mo · AI Image Market: $88.7B in 2025</div>
+    <div class="desc">The AI product photography market is valued at $88.7B and growing at 30%+ CAGR. US businesses spend $135B/year on photo production. AI cuts costs by 80–95% per image ($0.10–$2 vs $200–$5,000 traditional). Competitors include Photoroom (100M+ images/mo), Pebblely (25M+ generated), Claid, and Flair. BUT — most target enterprise or general users. A mobile-first, India-focused, affordable tool for small Shopify/Meesho/Amazon sellers is wide open. Focus on batch processing, marketplace-ready formats (white bg for Amazon), and lifestyle scene generation.</div>
+    <div class="grid4">
+      <div class="metric"><div class="v">$88.7B</div><div class="l">Market Size</div></div>
+      <div class="metric"><div class="v">30%+</div><div class="l">CAGR</div></div>
+      <div class="metric"><div class="v">80-95%</div><div class="l">Cost savings</div></div>
+      <div class="metric"><div class="v">$19-99</div><div class="l">Monthly</div></div>
+    </div>
+    <div class="rev"><strong>Revenue Max:</strong> Freemium (10 images/mo free) → Pro $19/mo (200 images) → Business $49/mo (1,000) → API access $99/mo. Upsell: white-label for agencies. India pricing: ₹299–₹999/mo for massive adoption.</div>
+  </div>
+
+  <div class="app">
+    <div class="rank-badge" style="background:var(--s-tier)">#2</div>
+    <h3>Instagram Tools Suite</h3>
+    <div class="meta">App / SaaS · $9.99–$29.99/mo · 3B Instagram MAUs</div>
+    <div class="desc">Instagram has 3B monthly active users, generates $66.9B in revenue, and 70% of marketers are increasing investment in 2026. A bundled tools suite (downloader + carousel creator + image splitter + hashtag generator + reel templates + analytics) creates massive value. Individual tools are saturated — the BUNDLE is the product. Think "Swiss Army Knife for Instagram Creators." Key: bundle 5-6 tools others sell separately into one $9.99/mo subscription.</div>
+    <div class="grid3">
+      <div class="metric"><div class="v">3B</div><div class="l">Instagram MAUs</div></div>
+      <div class="metric"><div class="v">70%</div><div class="l">Marketers investing more</div></div>
+      <div class="metric"><div class="v">$9.99–29.99</div><div class="l">Monthly sub</div></div>
+    </div>
+    <div class="rev"><strong>Revenue Max:</strong> Free tier (with watermark) → Creator $9.99/mo → Pro $19.99/mo (no watermark, batch, analytics) → Agency $29.99/mo (team accounts). This makes Image Splitter (#11), Instagram Downloader (#17), and AI Carousel Creator (#3) all features inside one paid product rather than separate low-value apps.</div>
+  </div>
+
+  <div class="app">
+    <div class="rank-badge" style="background:var(--s-tier)">#3</div>
+    <h3>AI Carousel Creator</h3>
+    <div class="meta">SaaS / App · $9.99–$19.99/mo · Creator Economy Tool</div>
+    <div class="desc">52% of Instagram users prefer short-form video, but carousel posts get 3x more engagement than single images. Creators and businesses need fast carousel creation for LinkedIn + Instagram. Existing tools (Canva, Opus) are general-purpose. A laser-focused "paste text → get a 10-slide branded carousel" AI tool fills a specific gap. Key differentiator: AI writes the copy + designs the slides from a URL, blog post, or raw text input.</div>
+    <div class="grid3">
+      <div class="metric"><div class="v">3x</div><div class="l">Carousel vs single post engagement</div></div>
+      <div class="metric"><div class="v">Creator</div><div class="l">Target market</div></div>
+      <div class="metric"><div class="v">$9.99–19.99</div><div class="l">Monthly</div></div>
+    </div>
+    <div class="rev"><strong>Revenue Max:</strong> Can live as standalone OR as the crown jewel feature inside the Instagram Tools Suite. Standalone: freemium with watermark → $9.99/mo unlimited. Offer templates marketplace where designers sell templates for 30% rev share.</div>
+  </div>
+
+  <div class="app">
+    <div class="rank-badge" style="background:var(--s-tier)">#4</div>
+    <h3>Restaurant Management + Thermal Printer</h3>
+    <div class="meta">SaaS · ₹999–₹4,999/mo · India SMB POS Market</div>
+    <div class="desc">India has 7.5M+ restaurants. Vyapar's Table feature validated demand but hasn't dominated. Most small Indian restaurants use paper or basic apps. A focused restaurant management app with KOT (Kitchen Order Ticket) via thermal printer, table management, bill splitting, GST invoicing, and UPI integration fills a massive, sticky need. Thermal printer integration is the KEY differentiator — it's the physical lock-in that generic software can't replicate easily.</div>
+    <div class="grid3">
+      <div class="metric"><div class="v">7.5M+</div><div class="l">India restaurants</div></div>
+      <div class="metric"><div class="v">₹999–4,999</div><div class="l">Monthly</div></div>
+      <div class="metric"><div class="v">Very High</div><div class="l">Stickiness</div></div>
+    </div>
+    <div class="rev"><strong>Revenue Max:</strong> SaaS subscription (₹999–4,999/mo based on tables/features). Sell thermal printers at markup (₹2,000–5,000 hardware margin). Payment processing cut (0.5–1% on UPI/card). White-label for restaurant chains. Upsell: AI inventory forecasting, customer loyalty system. This is the MOST defensible business on your list.</div>
+  </div>
+</div>
+
+<!-- A-TIER -->
+<div class="section">
+  <div class="tier-label tier-a">A-TIER — STRONG POTENTIAL</div>
+  <h2>Build After S-Tier is Running</h2>
+
+  <div class="app" style="border:2px solid var(--a-tier)">
+    <div class="rank-badge" style="background:var(--a-tier)">🆕</div>
+    <h3>AI Content Reformatter (Not Scheduler)</h3>
+    <div class="meta">Micro-SaaS · $19–$39/mo · Zero Direct Competition</div>
+    <div class="desc">Scheduling tools (Taplio, Typefully, Buffer) handle publishing. But nobody solves the reformatting problem BEFORE scheduling. Take one LinkedIn post → reformat for Twitter thread, Instagram carousel text, newsletter paragraph, blog section. This is NOT repurposing (creating new content). It's REFORMATTING (adapting existing content to platform-specific formats, character limits, aspect ratios, hooks). Validated gap. Nobody owns this niche.</div>
+    <div class="grid3">
+      <div class="metric"><div class="v">$19–39</div><div class="l">Monthly</div></div>
+      <div class="metric"><div class="v">Zero</div><div class="l">Direct competitors</div></div>
+      <div class="metric"><div class="v">Founders/coaches</div><div class="l">Target buyers</div></div>
+    </div>
+    <div class="rev"><strong>Revenue Max:</strong> Solo $19/mo (30 reformats) → Unlimited $39/mo → Agency $79/mo (team + white-label). Natural pairing with your AI Carousel Creator — reformat text + generate carousel in one flow. Can also be a feature inside your Instagram Tools Suite.</div>
+  </div>
+
+  <div class="app" style="border:2px solid var(--a-tier)">
+    <div class="rank-badge" style="background:var(--a-tier)">🆕</div>
+    <h3>AI Podcast Repurposing Engine</h3>
+    <div class="meta">Micro-SaaS · $29–$79/mo · 5M+ Active Podcasts</div>
+    <div class="desc">5M+ active podcasts globally. The #1 Reddit complaint: repurposing takes hours per episode. Build a tool that ingests audio → transcribes → generates LinkedIn posts, newsletter drafts, TikTok clips with captions, show notes, blog posts, tweet threads. RepurposePie and Opus Clip have validated the model, but massive room for niche-specific versions (business podcasters, health podcasters, Indian-language podcasters). The gap is in downstream workflow, not transcription.</div>
+    <div class="grid3">
+      <div class="metric"><div class="v">5M+</div><div class="l">Active podcasts</div></div>
+      <div class="metric"><div class="v">$29–79</div><div class="l">Monthly</div></div>
+      <div class="metric"><div class="v">High</div><div class="l">Retention</div></div>
+    </div>
+    <div class="rev"><strong>Revenue Max:</strong> Solo Creator $29/mo → Professional $49/mo (+ video clips) → Agency $79/mo (multi-show). Upsell: "done-for-you" tier at $199/mo where you use AI + light human review to deliver finished assets weekly. That's where the real margin is.</div>
+  </div>
+
+  <div class="app" style="border:2px solid var(--a-tier)">
+    <div class="rank-badge" style="background:var(--a-tier)">🆕</div>
+    <h3>Role-Specific AI Prompt Kits</h3>
+    <div class="meta">Digital Download · $27–$97 · $0 Startup Cost</div>
+    <div class="desc">Generic prompt packs are dying. But "150 ChatGPT Prompts for HR Policy Writers" or "AI Prompts for Real Estate Listing Descriptions" still sell well at $50–$100 on Gumroad. ChatGPT processes ~2.5B daily messages. The market is MASSIVE. Package as Notion databases or styled PDFs. Use AI to generate, test, and refine the prompts. The more niche the profession, the more valuable the kit. Zero startup cost. Launch in 1 day.</div>
+    <div class="grid3">
+      <div class="metric"><div class="v">$0</div><div class="l">Startup cost</div></div>
+      <div class="metric"><div class="v">$27–97</div><div class="l">Per kit</div></div>
+      <div class="metric"><div class="v">1 day</div><div class="l">Time to launch</div></div>
+    </div>
+    <div class="rev"><strong>Revenue Max:</strong> Sell on Gumroad/Etsy. Build 10 profession-specific kits → create a "Prompt Kit Store." Bundle 5 kits at $197. Add monthly subscription ($9/mo) for new prompts weekly. Cross-sell your micro-courses. 20 kits selling 5 copies/week each at $47 = $4,700/week = $244K/year.</div>
+  </div>
+
+  <div class="app" style="border:2px solid var(--a-tier)">
+    <div class="rank-badge" style="background:var(--a-tier)">🆕</div>
+    <h3>Freelancer/SMB All-in-One Platform</h3>
+    <div class="meta">SaaS · $19–$49/mo · Massive Market, Heavy Competition</div>
+    <div class="desc">The pain is real: freelancers run 5–7 disconnected tools costing $87–120/mo total. Combining CRM, client tracking, project management, docs, expenses, invoicing, and contracts into one platform is the dream. BUT — this space has serious players: HoneyBook ($16/mo), Bonsai ($9/mo), Plutio ($19/mo), Moxie ($10/mo), Indy, Dubsado, and Flowlu. Forbes says entrepreneurs spend 36% of their week on admin. The demand is undeniable. The competition is fierce.</div>
+    <div class="grid4">
+      <div class="metric"><div class="v">$87–120</div><div class="l">Tool stack cost today</div></div>
+      <div class="metric"><div class="v">36%</div><div class="l">Time on admin</div></div>
+      <div class="metric"><div class="v">$19–49</div><div class="l">Monthly target</div></div>
+      <div class="metric"><div class="v">8+</div><div class="l">Major competitors</div></div>
+    </div>
+    <div class="rev"><strong>Revenue Max:</strong> Solo $19/mo → Team $39/mo → Agency $79/mo. But hear this clearly: <strong>you cannot out-feature HoneyBook/Bonsai/Plutio as a solo builder.</strong> Your ONLY viable angle is vertical specialization — "the all-in-one platform for Indian freelance designers" or "for CA firms" or "for wedding photographers." Pick ONE profession and build exclusively for them. Generic = death. Niche = survival. Add India-specific features: GST invoicing, UPI payments, Tally integration, WhatsApp client communication.</div>
+  </div>
+
+  <div class="app">
+    <div class="rank-badge" style="background:var(--a-tier)">#5</div>
+    <h3>Shop Management + Thermal Printer</h3>
+    <div class="meta">SaaS · ₹499–₹2,999/mo · India Retail SMB</div>
+    <div class="desc">Same thermal printer moat as #4 but for general retail. Inventory tracking, GST billing, barcode scanning, expense management, customer ledger. Vyapar has traction but is broad — niche verticals (kirana stores, pharmacy, hardware shops) are underserved. Each vertical needs slightly different features. Start with ONE vertical.</div>
+    <div class="rev"><strong>Revenue Max:</strong> Same model as Restaurant — SaaS + hardware margin + payment processing. Add: supplier marketplace (earn referral fees), credit/lending partnerships (earn commission per lead to NBFCs).</div>
+  </div>
+
+  <div class="app">
+    <div class="rank-badge" style="background:var(--a-tier)">#6</div>
+    <h3>Receipt/Cheque Scanner App</h3>
+    <div class="meta">App · Freemium + $4.99–$9.99/mo · Fintech/Productivity</div>
+    <div class="desc">Expense tracking is a $5.8B market. OCR tech is mature. Differentiation: AI categorization, GST extraction, integration with Tally/Zoho, export to accountant-ready formats. India angle: cheque scanning with MICR code reading is underserved. Target: freelancers, small business owners, CAs. The standalone app is moderate, but as a FEATURE inside Shop/Restaurant Management (#4/#5), it's extremely valuable.</div>
+    <div class="rev"><strong>Revenue Max:</strong> Freemium (5 scans/day) → Pro $4.99/mo (unlimited + export). B2B: API for accounting software integration ($99–499/mo). Best move: build this as a module inside #4/#5.</div>
+  </div>
+
+  <div class="app">
+    <div class="rank-badge" style="background:var(--a-tier)">#7</div>
+    <h3>Voice-Based Recipe App</h3>
+    <div class="meta">App · Freemium + $3.99–$6.99/mo · Food/Lifestyle</div>
+    <div class="desc">Massive TAM — everyone cooks. Voice-first is the differentiator (hands are dirty while cooking). "Hey [app], what's the next step?" or "convert cups to grams." Add: AI meal planning, grocery list generation, dietary adaptation. Competition exists (SideChef, Paprika) but none are truly voice-FIRST. The experience of cooking with a voice assistant that reads each step is magical.</div>
+    <div class="rev"><strong>Revenue Max:</strong> Freemium → Premium $3.99/mo (unlimited recipes, meal plans, voice). Affiliate commissions on grocery delivery (BigBasket, Blinkit). Sponsored recipes from food brands. Content partnerships.</div>
+  </div>
+
+  <div class="app">
+    <div class="rank-badge" style="background:var(--a-tier)">#8</div>
+    <h3>Product Chemical Analyzer</h3>
+    <div class="meta">App · Freemium + $2.99–$4.99/mo · Health/Wellness</div>
+    <div class="desc">Growing consumer awareness about ingredients in food, cosmetics, and household products. Scan a barcode or ingredient list → AI flags harmful chemicals, allergens, endocrine disruptors. Competition is surprisingly low for a GOOD implementation. Yuka (40M+ users) proved the model in Europe/US but hasn't dominated India. Indian regulations (FSSAI) + Ayurvedic alternatives angle is wide open.</div>
+    <div class="rev"><strong>Revenue Max:</strong> Freemium (5 scans/day) → Pro $2.99/mo (unlimited + personalized health profiles). B2B: API for e-commerce platforms to show ingredient scores. Affiliate: recommend safer alternatives and earn commission. Data play: anonymized ingredient trend reports for FMCG companies.</div>
+  </div>
+</div>
+
+<!-- B-TIER -->
+<div class="section">
+  <div class="tier-label tier-b">B-TIER — VIABLE BUT CONDITIONAL</div>
+  <h2>Build Only With Clear Differentiation</h2>
+
+  <div class="app" style="border:2px solid var(--b-tier)">
+    <div class="rank-badge" style="background:var(--b-tier)">🆕</div>
+    <h3>Prompt Vault App</h3>
+    <div class="meta">App / SaaS · Freemium + $4.99–$9.99/mo · Productivity</div>
+    <div class="desc">A personal library to save, organize, tag, and reuse AI prompts across tools (ChatGPT, Claude, Midjourney, etc.). The concept is solid — prompt management is a real pain for power users. BUT: the standalone market is questionable. ChatGPT already has custom instructions and saved prompts. Claude has projects. The risk is that this becomes a feature of existing AI tools, not a product. Where it DOES work: as a companion to your Prompt Kits business — buyers of your kits get a vault to organize them.</div>
+    <div class="grid3">
+      <div class="metric"><div class="v">$4.99–9.99</div><div class="l">Monthly</div></div>
+      <div class="metric"><div class="v">Medium</div><div class="l">Competition</div></div>
+      <div class="metric"><div class="v">Feature risk</div><div class="l">AI tools absorb this</div></div>
+    </div>
+    <div class="rev"><strong>Revenue Max:</strong> Best as a FREE companion app to your paid Prompt Kits (drive kit sales). Alternatively: freemium (50 prompts free) → Pro $4.99/mo (unlimited + folders + team sharing + variables). Add a marketplace where users sell prompt kits (you take 30% cut). The marketplace angle is the only way this becomes a real business vs. a feature.</div>
+  </div>
+
+  <div class="app">
+    <div class="rank-badge" style="background:var(--b-tier)">#9</div>
+    <h3>Link Vault (MyMind-like)</h3>
+    <div class="meta">App/SaaS · $4.99–$9.99/mo · Productivity</div>
+    <div class="desc">MyMind, Raindrop.io, and Pocket exist. The market wants this, but competition is real and retention is hard. Your edge: AI auto-tagging + visual search + better mobile experience. Risk: productivity apps have notoriously high churn. Build only if you have a clear UX innovation over MyMind.</div>
+    <div class="rev"><strong>Revenue Max:</strong> Freemium (100 links) → Pro $4.99/mo. Team plan $9.99/user/mo. Integrate with browser extension + mobile share sheet. AI "resurface relevant links" feature is the retention hook.</div>
+  </div>
+
+  <div class="app">
+    <div class="rank-badge" style="background:var(--b-tier)">#10</div>
+    <h3>Voice Notes Capture: AudioSpark</h3>
+    <div class="meta">App · Freemium + $3.99/mo · Productivity</div>
+    <div class="desc">Otter.ai dominates transcription. Voice Memos is built-in. Your edge needs to be: instant AI summarization + action item extraction + auto-tagging + send-to-Notion/Slack. The "capture → organize → act" pipeline is the differentiator, not raw recording. Risk: feature, not product (Apple/Google can add this easily).</div>
+    <div class="rev"><strong>Revenue Max:</strong> Freemium (10 notes/mo) → Pro $3.99/mo. Best as a feature inside a larger productivity suite.</div>
+  </div>
+
+  <div class="app">
+    <div class="rank-badge" style="background:var(--b-tier)">#11</div>
+    <h3>Image Splitter (Insta Grid)</h3>
+    <div class="meta">Free App · Ad-supported · Utility</div>
+    <div class="desc">Simple utility — dozens already exist on both app stores. Low differentiation potential. Low monetization ceiling. HOWEVER: as a free feature inside your Instagram Tools Suite (#2), it's a great user acquisition hook. Don't build this standalone.</div>
+    <div class="rev"><strong>Revenue Max:</strong> Ad-supported if standalone (low — maybe $200–500/mo). 10x more valuable as a free feature in your Instagram Suite driving paid conversions.</div>
+  </div>
+
+  <div class="app">
+    <div class="rank-badge" style="background:var(--b-tier)">#12</div>
+    <h3>Travel Itinerary App</h3>
+    <div class="meta">App · Freemium · Extremely Saturated</div>
+    <div class="desc">Wanderlog, TripIt, Google Travel, Notion templates — this space is brutally competitive. AI itinerary generation is now a commodity (ChatGPT does this well). Unless you have a VERY specific niche (e.g., "AI travel planner for Indian families" or "budget backpacker South Asia"), avoid this. The TAM is huge but so is competition.</div>
+    <div class="rev"><strong>Revenue Max:</strong> If you must build: affiliate commissions on hotels/flights (Booking.com, MakeMyTrip). Premium tier $4.99/mo for offline access + group planning. Niche down aggressively.</div>
+  </div>
+
+  <div class="app">
+    <div class="rank-badge" style="background:var(--b-tier)">#13</div>
+    <h3>Design System Generator</h3>
+    <div class="meta">SaaS/Plugin · $19–$49/mo · Niche B2B</div>
+    <div class="desc">Figma now has built-in AI (Make Designs, Check Designs), Tokens Studio exists, and Untitled UI dominates paid kits. The market is real ($56B graphic design industry, 135% ROI on design systems) but the audience is narrow (professional designers) and Figma is absorbing this functionality. Your angle: auto-generate a complete design system (tokens + components + docs) from a brand kit upload. If Figma doesn't do this well, there's a window.</div>
+    <div class="rev"><strong>Revenue Max:</strong> Figma plugin: $19/mo. Standalone SaaS: $49/mo per workspace. One-time design system generation: $299. Target agencies who build systems for clients.</div>
+  </div>
+
+  <div class="app">
+    <div class="rank-badge" style="background:var(--b-tier)">#14</div>
+    <h3>Gita GPT / Puran, Ved GPT</h3>
+    <div class="meta">App · Freemium · Spiritual/Cultural</div>
+    <div class="desc">At least 6+ Gita GPT apps already exist (GitaGPT.in, GitaGPT.org, Srimad Gita with 75K+ users, Ask Krishna AI, Bhagavad Gita AI Community). The space is crowded and monetization is challenging — spiritual users are price-sensitive and expect free access. HOWEVER: expanding to Puranas + Vedas + Upanishads is genuinely underserved. The "Ved GPT" angle differentiates. The cultural TAM (1.2B Hindus) is enormous but conversion to paid is extremely low.</div>
+    <div class="rev"><strong>Revenue Max:</strong> Freemium with premium commentary/courses. Donations model. Sponsored by temples/spiritual organizations. Add: daily panchang, puja reminders, mantra audio — becomes a "Hindu spiritual companion" app with multiple retention hooks.</div>
+  </div>
+</div>
+
+<!-- C-TIER -->
+<div class="section">
+  <div class="tier-label tier-c">C-TIER — RETHINK OR ABSORB</div>
+  <h2>Don't Build Standalone — Absorb Into Other Products</h2>
+
+  <div class="app">
+    <div class="rank-badge" style="background:var(--c-tier)">#15</div>
+    <h3>Party Games App</h3>
+    <div class="meta">App · In-app purchases · Entertainment</div>
+    <div class="desc">Fun concept but extremely crowded (Heads Up!, Psych!, Houseparty clones). Discovery is brutal in entertainment. Retention is low (played once at a party, forgotten). Monetization is weak unless you go viral. High development cost for the engagement you get. Build only if you have a genuinely unique game mechanic.</div>
+    <div class="rev"><strong>Revenue Max:</strong> IAP for premium game packs ($1.99–$4.99). Ad-supported free tier. Realistically: $100–$500/mo unless viral.</div>
+  </div>
+
+  <div class="app">
+    <div class="rank-badge" style="background:var(--c-tier)">#16</div>
+    <h3>Box Cricket Scoring App</h3>
+    <div class="meta">App · Freemium · Niche Sports</div>
+    <div class="desc">CricHeroes dominates casual cricket scoring with millions of users. Box cricket is a sub-niche of a niche. TAM is small (urban India box cricket enthusiasts). Monetization ceiling is very low. Could work as a feature inside a broader "local sports booking + scoring" platform, but standalone is tough.</div>
+    <div class="rev"><strong>Revenue Max:</strong> Best angle: combine with turf booking, team management, tournament organization. The scoring is the hook, the booking marketplace is the business. Take 5–10% commission on turf bookings.</div>
+  </div>
+
+  <div class="app">
+    <div class="rank-badge" style="background:var(--c-tier)">#17</div>
+    <h3>Instagram Downloader</h3>
+    <div class="meta">Free Tool · Ad-supported · Utility</div>
+    <div class="desc">Brutally saturated — 50+ tools exist (SaveFromIns, SnapInsta, 4K Stogram, iGram, Inflact, FastSave, SSSInstagram, DownloadGram). Zero differentiation possible. Constant cat-and-mouse with Instagram's API changes. Risk of app store removal (violates ToS). Revenue from ads only. DO NOT build standalone. Absorb as a feature inside Instagram Tools Suite (#2).</div>
+    <div class="rev"><strong>Revenue Max:</strong> Standalone: $50–$200/mo from ads (not worth it). Inside Instagram Suite: drives free signups that convert to paid carousel/analytics tools.</div>
+  </div>
+</div>
+
+<!-- WHAT YOU'RE MISSING -->
+<div class="section">
+  <div class="sl" style="color:var(--gold)">Critical Gaps</div>
+  <h2>What You're Missing — Ideas to Add</h2>
+
+  <div class="missing"><strong>1. WhatsApp Business Tools / CRM:</strong> India runs on WhatsApp. A simple WhatsApp catalog manager, broadcast tool, or auto-reply bot for small businesses is a $10–$50/mo SaaS with massive demand. Interakt, Wati exist but are expensive for micro-businesses.</div>
+
+  <div class="missing"><strong>2. AI Resume/Cover Letter Builder (India-focused):</strong> Huge demand from fresh graduates. Zety and Resume.io dominate globally but aren't optimized for Indian job market (fresher profiles, GATE/campus placements, government job formats). ₹199–₹499 one-time or ₹99/mo.</div>
+
+  <div class="missing"><strong>3. Digital Visiting Card / Mini Website:</strong> Every Indian small business owner shares PDFs or images of visiting cards on WhatsApp. A "link-in-bio + digital visiting card + mini catalog" app at ₹99–₹299/mo is a natural upsell path from your Restaurant/Shop Management apps.</div>
+
+  <div class="missing"><strong>4. Tenant/Rent Management App:</strong> India has 100M+ rental households. Rent receipts for HRA, maintenance tracking, tenant communication — massively underserved. Freemium model with premium at ₹199/mo.</div>
+
+  <div class="missing"><strong>5. AI Video Subtitle/Caption Generator:</strong> Short-form video is exploding. Auto-generate animated captions for Reels/Shorts in Hindi + English + regional languages. CapCut does this but a focused, fast, mobile-first tool for Indian creators has room. Natural addition to your Instagram Tools Suite.</div>
+
+  <div class="missing"><strong>6. Invoice Generator with UPI QR:</strong> Simple, beautiful GST invoices with auto-generated UPI QR code for instant payment. Astoundingly underserved for Indian freelancers and micro-businesses. Could be a free acquisition tool that funnels to Shop Management (#5).</div>
+</div>
+
+<!-- STRATEGIC FRAMEWORK -->
+<div class="section">
+  <div class="sl" style="color:var(--s-tier)">Strategy</div>
+  <h2>The Optimal Build Order & Revenue Maximization</h2>
+
+  <div class="insight"><strong>The Ecosystem Play:</strong> Your 26 ideas aren't 26 separate businesses — they're 5 product ecosystems + 2 standalone service businesses. The biggest mistake would be building each independently. Build PLATFORMS with features.</div>
+
+  <p><strong>Ecosystem 1: Instagram/Creator Tools Platform</strong> (Ideas: IG Suite, Carousel Creator, Image Splitter, Downloader, Content Reformatter)</p>
+  <p>Bundle: Carousel Creator + Image Splitter + Downloader + Reformatter + Hashtag Gen + Analytics. One app, one subscription. $9.99–$29.99/mo. This is your highest-volume opportunity.</p>
+
+  <p><strong>Ecosystem 2: Indian SMB Operating System</strong> (Ideas: Restaurant Mgmt, Shop Mgmt, Receipt Scanner)</p>
+  <p>Bundle: Restaurant/Shop Management + Thermal Printer + Receipt Scanner + Invoice Generator. Start with Restaurant (highest willingness to pay), expand to retail. ₹999–₹4,999/mo + hardware margin. Most defensible business.</p>
+
+  <p><strong>Ecosystem 3: AI Knowledge Business</strong> (Ideas: Micro-Courses, Prompt Kits, Market Reports, Prompt Vault) 🆕</p>
+  <p>This is a content-driven business, not a software business. Create profession-specific courses ($97–$497), sell prompt kits ($27–$97), publish niche research reports ($99–$199). The Prompt Vault app serves as the free companion tool driving paid content sales. Highest margin, lowest cost, fastest to launch.</p>
+
+  <p><strong>Ecosystem 4: Pocketshoot (AI Commerce Visuals)</strong></p>
+  <p>Standalone SaaS. Pivot from "photo editor" to "AI listing generator" (photo + title + description + keywords). $19–$99/mo. Target Indian e-commerce sellers specifically.</p>
+
+  <p><strong>Service Business 1: $500 Website Service</strong> 🆕</p>
+  <p>Not an app — a repeatable service machine. Google Maps scraping → cold outreach → AI-built websites → $75/mo recurring. Build 100 clients = $7,500/mo passive. This can fund the development of all your other products.</p>
+
+  <p><strong>Service Business 2: SOP Generator SaaS</strong> 🆕</p>
+  <p>Screen recording → AI documentation. B2B product with high willingness to pay. $15–25/user/mo. Near-zero competition. Can be built and launched in 4–6 weeks.</p>
+
+  <p><strong>Standalone Apps (build when time permits):</strong> Voice Recipe App, Product Chemical Analyzer, Podcast Repurposing Engine, AudioSpark.</p>
+
+  <p><strong>Deprioritize:</strong> Travel Itinerary (saturated), Party Games (low ROI), Box Cricket (too niche), Instagram Downloader (saturated), Gita GPT (crowded), Prompt Vault as standalone (feature risk). Freelancer All-in-One Platform only viable if radically niched to one profession.</p>
+
+  <div class="insight"><strong>Revenue Stacking Strategy:</strong><br>
+  <strong>Layer 1:</strong> Service revenue — $500 websites generate cash flow within Week 1 🆕<br>
+  <strong>Layer 2:</strong> Digital product sales — courses + prompt kits + reports = passive income 🆕<br>
+  <strong>Layer 3:</strong> Freemium app downloads (user acquisition)<br>
+  <strong>Layer 4:</strong> Monthly SaaS subscriptions (core recurring revenue)<br>
+  <strong>Layer 5:</strong> Hardware margin on thermal printers (lock-in)<br>
+  <strong>Layer 6:</strong> Payment processing cut on transactions (compounding)<br>
+  <strong>Layer 7:</strong> API access for developers/agencies (high-margin B2B)<br>
+  <strong>Layer 8:</strong> Affiliate commissions (passive layer)<br>
+  <br>
+  <strong>The optimal sequence:</strong> Start with Layer 1 (website service) to generate immediate cash flow. Use that revenue to fund Layer 2 (digital products) which require zero ongoing cost. Reinvest into Layers 3–4 (SaaS apps) which take longer to build but compound forever.</div>
+</div>
+
+<!-- FINAL -->
+<div class="section">
+  <div class="sl" style="color:var(--s-tier)">Final Verdict</div>
+  <h2>If I Had to Pick 4 to Build First (Updated)</h2>
+
+  <p><strong>🥇 #1 $500 Website Service</strong> — Start THIS WEEK. Zero code needed. Immediate revenue. Funds everything else. Scrape 500 leads Monday, cold call Tuesday, close 3–5 clients by Friday. $1,500–$2,500 in Week 1 revenue. This is the cash engine that powers your entire portfolio.</p>
+
+  <p><strong>🥈 #5 Profession-Specific AI Micro-Courses</strong> — Start NEXT WEEK. Pick one profession (e.g., "ChatGPT for Indian CAs"). Interview 3 practitioners. Record a 90-minute course. Sell at ₹2,999 on Gumroad. Zero ongoing cost. Revenue while you sleep. Compound by adding one new profession per month.</p>
+
+  <p><strong>🥉 #6 Restaurant Management + Thermal Printer</strong> — Start MONTH 2. Most defensible long-term business. Requires real development time but creates the deepest moat. Hardware lock-in + SaaS recurring + payment processing = triple revenue layer.</p>
+
+  <p><strong>🏅 #8 Instagram Tools Suite</strong> — Start MONTH 3. Absorbs 5 of your other ideas. Highest volume potential. Global market. Ship the Carousel Creator first as the hero feature, then layer in Reformatter, Splitter, Downloader as feature updates.</p>
+
+  <div class="insight"><strong>The 90-Day Roadmap:</strong><br>
+  <strong>Week 1–2:</strong> Launch $500 website service. Close 5 clients. Revenue: $2,500 + $375/mo recurring.<br>
+  <strong>Week 3–4:</strong> Create first micro-course. Launch on Gumroad. Revenue: $500–$2,000.<br>
+  <strong>Month 2:</strong> Build Restaurant Management MVP. Begin beta with 5 restaurants.<br>
+  <strong>Month 3:</strong> Launch Instagram Carousel Creator. Free tier → paid conversions.<br>
+  <strong>Month 3 total revenue projection:</strong> $8,000–$15,000 (service + courses + early SaaS).<br>
+  <strong>Month 12 projection:</strong> $15,000–$30,000/mo across all products.</div>
+</div>
+
+<div style="text-align:center;padding-top:40px;border-top:2px solid var(--border);font-size:12px;color:var(--muted)">
+  <p>Analysis compiled April 18, 2026 (v2.0 — updated with 9 new ideas) · Sources: Photoroom, Sprout Social, Business of Apps, BigIdeasDB, Plutio, HoneyBook, Millo, Market Clarity, MicroGaps, Scrap.io, LeadsAgent, App Store/Play Store data</p>
+  <p style="margin-top:6px;">Validate all assumptions with real user interviews before committing significant development time.</p>
+</div>
+
+</div>
+</body>
+</html>

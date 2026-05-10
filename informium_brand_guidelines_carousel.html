@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Informium Labs — Brand Guidelines Carousel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --brand-primary: #7C3AED;
+    --brand-light: #A78BFA;
+    --brand-dark: #4C1D95;
+    --brand-orange: #F97316;
+    --brand-orange-light: #FB923C;
+    --brand-orange-dark: #C2410C;
+    --light-bg: #F5F3FF;
+    --light-border: #E4DEFF;
+    --dark-bg: #0F0A1E;
+    --gradient: linear-gradient(165deg, #4C1D95 0%, #7C3AED 50%, #F97316 100%);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #111;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 40px 20px;
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+  }
+
+  .serif { font-family: 'Playfair Display', serif; }
+  .sans  { font-family: 'DM Sans', sans-serif; }
+
+  /* ── IG FRAME ── */
+  .ig-frame {
+    width: 420px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.55);
+    overflow: hidden;
+  }
+
+  .ig-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    border-bottom: 1px solid #efefef;
+  }
+  .ig-avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--gradient);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-weight: 700; font-size: 13px; color: #fff;
+    flex-shrink: 0;
+  }
+  .ig-handle { font-size: 13px; font-weight: 600; color: #111; }
+  .ig-sub    { font-size: 11px; color: #888; }
+  .ig-more   { margin-left: auto; font-size: 18px; color: #888; line-height: 1; }
+
+  /* ── CAROUSEL VIEWPORT ── */
+  .carousel-viewport {
+    width: 420px;
+    aspect-ratio: 4/5;
+    overflow: hidden;
+    position: relative;
+    cursor: grab;
+    user-select: none;
+  }
+  .carousel-viewport:active { cursor: grabbing; }
+
+  .carousel-track {
+    display: flex;
+    height: 100%;
+    transition: transform 0.38s cubic-bezier(0.4,0,0.2,1);
+    will-change: transform;
+  }
+
+  /* ── SLIDE BASE ── */
+  .slide {
+    width: 420px;
+    height: 525px;
+    flex-shrink: 0;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0 36px 56px;
+    overflow: hidden;
+  }
+  .slide.center { justify-content: center; }
+  .slide.light  { background: var(--light-bg); }
+  .slide.dark   { background: var(--dark-bg); }
+  .slide.grad   { background: var(--gradient); }
+
+  /* ── PROGRESS BAR ── */
+  .prog-bar {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    padding: 12px 28px 18px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .prog-track {
+    flex: 1; height: 3px; border-radius: 99px; overflow: hidden;
+  }
+  .prog-fill {
+    height: 100%; border-radius: 99px;
+    transition: width 0.38s ease;
+  }
+  .prog-label { font-size: 11px; font-weight: 500; flex-shrink: 0; }
+
+  .slide.light .prog-track { background: rgba(0,0,0,0.08); }
+  .slide.light .prog-fill  { background: var(--brand-primary); }
+  .slide.light .prog-label { color: rgba(0,0,0,0.3); }
+  .slide.dark  .prog-track { background: rgba(255,255,255,0.12); }
+  .slide.dark  .prog-fill  { background: #fff; }
+  .slide.dark  .prog-label { color: rgba(255,255,255,0.4); }
+  .slide.grad  .prog-track { background: rgba(255,255,255,0.15); }
+  .slide.grad  .prog-fill  { background: #fff; }
+  .slide.grad  .prog-label { color: rgba(255,255,255,0.5); }
+
+  /* ── SWIPE ARROW ── */
+  .swipe-arrow {
+    position: absolute; right: 0; top: 0; bottom: 0;
+    width: 48px; display: flex; align-items: center; justify-content: center;
+    z-index: 10;
+  }
+  .slide.light .swipe-arrow { background: linear-gradient(to right, transparent, rgba(0,0,0,0.04)); }
+  .slide.dark  .swipe-arrow { background: linear-gradient(to right, transparent, rgba(255,255,255,0.05)); }
+  .slide.grad  .swipe-arrow { background: linear-gradient(to right, transparent, rgba(0,0,0,0.08)); }
+
+  /* ── LOGO MARK ── */
+  .logo-mark { display: inline-flex; align-items: center; gap: 8px; }
+  .logo-icon {
+    width: 32px; height: 32px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-weight: 700; font-size: 14px;
+  }
+  .logo-icon.light { background: var(--brand-primary); color: #fff; }
+  .logo-icon.dark  { background: rgba(255,255,255,0.12); color: #fff; }
+  .logo-icon.grad  { background: rgba(255,255,255,0.18); color: #fff; }
+  .logo-text { font-size: 12px; font-weight: 600; letter-spacing: 0.5px; }
+  .logo-text.on-light { color: var(--brand-dark); }
+  .logo-text.on-dark  { color: rgba(255,255,255,0.7); }
+  .logo-text.on-grad  { color: rgba(255,255,255,0.85); }
+
+  /* ── TAGS ── */
+  .tag {
+    display: inline-block;
+    font-size: 10px; font-weight: 600; letter-spacing: 2px;
+    text-transform: uppercase; border-radius: 20px; padding: 5px 12px;
+  }
+  .tag.orange-light { background: rgba(249,115,22,0.12); color: var(--brand-orange); }
+  .tag.violet-light { background: rgba(124,58,237,0.1); color: var(--brand-primary); }
+  .tag.on-dark      { background: rgba(249,115,22,0.18); color: var(--brand-orange-light); }
+  .tag.on-grad      { background: rgba(255,255,255,0.15); color: #fff; }
+
+  /* ── DECORATIVE ── */
+  .deco-circle { position: absolute; border-radius: 50%; pointer-events: none; }
+  .glow-dot { position: absolute; border-radius: 50%; pointer-events: none; filter: blur(40px); opacity: 0.35; }
+
+  /* ── IG UI ── */
+  .ig-dots { display: flex; justify-content: center; gap: 5px; padding: 10px 0 8px; }
+  .ig-dot { width: 6px; height: 6px; border-radius: 50%; background: #dbdbdb; transition: background 0.25s; }
+  .ig-dot.active { background: #3897f0; }
+
+  .ig-actions { display: flex; align-items: center; padding: 6px 14px 2px; gap: 14px; }
+  .ig-actions svg { width: 24px; height: 24px; }
+  .ig-save { margin-left: auto; }
+
+  .ig-caption { padding: 8px 14px 16px; font-size: 13px; color: #111; line-height: 1.4; }
+  .ig-caption strong { font-weight: 700; }
+  .ig-caption .ts { color: #8e8e8e; font-size: 11px; display: block; margin-top: 4px; }
+
+  /* ── STAT BOX ── */
+  .stat-box {
+    background: #fff;
+    border-radius: 12px;
+    padding: 14px 16px;
+    border: 1px solid var(--light-border);
+    box-shadow: 0 2px 8px rgba(124,58,237,0.06);
+  }
+</style>
+</head>
+<body>
+
+<div class="ig-frame">
+
+  <!-- Header -->
+  <div class="ig-header">
+    <div class="ig-avatar">IL</div>
+    <div>
+      <div class="ig-handle">informium.labs</div>
+      <div class="ig-sub">Informium Labs · Sponsored</div>
+    </div>
+    <div class="ig-more">···</div>
+  </div>
+
+  <!-- Carousel -->
+  <div class="carousel-viewport" id="viewport">
+    <div class="carousel-track" id="track">
+
+
+      <!-- ═══════ SLIDE 1 — HERO (light) ═══════ -->
+      <div class="slide light center" style="padding: 0 36px;">
+        <div class="glow-dot" style="width:220px;height:220px;background:var(--brand-primary);top:-60px;right:-60px;"></div>
+        <div class="glow-dot" style="width:160px;height:160px;background:var(--brand-orange);bottom:-40px;left:-40px;opacity:0.2;"></div>
+
+        <div style="position:relative;z-index:2;text-align:center;">
+          <div style="margin-bottom:20px;">
+            <div style="width:56px;height:56px;border-radius:14px;background:var(--gradient);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;box-shadow:0 8px 24px rgba(124,58,237,0.35);">
+              <span style="font-family:'Playfair Display',serif;font-weight:700;font-size:22px;color:#fff;">IL</span>
+            </div>
+            <div style="font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--brand-primary);opacity:0.7;">Informium Labs</div>
+          </div>
+
+          <h1 class="serif" style="font-size:30px;font-weight:700;line-height:1.1;letter-spacing:-0.4px;color:#0F0A1E;margin-bottom:14px;">
+            Your brand is<br>leaking money.<br>
+            <span style="font-style:italic;color:var(--brand-primary);">Here's the fix.</span>
+          </h1>
+
+          <p class="sans" style="font-size:13px;color:#5B5272;line-height:1.55;max-width:290px;margin:0 auto 22px;">
+            Most businesses have a logo. Almost none have a brand system. Here's why that gap costs you — and exactly how to close it.
+          </p>
+
+          <div style="display:inline-flex;align-items:center;gap:6px;padding:7px 16px;background:var(--brand-primary);border-radius:20px;">
+            <span style="font-size:12px;font-weight:600;color:#fff;letter-spacing:0.3px;">Swipe to learn</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        </div>
+
+        <div style="position:absolute;bottom:52px;left:50%;transform:translateX(-50%);opacity:0.3;">
+          <div style="font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--brand-primary);">@informium.labs</div>
+        </div>
+
+        <div class="prog-bar">
+          <div class="prog-track"><div class="prog-fill" style="width:8.33%;"></div></div>
+          <span class="prog-label">1/12</span>
+        </div>
+        <div class="swipe-arrow">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.22)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
+
+
+      <!-- ═══════ SLIDE 2 — PROBLEM (dark) ═══════ -->
+      <div class="slide dark">
+        <div class="glow-dot" style="width:200px;height:200px;background:var(--brand-orange);top:-80px;right:-60px;opacity:0.15;"></div>
+
+        <div style="position:relative;z-index:2;">
+          <div class="logo-mark" style="margin-bottom:20px;">
+            <div class="logo-icon dark">IL</div>
+            <span class="logo-text on-dark">Informium Labs</span>
+          </div>
+
+          <span class="tag on-dark" style="margin-bottom:14px;display:inline-block;">The real problem</span>
+
+          <h2 class="serif" style="font-size:28px;font-weight:700;line-height:1.12;letter-spacing:-0.3px;color:#fff;margin-bottom:14px;">
+            Brand chaos is<br>
+            <span style="font-style:italic;color:var(--brand-orange-light);">silent & expensive.</span>
+          </h2>
+
+          <p class="sans" style="font-size:13px;color:rgba(255,255,255,0.5);line-height:1.5;margin-bottom:18px;">
+            5 logo versions. 3 fonts no one agreed on. A blue that shifts every quarter. Your audience feels it — even if they can't name it.
+          </p>
+
+          <div style="display:flex;flex-wrap:wrap;gap:8px;">
+            <span style="font-size:11px;padding:5px 12px;border:1px solid rgba(255,255,255,0.1);border-radius:20px;color:#5B5370;text-decoration:line-through;">Random colors</span>
+            <span style="font-size:11px;padding:5px 12px;border:1px solid rgba(255,255,255,0.1);border-radius:20px;color:#5B5370;text-decoration:line-through;">Inconsistent fonts</span>
+            <span style="font-size:11px;padding:5px 12px;border:1px solid rgba(255,255,255,0.1);border-radius:20px;color:#5B5370;text-decoration:line-through;">Logo abuse</span>
+            <span style="font-size:11px;padding:5px 12px;border:1px solid rgba(255,255,255,0.1);border-radius:20px;color:#5B5370;text-decoration:line-through;">Off-brand tone</span>
+          </div>
+        </div>
+
+        <div class="prog-bar">
+          <div class="prog-track"><div class="prog-fill" style="width:16.66%;"></div></div>
+          <span class="prog-label">2/12</span>
+        </div>
+        <div class="swipe-arrow">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
+
+
+      <!-- ═══════ SLIDE 3 — SOLUTION (gradient) ═══════ -->
+      <div class="slide grad">
+        <div class="deco-circle" style="width:280px;height:280px;border:1px solid rgba(255,255,255,0.08);top:-80px;right:-80px;"></div>
+        <div class="deco-circle" style="width:160px;height:160px;border:1px solid rgba(255,255,255,0.06);top:-20px;right:-20px;"></div>
+
+        <div style="position:relative;z-index:2;">
+          <div class="logo-mark" style="margin-bottom:20px;">
+            <div class="logo-icon grad">IL</div>
+            <span class="logo-text on-grad">Informium Labs</span>
+          </div>
+
+          <span class="tag on-grad" style="margin-bottom:14px;display:inline-block;">The solution</span>
+
+          <h2 class="serif" style="font-size:28px;font-weight:700;line-height:1.12;letter-spacing:-0.3px;color:#fff;margin-bottom:14px;">
+            A brand system is<br>a decision made once<br>
+            <span style="font-style:italic;">used forever.</span>
+          </h2>
+
+          <div style="padding:16px;background:rgba(0,0,0,0.2);border-radius:12px;border:1px solid rgba(255,255,255,0.1);">
+            <p style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:6px;">The truth</p>
+            <p class="serif" style="font-size:14px;color:#fff;font-style:italic;line-height:1.45;">"Brand is the promise you make. Brand guidelines are how you keep it — every single time."</p>
+          </div>
+        </div>
+
+        <div class="prog-bar">
+          <div class="prog-track"><div class="prog-fill" style="width:25%;"></div></div>
+          <span class="prog-label">3/12</span>
+        </div>
+        <div class="swipe-arrow">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
+
+
+      <!-- ═══════ SLIDE 4 — 5 CORE ASSETS (light) ═══════ -->
+      <div class="slide light">
+        <div class="glow-dot" style="width:180px;height:180px;background:var(--brand-primary);top:-60px;left:-40px;opacity:0.15;"></div>
+
+        <div style="position:relative;z-index:2;">
+          <div class="logo-mark" style="margin-bottom:16px;">
+            <div class="logo-icon light">IL</div>
+            <span class="logo-text on-light">Informium Labs</span>
+          </div>
+
+          <span class="tag violet-light" style="margin-bottom:12px;display:inline-block;">The 5 essentials</span>
+
+          <h2 class="serif" style="font-size:25px;font-weight:700;line-height:1.15;letter-spacing:-0.3px;color:#0F0A1E;margin-bottom:14px;">
+            Core brand assets<br>every business needs.
+          </h2>
+
+          <div style="display:flex;align-items:flex-start;gap:12px;padding:9px 0;border-bottom:1px solid var(--light-border);">
+            <span style="font-size:16px;flex-shrink:0;margin-top:1px;">🎨</span>
+            <div><div style="font-size:13px;font-weight:600;color:#0F0A1E;margin-bottom:1px;">Primary logo + variations</div>
+            <div style="font-size:11px;color:#8A85A0;line-height:1.4;">Full, stacked, icon-only, mono. One for every context.</div></div>
+          </div>
+
+          <div style="display:flex;align-items:flex-start;gap:12px;padding:9px 0;border-bottom:1px solid var(--light-border);">
+            <span style="font-size:16px;flex-shrink:0;margin-top:1px;">🖌️</span>
+            <div><div style="font-size:13px;font-weight:600;color:#0F0A1E;margin-bottom:1px;">Color palette</div>
+            <div style="font-size:11px;color:#8A85A0;line-height:1.4;">Primary, secondary, neutrals, and their hex/RGB values.</div></div>
+          </div>
+
+          <div style="display:flex;align-items:flex-start;gap:12px;padding:9px 0;border-bottom:1px solid var(--light-border);">
+            <span style="font-size:16px;flex-shrink:0;margin-top:1px;">🔤</span>
+            <div><div style="font-size:13px;font-weight:600;color:#0F0A1E;margin-bottom:1px;">Typography system</div>
+            <div style="font-size:11px;color:#8A85A0;line-height:1.4;">Heading + body fonts with defined size scale.</div></div>
+          </div>
+
+          <div style="display:flex;align-items:flex-start;gap:12px;padding:9px 0;border-bottom:1px solid var(--light-border);">
+            <span style="font-size:16px;flex-shrink:0;margin-top:1px;">🗣️</span>
+            <div><div style="font-size:13px;font-weight:600;color:#0F0A1E;margin-bottom:1px;">Brand voice & tone</div>
+            <div style="font-size:11px;color:#8A85A0;line-height:1.4;">How you sound — and what you never say.</div></div>
+          </div>
+
+          <div style="display:flex;align-items:flex-start;gap:12px;padding:9px 0;">
+            <span style="font-size:16px;flex-shrink:0;margin-top:1px;">📐</span>
+            <div><div style="font-size:13px;font-weight:600;color:#0F0A1E;margin-bottom:1px;">Spacing & layout rules</div>
+            <div style="font-size:11px;color:#8A85A0;line-height:1.4;">Margins, padding, grid. The invisible glue.</div></div>
+          </div>
+        </div>
+
+        <div class="prog-bar">
+          <div class="prog-track"><div class="prog-fill" style="width:33.33%;"></div></div>
+          <span class="prog-label">4/12</span>
+        </div>
+        <div class="swipe-arrow">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.22)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
+
+
+      <!-- ═══════ SLIDE 5 — CONSISTENCY STATS (dark) ═══════ -->
+      <div class="slide dark">
+        <div class="glow-dot" style="width:200px;height:200px;background:var(--brand-primary);bottom:-80px;right:-60px;opacity:0.2;"></div>
+
+        <div style="position:relative;z-index:2;">
+          <div class="logo-mark" style="margin-bottom:18px;">
+            <div class="logo-icon dark">IL</div>
+            <span class="logo-text on-dark">Informium Labs</span>
+          </div>
+
+          <span class="tag on-dark" style="margin-bottom:14px;display:inline-block;">By the numbers</span>
+
+          <h2 class="serif" style="font-size:26px;font-weight:700;line-height:1.12;letter-spacing:-0.3px;color:#fff;margin-bottom:16px;">
+            Consistency isn't<br>
+            <span style="font-style:italic;color:var(--brand-orange-light);">a nice-to-have.</span>
+          </h2>
+
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:14px;">
+              <div class="serif" style="font-size:28px;font-weight:700;color:var(--brand-orange-light);line-height:1;flex-shrink:0;">33%</div>
+              <div style="font-size:12px;color:rgba(255,255,255,0.5);line-height:1.4;">more revenue for brands with consistent presentation across all platforms <span style="color:rgba(255,255,255,0.25);font-size:10px;">· Lucidpress</span></div>
+            </div>
+            <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:14px;">
+              <div class="serif" style="font-size:28px;font-weight:700;color:var(--brand-light);line-height:1;flex-shrink:0;">3.5×</div>
+              <div style="font-size:12px;color:rgba(255,255,255,0.5);line-height:1.4;">more likely to have excellent brand visibility when presented consistently</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:14px;">
+              <div class="serif" style="font-size:28px;font-weight:700;color:var(--brand-orange-light);line-height:1;flex-shrink:0;">81%</div>
+              <div style="font-size:12px;color:rgba(255,255,255,0.5);line-height:1.4;">of companies still produce off-brand content — even those with guidelines</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="prog-bar">
+          <div class="prog-track"><div class="prog-fill" style="width:41.66%;"></div></div>
+          <span class="prog-label">5/12</span>
+        </div>
+        <div class="swipe-arrow">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
+
+
+      <!-- ═══════ SLIDE 6 — LOGO RULES (light) ═══════ -->
+      <div class="slide light">
+        <div class="glow-dot" style="width:160px;height:160px;background:var(--brand-primary);top:-50px;right:-30px;opacity:0.18;"></div>
+
+        <div style="position:relative;z-index:2;">
+          <div class="logo-mark" style="margin-bottom:16px;">
+            <div class="logo-icon light">IL</div>
+            <span class="logo-text on-light">Informium Labs</span>
+          </div>
+
+          <span class="tag violet-light" style="margin-bottom:12px;display:inline-block;">Logo rules</span>
+
+          <h2 class="serif" style="font-size:25px;font-weight:700;line-height:1.15;letter-spacing:-0.3px;color:#0F0A1E;margin-bottom:6px;">
+            Your logo is not<br>a suggestion.
+          </h2>
+
+          <p class="sans" style="font-size:12px;color:#8A85A0;line-height:1.5;margin-bottom:14px;">Squishing it. Recoloring it. Slapping it on a clashing background. These aren't small mistakes — they signal amateur to your audience.</p>
+
+          <div style="display:flex;gap:8px;margin-bottom:14px;">
+            <div style="flex:1;background:#fff;border:1px solid var(--light-border);border-radius:10px;padding:10px 12px;">
+              <div style="font-size:10px;font-weight:600;color:var(--brand-primary);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">✅ Always define</div>
+              <div style="font-size:11px;color:#5B5272;line-height:1.6;">Clear space rules<br>Approved colorways<br>Minimum size<br>Approved backgrounds</div>
+            </div>
+            <div style="flex:1;background:#fff;border:1px solid var(--light-border);border-radius:10px;padding:10px 12px;">
+              <div style="font-size:10px;font-weight:600;color:var(--brand-orange);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">🚫 Never allow</div>
+              <div style="font-size:11px;color:#5B5272;line-height:1.6;">Stretching or skewing<br>Unapproved colors<br>Drop shadows<br>Low-res versions</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="prog-bar">
+          <div class="prog-track"><div class="prog-fill" style="width:50%;"></div></div>
+          <span class="prog-label">6/12</span>
+        </div>
+        <div class="swipe-arrow">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.22)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
+
+
+      <!-- ═══════ SLIDE 7 — COLOR PSYCHOLOGY (dark) ═══════ -->
+      <div class="slide dark">
+        <div class="glow-dot" style="width:220px;height:220px;background:var(--brand-orange);top:-80px;left:-60px;opacity:0.12;"></div>
+
+        <div style="position:relative;z-index:2;">
+          <div class="logo-mark" style="margin-bottom:18px;">
+            <div class="logo-icon dark">IL</div>
+            <span class="logo-text on-dark">Informium Labs</span>
+          </div>
+
+          <span class="tag on-dark" style="margin-bottom:14px;display:inline-block;">Color system</span>
+
+          <h2 class="serif" style="font-size:26px;font-weight:700;line-height:1.12;letter-spacing:-0.3px;color:#fff;margin-bottom:12px;">
+            Color is your fastest<br>
+            <span style="font-style:italic;color:var(--brand-light);">brand signal.</span>
+          </h2>
+
+          <p class="sans" style="font-size:12px;color:rgba(255,255,255,0.45);line-height:1.5;margin-bottom:14px;">Before they read a word, they've felt your color. A palette without rules gets mutated by every vendor, designer, and template.</p>
+
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:10px;">
+              <div style="width:28px;height:28px;border-radius:6px;background:var(--brand-primary);flex-shrink:0;"></div>
+              <div><div style="font-size:12px;font-weight:600;color:#fff;">Primary</div><div style="font-size:10px;color:rgba(255,255,255,0.35);">Main brand color — buttons, links, icons</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:10px;">
+              <div style="width:28px;height:28px;border-radius:6px;background:var(--brand-light);flex-shrink:0;"></div>
+              <div><div style="font-size:12px;font-weight:600;color:#fff;">Secondary</div><div style="font-size:10px;color:rgba(255,255,255,0.35);">Supporting accent — tags, highlights</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:10px;">
+              <div style="width:28px;height:28px;border-radius:6px;background:#374151;flex-shrink:0;"></div>
+              <div><div style="font-size:12px;font-weight:600;color:#fff;">Neutral</div><div style="font-size:10px;color:rgba(255,255,255,0.35);">Text, backgrounds, borders</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="prog-bar">
+          <div class="prog-track"><div class="prog-fill" style="width:58.33%;"></div></div>
+          <span class="prog-label">7/12</span>
+        </div>
+        <div class="swipe-arrow">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
+
+
+      <!-- ═══════ SLIDE 8 — TYPOGRAPHY (light) ═══════ -->
+      <div class="slide light">
+        <div class="glow-dot" style="width:160px;height:160px;background:var(--brand-orange);top:-40px;right:-40px;opacity:0.15;"></div>
+
+        <div style="position:relative;z-index:2;">
+          <div class="logo-mark" style="margin-bottom:16px;">
+            <div class="logo-icon light">IL</div>
+            <span class="logo-text on-light">Informium Labs</span>
+          </div>
+
+          <span class="tag orange-light" style="margin-bottom:12px;display:inline-block;">Typography</span>
+
+          <h2 class="serif" style="font-size:25px;font-weight:700;line-height:1.15;letter-spacing:-0.3px;color:#0F0A1E;margin-bottom:12px;">
+            Wrong font =<br>wrong feeling.
+          </h2>
+
+          <p class="sans" style="font-size:12px;color:#8A85A0;line-height:1.5;margin-bottom:14px;">Typography sets tone faster than copy does. One heading font. One body font. Defined sizes. No exceptions.</p>
+
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="background:#fff;border:1px solid var(--light-border);border-radius:10px;padding:11px 14px;">
+              <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:#0F0A1E;line-height:1.2;margin-bottom:3px;">Heading Font</div>
+              <div style="font-size:11px;color:#8A85A0;">Personality · Impact · Recall</div>
+            </div>
+            <div style="background:#fff;border:1px solid var(--light-border);border-radius:10px;padding:11px 14px;">
+              <div style="font-family:'DM Sans',sans-serif;font-size:14px;font-weight:400;color:#3D3552;line-height:1.5;margin-bottom:3px;">Body Font — readable, clear, trustworthy at any size.</div>
+              <div style="font-size:11px;color:#8A85A0;">Readability · Trust · Clarity</div>
+            </div>
+            <div style="background:rgba(124,58,237,0.06);border:1px solid var(--light-border);border-radius:10px;padding:10px 14px;display:flex;gap:10px;align-items:center;">
+              <span style="font-size:16px;">🚫</span>
+              <div style="font-size:11px;color:#5B5272;line-height:1.4;"><strong>Always include:</strong> a banned fonts list. Comic Sans lives rent-free on too many pitch decks.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="prog-bar">
+          <div class="prog-track"><div class="prog-fill" style="width:66.66%;"></div></div>
+          <span class="prog-label">8/12</span>
+        </div>
+        <div class="swipe-arrow">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.22)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
+
+
+      <!-- ═══════ SLIDE 9 — BRAND VOICE (dark) ═══════ -->
+      <div class="slide dark">
+        <div class="glow-dot" style="width:200px;height:200px;background:var(--brand-light);bottom:-60px;left:-60px;opacity:0.15;"></div>
+
+        <div style="position:relative;z-index:2;">
+          <div class="logo-mark" style="margin-bottom:18px;">
+            <div class="logo-icon dark">IL</div>
+            <span class="logo-text on-dark">Informium Labs</span>
+          </div>
+
+          <span class="tag on-dark" style="margin-bottom:14px;display:inline-block;">Brand voice</span>
+
+          <h2 class="serif" style="font-size:26px;font-weight:700;line-height:1.12;letter-spacing:-0.3px;color:#fff;margin-bottom:12px;">
+            What you say matters.<br>
+            <span style="font-style:italic;color:var(--brand-light);">How you say it matters more.</span>
+          </h2>
+
+          <p class="sans" style="font-size:12px;color:rgba(255,255,255,0.45);line-height:1.5;margin-bottom:14px;">Same message, different voice = completely different brand. Define it. Document it. Make it impossible to get wrong.</p>
+
+          <div style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px;">
+            <span style="font-size:11px;padding:5px 12px;background:rgba(167,139,250,0.15);border-radius:20px;color:var(--brand-light);">Professional, not stiff</span>
+            <span style="font-size:11px;padding:5px 12px;background:rgba(167,139,250,0.15);border-radius:20px;color:var(--brand-light);">Direct, not rude</span>
+            <span style="font-size:11px;padding:5px 12px;background:rgba(167,139,250,0.15);border-radius:20px;color:var(--brand-light);">Warm, not cheesy</span>
+            <span style="font-size:11px;padding:5px 12px;background:rgba(167,139,250,0.15);border-radius:20px;color:var(--brand-light);">Bold, not arrogant</span>
+          </div>
+
+          <div style="padding:12px 14px;background:rgba(0,0,0,0.25);border-radius:10px;border-left:3px solid var(--brand-orange-light);">
+            <p style="font-size:12px;color:rgba(255,255,255,0.55);line-height:1.5;">Include: sample copy, words you use, words you avoid, and tone shifts for different contexts (ads vs. support vs. social).</p>
+          </div>
+        </div>
+
+        <div class="prog-bar">
+          <div class="prog-track"><div class="prog-fill" style="width:75%;"></div></div>
+          <span class="prog-label">9/12</span>
+        </div>
+        <div class="swipe-arrow">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
+
+
+      <!-- ═══════ SLIDE 10 — WHERE TO APPLY IT (light) ═══════ -->
+      <div class="slide light">
+        <div class="glow-dot" style="width:160px;height:160px;background:var(--brand-primary);top:-50px;right:-30px;opacity:0.15;"></div>
+
+        <div style="position:relative;z-index:2;">
+          <div class="logo-mark" style="margin-bottom:16px;">
+            <div class="logo-icon light">IL</div>
+            <span class="logo-text on-light">Informium Labs</span>
+          </div>
+
+          <span class="tag violet-light" style="margin-bottom:12px;display:inline-block;">Application</span>
+
+          <h2 class="serif" style="font-size:25px;font-weight:700;line-height:1.15;letter-spacing:-0.3px;color:#0F0A1E;margin-bottom:6px;">
+            Every touchpoint.<br>No exceptions.
+          </h2>
+
+          <p class="sans" style="font-size:12px;color:#8A85A0;line-height:1.5;margin-bottom:12px;">If your audience sees it — it must be on-brand. The guide isn't just for your designer.</p>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <div style="background:#fff;border:1px solid var(--light-border);border-radius:10px;padding:10px 12px;">
+              <div style="font-size:16px;margin-bottom:4px;">📱</div>
+              <div style="font-size:12px;font-weight:600;color:#0F0A1E;">Social media</div>
+              <div style="font-size:10px;color:#8A85A0;margin-top:2px;">Posts, stories, ads</div>
+            </div>
+            <div style="background:#fff;border:1px solid var(--light-border);border-radius:10px;padding:10px 12px;">
+              <div style="font-size:16px;margin-bottom:4px;">📊</div>
+              <div style="font-size:12px;font-weight:600;color:#0F0A1E;">Pitch decks</div>
+              <div style="font-size:10px;color:#8A85A0;margin-top:2px;">Investor, sales, internal</div>
+            </div>
+            <div style="background:#fff;border:1px solid var(--light-border);border-radius:10px;padding:10px 12px;">
+              <div style="font-size:16px;margin-bottom:4px;">✉️</div>
+              <div style="font-size:12px;font-weight:600;color:#0F0A1E;">Email</div>
+              <div style="font-size:10px;color:#8A85A0;margin-top:2px;">Campaigns + signatures</div>
+            </div>
+            <div style="background:#fff;border:1px solid var(--light-border);border-radius:10px;padding:10px 12px;">
+              <div style="font-size:16px;margin-bottom:4px;">🌐</div>
+              <div style="font-size:12px;font-weight:600;color:#0F0A1E;">Website</div>
+              <div style="font-size:10px;color:#8A85A0;margin-top:2px;">Copy, UI, imagery</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="prog-bar">
+          <div class="prog-track"><div class="prog-fill" style="width:83.33%;"></div></div>
+          <span class="prog-label">10/12</span>
+        </div>
+        <div class="swipe-arrow">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.22)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
+
+
+      <!-- ═══════ SLIDE 11 — COST OF NO GUIDELINES (dark) ═══════ -->
+      <div class="slide dark">
+        <div class="glow-dot" style="width:240px;height:240px;background:var(--brand-orange);top:-100px;right:-80px;opacity:0.1;"></div>
+
+        <div style="position:relative;z-index:2;">
+          <div class="logo-mark" style="margin-bottom:18px;">
+            <div class="logo-icon dark">IL</div>
+            <span class="logo-text on-dark">Informium Labs</span>
+          </div>
+
+          <span class="tag on-dark" style="margin-bottom:14px;display:inline-block;">The real cost</span>
+
+          <h2 class="serif" style="font-size:26px;font-weight:700;line-height:1.12;letter-spacing:-0.3px;color:#fff;margin-bottom:12px;">
+            "We'll figure it out<br>as we go"<br>
+            <span style="font-style:italic;color:var(--brand-orange-light);">is very expensive.</span>
+          </h2>
+
+          <div style="display:flex;flex-direction:column;gap:9px;">
+            <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:11px 14px;display:flex;gap:12px;align-items:flex-start;">
+              <span style="font-size:15px;flex-shrink:0;margin-top:1px;">💸</span>
+              <div style="font-size:12px;color:rgba(255,255,255,0.5);line-height:1.45;">52% of senior professionals say poor brand consistency costs their companies <strong style="color:rgba(255,255,255,0.75);">over $6M/year</strong> in lost revenue</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:11px 14px;display:flex;gap:12px;align-items:flex-start;">
+              <span style="font-size:15px;flex-shrink:0;margin-top:1px;">🔁</span>
+              <div style="font-size:12px;color:rgba(255,255,255,0.5);line-height:1.45;"><strong style="color:rgba(255,255,255,0.75);">95% of companies have guidelines.</strong> Only 30% use them. The gap is costing millions.</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:11px 14px;display:flex;gap:12px;align-items:flex-start;">
+              <span style="font-size:15px;flex-shrink:0;margin-top:1px;">⏱️</span>
+              <div style="font-size:12px;color:rgba(255,255,255,0.5);line-height:1.45;">A brand guide pays for itself the first time a freelancer gets it right — without 3 revision rounds.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="prog-bar">
+          <div class="prog-track"><div class="prog-fill" style="width:91.66%;"></div></div>
+          <span class="prog-label">11/12</span>
+        </div>
+        <div class="swipe-arrow">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
+
+
+      <!-- ═══════ SLIDE 12 — CTA (gradient) ═══════ -->
+      <div class="slide grad center" style="padding: 0 36px;">
+        <div class="deco-circle" style="width:320px;height:320px;border:1px solid rgba(255,255,255,0.07);top:-100px;right:-100px;"></div>
+        <div class="deco-circle" style="width:200px;height:200px;border:1px solid rgba(255,255,255,0.05);top:-40px;right:-40px;"></div>
+        <div class="deco-circle" style="width:180px;height:180px;border:1px solid rgba(255,255,255,0.06);bottom:-60px;left:-60px;"></div>
+
+        <div style="position:relative;z-index:2;text-align:center;">
+          <div style="width:64px;height:64px;border-radius:16px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;backdrop-filter:blur(8px);">
+            <span style="font-family:'Playfair Display',serif;font-weight:700;font-size:26px;color:#fff;">IL</span>
+          </div>
+
+          <div style="font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.55);margin-bottom:12px;">Informium Labs</div>
+
+          <h2 class="serif" style="font-size:28px;font-weight:700;line-height:1.12;letter-spacing:-0.4px;color:#fff;margin-bottom:10px;">
+            Ready to build a brand<br>that runs <span style="font-style:italic;">itself?</span>
+          </h2>
+
+          <p class="sans" style="font-size:13px;color:rgba(255,255,255,0.65);line-height:1.55;margin-bottom:20px;max-width:280px;margin-left:auto;margin-right:auto;">
+            We put together a free <strong style="color:#fff;">Brand Assets Checklist</strong> — everything you need to brief a designer, onboard a team, or build it yourself.
+          </p>
+
+          <div style="display:inline-flex;align-items:center;gap:8px;padding:13px 28px;background:var(--light-bg);border-radius:28px;margin-bottom:12px;box-shadow:0 8px 24px rgba(0,0,0,0.2);">
+            <span style="font-size:14px;font-weight:700;color:var(--brand-dark);">Comment "BRAND" below</span>
+          </div>
+
+          <p style="font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:10px;">We'll send the free guide straight to your DMs.</p>
+
+          <div style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.35);">follow @informium.labs for more</div>
+        </div>
+
+        <div class="prog-bar">
+          <div class="prog-track"><div class="prog-fill" style="width:100%;"></div></div>
+          <span class="prog-label">12/12</span>
+        </div>
+        <!-- no swipe arrow on last slide -->
+      </div>
+
+
+    </div><!-- /track -->
+  </div><!-- /viewport -->
+
+  <!-- Dots -->
+  <div class="ig-dots" id="dots">
+    <div class="ig-dot active"></div>
+    <div class="ig-dot"></div>
+    <div class="ig-dot"></div>
+    <div class="ig-dot"></div>
+    <div class="ig-dot"></div>
+    <div class="ig-dot"></div>
+    <div class="ig-dot"></div>
+    <div class="ig-dot"></div>
+    <div class="ig-dot"></div>
+    <div class="ig-dot"></div>
+    <div class="ig-dot"></div>
+    <div class="ig-dot"></div>
+  </div>
+
+  <!-- Actions -->
+  <div class="ig-actions">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#262626" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+    </svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="#262626" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+    </svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="#262626" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+    </svg>
+    <svg class="ig-save" viewBox="0 0 24 24" fill="none" stroke="#262626" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+    </svg>
+  </div>
+
+  <!-- Caption -->
+  <div class="ig-caption">
+    <strong>informium.labs</strong> Your brand is leaking money — here's exactly how to fix it 🧵 Comment "BRAND" for the free checklist.
+    <span class="ts">Just now · <span style="color:var(--brand-primary);font-weight:600;">See translation</span></span>
+  </div>
+
+</div><!-- /ig-frame -->
+
+<script>
+  const track    = document.getElementById('track');
+  const dots     = document.querySelectorAll('.ig-dot');
+  const viewport = document.getElementById('viewport');
+  const TOTAL    = 12;
+  let current    = 0;
+  let startX     = 0;
+  let isDragging = false;
+
+  function goTo(idx) {
+    current = Math.max(0, Math.min(TOTAL - 1, idx));
+    track.style.transform = `translateX(${-current * 420}px)`;
+    dots.forEach((d, i) => d.classList.toggle('active', i === current));
+  }
+
+  viewport.addEventListener('mousedown', e => { startX = e.clientX; isDragging = true; });
+  viewport.addEventListener('touchstart', e => { startX = e.touches[0].clientX; isDragging = true; }, { passive: true });
+
+  viewport.addEventListener('mouseup', e => {
+    if (!isDragging) return;
+    const dx = e.clientX - startX;
+    if (dx < -40) goTo(current + 1);
+    else if (dx > 40) goTo(current - 1);
+    isDragging = false;
+  });
+
+  viewport.addEventListener('touchend', e => {
+    if (!isDragging) return;
+    const dx = e.changedTouches[0].clientX - startX;
+    if (dx < -40) goTo(current + 1);
+    else if (dx > 40) goTo(current - 1);
+    isDragging = false;
+  });
+
+  viewport.addEventListener('mouseleave', () => { isDragging = false; });
+</script>
+</body>
+</html>

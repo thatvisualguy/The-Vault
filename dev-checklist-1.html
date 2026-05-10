@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Build & Ship Framework v2 — Expert Edition</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap');
+  :root {
+    --bg:#0a0a0f;--surface:#111118;--surface2:#18181f;--border:#2a2a38;
+    --accent:#e8ff47;--accent2:#47d4ff;--accent3:#ff6b47;--accent4:#b047ff;
+    --expert:#ffb347;--text:#f0f0f8;--muted:#888899;--done-bg:#131a13;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'JetBrains Mono',monospace;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+  body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(232,255,71,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(232,255,71,0.025) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
+  .wrapper{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 24px 80px;}
+  header{padding:56px 0 44px;border-bottom:1px solid var(--border);margin-bottom:36px;}
+  .header-badge{display:inline-flex;align-items:center;gap:8px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--expert);border:1px solid var(--expert);padding:4px 12px;margin-bottom:20px;font-weight:500;}
+  .badge-dot{width:6px;height:6px;background:var(--expert);border-radius:50%;animation:pulse 2s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+  h1{font-family:'Syne',sans-serif;font-size:clamp(2.2rem,4.5vw,3.8rem);font-weight:800;line-height:1.06;letter-spacing:-0.02em;margin-bottom:14px;}
+  h1 .ac{color:var(--accent);}h1 .ec{color:var(--expert);}
+  .header-sub{font-size:12px;color:var(--muted);max-width:580px;line-height:1.65;}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:22px;padding:12px 16px;background:var(--surface2);border:1px solid var(--border);font-size:10px;align-items:center;}
+  .legend-title{color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;}
+  .stats-bar{display:flex;gap:28px;margin-top:22px;flex-wrap:wrap;}
+  .stat{display:flex;flex-direction:column;gap:3px;}
+  .stat-num{font-family:'Syne',sans-serif;font-size:26px;font-weight:700;color:var(--accent);}
+  .stat-label{font-size:10px;color:var(--muted);letter-spacing:0.08em;}
+  .header-actions{display:flex;gap:10px;margin-top:22px;flex-wrap:wrap;}
+  .export-btn{font-family:'JetBrains Mono',monospace;font-size:11px;padding:9px 16px;background:var(--accent);border:1px solid var(--accent);color:#000;cursor:pointer;font-weight:600;transition:all 0.2s;}
+  .export-btn:hover{background:#d4eb30;}
+  .reset-btn{font-family:'JetBrains Mono',monospace;font-size:11px;padding:9px 16px;background:transparent;border:1px solid var(--border);color:var(--muted);cursor:pointer;transition:all 0.2s;}
+  .reset-btn:hover{border-color:var(--accent3);color:var(--accent3);}
+  .progress-container{background:var(--surface2);border:1px solid var(--border);padding:18px 22px;margin-bottom:36px;display:flex;align-items:center;gap:18px;}
+  .progress-label{font-size:10px;color:var(--muted);white-space:nowrap;letter-spacing:0.1em;text-transform:uppercase;}
+  .progress-track{flex:1;height:5px;background:var(--border);overflow:hidden;}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0%;transition:width 0.5s cubic-bezier(0.4,0,0.2,1);}
+  .progress-pct{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--accent);min-width:36px;text-align:right;}
+  .phase-nav{display:flex;gap:6px;margin-bottom:36px;flex-wrap:wrap;}
+  .phase-btn{font-family:'JetBrains Mono',monospace;font-size:10px;padding:7px 13px;background:var(--surface);border:1px solid var(--border);color:var(--muted);cursor:pointer;transition:all 0.2s;letter-spacing:0.05em;}
+  .phase-btn:hover{background:rgba(232,255,71,0.08);border-color:var(--accent);color:var(--accent);}
+  .phase-btn.active{background:var(--accent);border-color:var(--accent);color:#000;font-weight:600;}
+  .phase-section{display:none;animation:fadeIn 0.25s ease;}
+  .phase-section.visible{display:block;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+  .phase-header{display:flex;align-items:flex-start;gap:18px;margin-bottom:24px;padding:22px;background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--phase-color,var(--accent));}
+  .phase-icon{font-size:26px;line-height:1;flex-shrink:0;}
+  .phase-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;margin-bottom:5px;color:var(--phase-color,var(--accent));}
+  .phase-desc{font-size:11px;color:var(--muted);line-height:1.55;}
+  .phase-meta{margin-left:auto;text-align:right;flex-shrink:0;}
+  .phase-count{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;}
+  .phase-count-label{font-size:10px;color:var(--muted);}
+  .category{margin-bottom:20px;border:1px solid var(--border);background:var(--surface);overflow:hidden;}
+  .cat-header{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:var(--surface2);border-bottom:1px solid var(--border);cursor:pointer;user-select:none;transition:background 0.15s;}
+  .cat-header:hover{background:#1c1c26;}
+  .cat-title{font-family:'Syne',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;}
+  .cat-right{display:flex;align-items:center;gap:10px;}
+  .cat-progress-mini{font-size:10px;color:var(--muted);}
+  .cat-toggle{font-size:11px;color:var(--muted);}
+  .cat-body{padding:6px 0;}
+  .item{display:flex;align-items:flex-start;gap:13px;padding:11px 18px;transition:background 0.12s;cursor:pointer;}
+  .item:hover{background:rgba(232,255,71,0.025);}
+  .item.checked{background:var(--done-bg);}
+  .item.checked .item-text{text-decoration:line-through;color:var(--muted);opacity:0.55;}
+  .checkbox{width:17px;height:17px;border:1.5px solid var(--border);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all 0.15s;font-size:10px;}
+  .item.checked .checkbox{background:var(--accent);border-color:var(--accent);color:#000;font-weight:700;}
+  .item-content{flex:1;min-width:0;}
+  .item-text{font-size:12.5px;line-height:1.5;color:var(--text);}
+  .item-note{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.4;}
+  .item-tags{display:flex;gap:5px;margin-top:5px;flex-wrap:wrap;}
+  .item-tag{font-size:9px;padding:2px 6px;letter-spacing:0.08em;text-transform:uppercase;font-weight:500;}
+  .tag-revenue{background:rgba(232,255,71,0.1);color:var(--accent);border:1px solid rgba(232,255,71,0.18);}
+  .tag-critical{background:rgba(255,107,71,0.1);color:var(--accent3);border:1px solid rgba(255,107,71,0.18);}
+  .tag-tool{background:rgba(71,212,255,0.08);color:var(--accent2);border:1px solid rgba(71,212,255,0.15);}
+  .tag-marketing{background:rgba(176,71,255,0.1);color:var(--accent4);border:1px solid rgba(176,71,255,0.18);}
+  .tag-free{background:rgba(45,200,100,0.1);color:#45c864;border:1px solid rgba(45,200,100,0.18);}
+  .tag-b2b{background:rgba(71,212,255,0.1);color:var(--accent2);border:1px solid rgba(71,212,255,0.2);}
+  .tag-b2c{background:rgba(176,71,255,0.1);color:var(--accent4);border:1px solid rgba(176,71,255,0.2);}
+  .tag-mobile{background:rgba(255,179,71,0.1);color:var(--expert);border:1px solid rgba(255,179,71,0.2);}
+  /* Callouts */
+  .expert-callout{margin:4px 0;padding:13px 18px 13px 16px;border-left:3px solid var(--expert);background:rgba(255,179,71,0.05);}
+  .expert-callout::before{content:'⚡ EXPERT INSIGHT';display:block;font-size:9px;font-weight:600;letter-spacing:0.14em;color:var(--expert);margin-bottom:7px;opacity:0.9;}
+  .expert-text{font-size:12px;color:#e8d5b0;line-height:1.6;font-style:italic;}
+  .expert-text strong{color:var(--expert);font-style:normal;font-weight:500;}
+  .hack-callout{margin:4px 0;padding:13px 18px 13px 16px;border-left:3px solid var(--accent2);background:rgba(71,212,255,0.04);}
+  .hack-callout::before{content:'🔑 GROWTH HACK';display:block;font-size:9px;font-weight:600;letter-spacing:0.14em;color:var(--accent2);margin-bottom:7px;}
+  .hack-text{font-size:12px;color:#b8e8f0;line-height:1.6;font-style:italic;}
+  .hack-text strong{color:var(--accent2);font-style:normal;font-weight:500;}
+  .warning-callout{margin:4px 0;padding:13px 18px 13px 16px;border-left:3px solid var(--accent3);background:rgba(255,107,71,0.04);}
+  .warning-callout::before{content:'⚠ AVOID THIS MISTAKE';display:block;font-size:9px;font-weight:600;letter-spacing:0.14em;color:var(--accent3);margin-bottom:7px;}
+  .warning-text{font-size:12px;color:#f0c8b8;line-height:1.6;font-style:italic;}
+  .warning-text strong{color:var(--accent3);font-style:normal;font-weight:500;}
+  ::-webkit-scrollbar{width:5px;}
+  ::-webkit-scrollbar-track{background:var(--bg);}
+  ::-webkit-scrollbar-thumb{background:var(--border);}
+  @media(max-width:640px){h1{font-size:1.9rem;}.phase-btn{font-size:9px;padding:6px 9px;}.stats-bar{gap:18px;}}
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <header>
+    <div class="header-badge"><span class="badge-dot"></span>Expert Edition v2.0 — $2M+ ARR Insights Layered In</div>
+    <h1>Build &amp; <span class="ac">Ship</span><br><span class="ec">Framework</span></h1>
+    <p class="header-sub">The definitive checklist for shipping web apps, SaaS &amp; mobile products — battle-tested from ideation to $2M+ ARR. Expert callouts highlight the moves that separate $1k MRR from $100k MRR.</p>
+    <div class="legend">
+      <span class="legend-title">Tags:</span>
+      <span class="item-tag tag-critical">🔴 critical</span>
+      <span class="item-tag tag-revenue">💰 revenue</span>
+      <span class="item-tag tag-free">🆓 free</span>
+      <span class="item-tag tag-tool">🔧 tool</span>
+      <span class="item-tag tag-marketing">📣 marketing</span>
+      <span class="item-tag tag-b2b">🏢 b2b</span>
+      <span class="item-tag tag-b2c">👤 b2c</span>
+      <span class="item-tag tag-mobile">📱 mobile</span>
+      &nbsp;|&nbsp;
+      <span style="font-size:10px;color:var(--expert)">⚡ Expert Insight</span>
+      <span style="font-size:10px;color:var(--accent2)">🔑 Growth Hack</span>
+      <span style="font-size:10px;color:var(--accent3)">⚠ Avoid This</span>
+    </div>
+    <div class="stats-bar">
+      <div class="stat"><span class="stat-num" id="total-count">0</span><span class="stat-label">Total Tasks</span></div>
+      <div class="stat"><span class="stat-num" id="done-count" style="color:var(--accent2)">0</span><span class="stat-label">Completed</span></div>
+      <div class="stat"><span class="stat-num" id="expert-count" style="color:var(--expert)">0</span><span class="stat-label">Expert Tips</span></div>
+      <div class="stat"><span class="stat-num" id="revenue-count" style="color:var(--accent3)">0</span><span class="stat-label">Revenue Tasks</span></div>
+    </div>
+    <div class="header-actions">
+      <button class="export-btn" onclick="exportProgress()">↓ Export Progress</button>
+      <button class="reset-btn" onclick="resetAll()">↺ Reset All</button>
+    </div>
+  </header>
+  <div class="progress-container">
+    <span class="progress-label">Overall Progress</span>
+    <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+    <span class="progress-pct" id="progress-pct">0%</span>
+  </div>
+  <nav class="phase-nav" id="phase-nav"></nav>
+  <div id="phases-container"></div>
+</div>
+<script>
+const E=t=>({type:'expert',text:t});
+const H=t=>({type:'hack',text:t});
+const W=t=>({type:'warning',text:t});
+const T=(text,note,tags)=>({type:'item',text,note:note||'',tags:tags||[]});
+
+const phases=[
+{id:"ideation",label:"01 Ideation",icon:"💡",color:"#e8ff47",title:"Ideation & Problem Discovery",desc:"Validate the problem before writing a single line of code. Most products fail because they build something nobody cares about enough to pay for.",categories:[
+  {title:"Problem Definition",items:[
+    T("Write a 1-sentence problem statement: who has exactly what pain?","e.g. 'Freelancers lose 4hrs/week chasing late invoices'",["critical"]),
+    E("The best SaaS ideas come from your own pain OR from watching a specific professional struggle daily. <strong>'I noticed that...'</strong> is a better origin than <strong>'I think there's a market for...'</strong>"),
+    T("List 5–8 existing alternatives including spreadsheets, manual work, hiring someone","Inaction is also your competitor",[]),
+    T("Define your unfair advantage vs. each alternative","Faster? 10x cheaper? Niche-specific? Founder domain expertise?",["critical"]),
+    T("Identify your ICP with brutal specificity","Not 'small businesses' — 'solo immigration lawyers in US doing 20+ cases/month'",["critical"]),
+    W("<strong>Vague ICPs produce vague products.</strong> A product for 'everyone' is a product for no one. The riches are in the niches, especially at the $0–$1M ARR stage."),
+    T("Score idea on: market size / monetizability / personal passion / unfair advantage (1–5 each)","Cut ideas scoring below 12/20",[]),
+    T("Write down 3 killer assumptions that could invalidate the idea","e.g. 'Users will trust AI with their financial data'",[]),
+  ]},
+  {title:"Market Research",items:[
+    T("Search Reddit for raw customer voice: 'I hate [x]', '[tool] sucks', 'alternative to [x]'","reddit.com/search — unfiltered, honest complaints",["tool","free"]),
+    H("<strong>Screenshot every Reddit/Twitter complaint</strong> about your problem space. These become your landing page headlines. Use their exact words — it's the highest-converting copy you'll ever write."),
+    T("Search Twitter/X, Indie Hackers, HN for pain point discussions","HN: use site:news.ycombinator.com '[problem]'",["free"]),
+    T("Check Google Trends for demand + seasonality","Is interest growing or declining?",[]),
+    T("Audit all competitor pricing pages: tiers, features, price points","Build a comparison spreadsheet",[]),
+    T("Estimate competitor traffic with Similarweb or SpyFu (free tier)","Validates market size and acquisition channels",["tool","free"]),
+    T("Find where your ICP hangs out: subreddits, Slack groups, LinkedIn groups, Discord","You need to fish where the fish are",["marketing"]),
+    E("<strong>If you can't find 3–5 active communities of your target customer, that's a red flag.</strong> Great markets have communities. No community = possibly no market."),
+  ]},
+  {title:"Customer Discovery Interviews (The Mom Test)",items:[
+    T("Schedule 8–12 problem-discovery interviews with real potential customers","Zero selling. Zero pitching. Just listening.",["critical","revenue"]),
+    E("<strong>Use the Mom Test framework:</strong> Ask about their life, not your idea. 'Walk me through the last time you dealt with [problem].' 'How do you handle it today?' 'How much is that costing you?' Never ask 'Would you pay for X?' — people lie. Past behavior doesn't."),
+    T("Ask: 'How are you solving this today?' and 'What have you already tried?'","If they're not solving it at all, the pain isn't bad enough",["critical"]),
+    T("Ask: 'What would it mean for your business if this was solved?'","Quantify the pain in dollars or hours — this becomes your pricing anchor",[]),
+    T("Ask: 'Who else in your network has this exact problem?'","Best interview ends with 3 referrals to more interviews",["revenue"]),
+    W("<strong>Classic mistake:</strong> demoing your solution and asking 'what do you think?' People will be polite. Compliments are vanity. Ask about their behavior, not their opinion."),
+    T("After 8+ interviews, find recurring language, pain points, and workflows","3+ people saying the same thing = genuine signal",[]),
+    T("Document the top 3 'Jobs to be Done' — what customers are hiring a solution for","'When I [situation], I want to [motivation], so I can [outcome]'",[]),
+  ]},
+  {title:"Validation — Getting Real Signal",items:[
+    T("Build a one-page landing page to collect email signups BEFORE building","Carrd, plain HTML, or even a Notion page",["revenue","tool","critical"]),
+    H("<strong>The Pre-Sale Test:</strong> Add a 'Get Early Access for $X' button to your landing page. If nobody clicks, nobody was going to pay post-launch either. Even 3 pre-sales from strangers is stronger signal than 500 email signups."),
+    T("Attempt to pre-sell to 5 people from your interview pool","Offer a lifetime deal or founder pricing — make it real",["revenue","critical"]),
+    T("Run a $50–100 ad test to validate demand","Google Ads for B2B/search intent; Meta for B2C/impulse",["revenue"]),
+    H("<strong>Fake Door Test:</strong> Build a 'Feature X — coming soon' button in a mockup or prototype. Track clicks. Reveals what users actually want vs. what they say they want."),
+    T("Define go/no-go criteria BEFORE seeing results","e.g. '50+ signups AND 2 pre-sales = proceed'",["critical"]),
+    E("<strong>If you can't get 3 strangers to pre-pay even $49–99, be very careful proceeding.</strong> An email address costs nothing. $49 costs something. That friction is the signal."),
+  ]}
+]},
+{id:"planning",label:"02 Planning",icon:"📐",color:"#47d4ff",title:"Product Planning & Strategy",desc:"Define what you're building, for whom, and how you make money — before design, before code.",categories:[
+  {title:"Product Strategy & Scope",items:[
+    T("Write a 1-page PRD: problem, solution, ICP, success metrics, and OUT-OF-SCOPE list","Out-of-scope list is as important as in-scope",["critical"]),
+    T("Define MVP as minimum that delivers the core job-to-be-done end-to-end","Not minimum features — minimum value loop",["critical"]),
+    W("<strong>Classic MVP trap:</strong> building a 'skateboard' that doesn't actually get anyone to their destination. Your MVP must create a complete experience for one narrow use case — not a half-baked version of everything."),
+    T("Map full user journey: signup → first value → habit formation → upgrade","Every step is a potential drop-off. Minimize them.",["revenue"]),
+    T("Define your 'aha moment' — the exact moment a user first feels the product's value","All onboarding should be engineered to reach this ASAP",["revenue","critical"]),
+    E("<strong>The faster users reach their aha moment, the lower your churn.</strong> Dropbox's aha moment = seeing a file sync. Slack's = receiving your first message. What's yours? Time it. Halving time-to-aha typically cuts 7-day churn by 30%+."),
+    T("Build feature backlog and score by: revenue impact, retention impact, effort","Focus on what gets users to pay AND keeps them paying",[]),
+    T("Set a hard public launch date and work backwards with weekly milestones","Public commitment creates accountability",["critical"]),
+  ]},
+  {title:"Pricing Strategy (Most Underrated Phase)",items:[
+    T("Talk to 10 potential customers about price BEFORE setting it","Ask: 'What would feel too cheap? Too expensive? Just right?'",["revenue","critical"]),
+    E("<strong>Founders chronically underprice.</strong> If nobody complains about price during sales calls, you're too cheap. You should hear occasional price objections — that's healthy. Start higher than you're comfortable with. You can discount; you can rarely raise prices on existing customers."),
+    T("Choose pricing model: subscription / one-time / usage-based / freemium","Subscription = most predictable ARR. Usage-based = aligns with value delivered.",["revenue","critical"]),
+    W("<strong>Freemium is a marketing strategy, not a business model.</strong> Only works with viral/network effects (Slack, Dropbox) or massive top-of-funnel. For bootstrapped products, start with a free trial instead."),
+    T("Design 3 tiers: Starter / Pro / Business — middle tier is the anchor","Most users default to middle tier",["revenue"]),
+    T("Add 'Most Popular' badge on middle tier","Increases middle-tier conversion 20–40%",["revenue"]),
+    H("<strong>Pricing page hack:</strong> Show highest tier first (right-to-left). Anchors perception of value upward. Add a 4th 'Enterprise — Contact Us' tier at 3–5x top price. Makes your top tier look reasonable."),
+    T("Add annual pricing with ~2 months free (~17% discount)","Annual plans reduce churn 60–80% vs monthly",["revenue","critical"]),
+    T("Add a 'Done For You' onboarding package at 3–5x product price","Converts fence-sitters. Some customers want someone to set it up.",["revenue","b2b"]),
+    T("Calculate minimum viable price: COGS + margin target + LTV math","Know your numbers before you launch",["revenue"]),
+  ]},
+  {title:"Business Model & Financials",items:[
+    T("Set revenue goals for Month 1, 3, 6, 12 (specific: $X MRR by date Y)","Vague goals produce vague results",["revenue","critical"]),
+    T("Calculate target LTV, CAC, and payback period","LTV:CAC > 3:1 is healthy for SaaS",["revenue"]),
+    T("Choose payment processor: Stripe / Lemon Squeezy / Paddle","LS or Paddle = Merchant of Record, handles global VAT. Best for solo founders.",["revenue","tool"]),
+    T("Set up bookkeeping from day 1: Wave (free) or Hledger (self-hosted)","Tax surprises at year-end are avoidable",["free","tool"]),
+    E("<strong>Revenue is vanity, profit is sanity, cash is reality.</strong> Know your burn rate, runway, and break-even at all times. Most founders ignore this until it's a crisis."),
+  ]},
+  {title:"Tech Stack (Choose Boring, Ship Fast)",items:[
+    T("Choose frontend: Next.js (web), Expo (mobile), SvelteKit (lighter alternative)","Next.js has deepest ecosystem support",["tool"]),
+    T("Choose backend/DB: Supabase (free: 500MB, 2 projects) or PocketBase","Supabase = Postgres + Auth + Storage + Realtime out of the box",["tool","free"]),
+    T("Choose auth: Clerk (best DX, free to 10k MAU) or Supabase Auth","Clerk has beautiful pre-built UI components",["tool","free"]),
+    T("Choose hosting: Vercel (web) / Coolify (self-hosted VPS) / Fly.io","Coolify on $6/mo Hetzner VPS = near-zero infra cost",["tool","free"]),
+    T("Choose transactional email: Resend (3k/mo free, best DX)","React Email integration is excellent",["tool","free"]),
+    W("<strong>Don't over-engineer the stack.</strong> Next.js + Supabase is battle-tested at $10M ARR. You don't need microservices, Kubernetes, or a custom auth system at launch. Build the product, not the infrastructure."),
+    T("Document all required env vars and services in a README","Future you will thank present you",["critical"]),
+  ]}
+]},
+{id:"design",label:"03 Design",icon:"🎨",color:"#b047ff",title:"UX & Visual Design",desc:"Design for conversion and activation. Every screen has one job: move the user to the next step.",categories:[
+  {title:"UX Strategy",items:[
+    T("Create 1–2 primary user personas from real interview quotes","Ground in data, not assumptions",[]),
+    T("Map critical user flows: signup → onboarding → core action → upgrade → cancel","Cancel flow is where you save churning users",["critical"]),
+    E("<strong>Design the upgrade moment before anything else.</strong> Know exactly what screen or action triggers an upgrade prompt. The upgrade path is a product feature, not an afterthought. Build it on day one."),
+    T("Design every empty state: new user, no data, no results","Empty states are the #1 killer of activation — show a clear CTA",["critical","revenue"]),
+    T("Design onboarding checklist / progress indicator for setup","Gamification of setup completion increases activation 30–50%",["revenue"]),
+    W("Don't skip the <strong>offboarding/cancel flow.</strong> When users try to cancel, show what they'll lose + a pause option + a downgrade option + ask why. A good cancel flow saves 15–25% of churning users."),
+  ]},
+  {title:"Landing Page & Visual Design",items:[
+    T("Choose design tool: Figma (free) or Penpot (open-source, self-hostable)","Penpot = fully free Figma alternative",["tool","free"]),
+    T("Choose component library: shadcn/ui (recommended), Radix, or MUI","shadcn/ui = copy-paste, fully customizable, zero lock-in",["tool","free"]),
+    T("Design landing page: hero → social proof → features → pricing → FAQ → final CTA","This order is conversion-tested. Don't reorder it.",["revenue","critical"]),
+    E("<strong>Landing page headline formula:</strong> '[Do X] without [pain]' or '[Outcome] in [timeframe]'. Be specific. 'Manage projects faster' is weak. 'Ship client projects 2 weeks faster without chasing status updates' converts."),
+    H("<strong>Above the fold rule:</strong> A visitor should understand who the product is for, what it does, and what to do next — within 5 seconds without scrolling. Test by showing it to a stranger for 5 seconds and asking what they understood."),
+    T("Design high-fidelity mockups for: dashboard, core feature, upgrade page","Core screens only — don't design what you haven't built yet",[]),
+    T("Create app icon, favicon, OG image (1200×630px for social sharing)","OG image is your first impression on social and in Slack",[]),
+    T("Design mobile-responsive layouts for all pages","50%+ of landing page traffic is mobile",["critical"]),
+  ]},
+  {title:"Trust & Conversion Design",items:[
+    T("Add social proof: user count, testimonials, company logos, ratings","Even '47 teams signed up this week' works",["revenue"]),
+    T("Design clear pricing comparison table","Feature comparison should make your best tier obviously worth it",["revenue"]),
+    T("Add trust signals: SSL badge, privacy policy, founder photo + bio","Founder face on landing page increases conversion — people buy from people",["revenue"]),
+    H("<strong>The 'As Seen On' Hack:</strong> Any mention in a newsletter, HN, podcast, or publication — add their logo. Media social proof outperforms testimonials for cold traffic."),
+  ]}
+]},
+{id:"development",label:"04 Build",icon:"⚙️",color:"#ff6b47",title:"Core Development",desc:"Build the MVP. Ship the core loop. Resist scope creep with your life.",categories:[
+  {title:"Project Setup",items:[
+    T("Initialize Git, configure .gitignore, set up branch strategy","main = production. Feature branches. Never push to main directly.",["critical"]),
+    T("Configure env vars: .env.local + .env.production. Never hardcode secrets.","",["critical"]),
+    T("Set up CI/CD with GitHub Actions (free)","Auto-deploy on push. Tests run automatically.",["tool","free"]),
+    T("Configure separate staging + production environments","Test everything on staging before prod",["critical"]),
+    T("Set up error monitoring: Sentry (5k errors/mo free)","You can't fix what you can't see",["tool","free"]),
+    T("Set up uptime monitoring: UptimeRobot (50 monitors free)","Get SMS before customers tweet about downtime",["tool","free"]),
+    W("<strong>Don't skip staging.</strong> 'I'll test in prod' is how you break paying customers' workflows at 2pm on a Tuesday."),
+  ]},
+  {title:"Auth & Users",items:[
+    T("Implement: signup, login, logout, password reset, email verification","The boring foundation everything depends on",["critical"]),
+    T("Add Google OAuth — reduces signup friction by ~40%","30 minutes of work. Always worth it.",["revenue","critical"]),
+    T("Build team/org invites + roles if B2B","Without this, you can't expand within companies",["b2b","revenue"]),
+    E("<strong>For B2B: always build team accounts, not individual accounts.</strong> Individual accounts block viral expansion. When a user wants to add a colleague and can't, you've killed your best growth channel."),
+  ]},
+  {title:"Core Product",items:[
+    T("Build the ONE feature that solves the core problem. Nothing else first.","The hardest discipline in product development",["critical"]),
+    W("<strong>Feature creep kills MVPs.</strong> Every added feature doubles QA time, halves shipping speed, and divides user attention. If a feature isn't directly on the path to the aha moment, it goes in the backlog."),
+    T("Build the core loop end-to-end (input → process → output → delivered value)","Users must complete a full cycle without hitting a dead end",["critical"]),
+    T("Implement usage limits per plan tier — gate premium features","Limits create upgrade pressure naturally",["revenue","critical"]),
+    T("Build in-app upgrade prompts that trigger at the moment of limit","Context-aware prompts convert 3–5x better than banners",["revenue"]),
+    H("<strong>The Upgrade Trigger:</strong> Show upgrade prompt when users hit a limit or reach a milestone ('You've created 5 projects — upgrade for unlimited!'). Desire is highest at the moment of constraint."),
+    T("Add data export/download functionality early","Lack of export is a sales blocker for every B2B deal",["b2b"]),
+  ]},
+  {title:"Payments",items:[
+    T("Integrate Stripe/Lemon Squeezy: products, prices, Stripe Checkout","Stripe Checkout = fastest implementation, handles everything",["revenue","critical"]),
+    T("Build webhook handler for all payment events","checkout.session.completed, subscription.updated, invoice.payment_failed",["revenue","critical"]),
+    T("Set up Stripe Customer Portal for self-serve plan changes","Reduces support + gives you a pause/downgrade hook",["revenue"]),
+    T("Implement free trial: 7 or 14 days","No-card trials get 3–4x more signups; card-required gets better-qualified leads",["revenue"]),
+    E("<strong>Free trial philosophy:</strong> No-credit-card = maximize top-of-funnel (B2C, self-serve, low ACV). Credit-card required = better conversion quality (B2B, higher ACV, more intentional buyers). Choose based on your ICP."),
+    T("Test full purchase flow end-to-end: purchase → webhook → access → email receipt","Including failed payment + retry",["critical","revenue"]),
+    T("Add annual pricing toggle on pricing page","Annual = better cash flow + dramatically lower churn",["revenue"]),
+  ]},
+  {title:"Analytics & Admin",items:[
+    T("Set up product analytics: PostHog (open-source, 1M events/mo free)","Track signups, activations, feature usage, upgrades",["tool","free","revenue"]),
+    T("Define and instrument your activation event (predicts 30-day retention)","Usually: completing the core action within the first session",["revenue","critical"]),
+    E("<strong>Activation rate is your most important metric before $1M ARR.</strong> Most products have 20–40% activation. Doubling it is usually easier than doubling traffic and has 2x the revenue impact."),
+    T("Build internal admin panel: Appsmith (self-hosted) or Retool (free tier)","Support and ops without building custom tooling",["tool"]),
+    T("Set up revenue dashboard: Stripe dashboard + Chartmogul (free tier)","MRR, churn, LTV, expansion revenue",["revenue","tool"]),
+  ]},
+  {title:"Mobile (if applicable)",items:[
+    T("Set up Expo project with EAS Build for iOS + Android","EAS = managed builds, no Mac required for iOS",["mobile","tool"]),
+    T("Integrate push notifications via Expo Notifications (free)","Highest re-engagement open rates of any channel",["mobile","revenue","free"]),
+    T("Set up in-app purchases via RevenueCat (free tier)","Single API for iOS + Android IAP + subscriptions",["mobile","revenue","tool","free"]),
+    E("<strong>App Store rejection can delay launch 2–4 weeks.</strong> Submit for review 2–3 weeks early. Read Apple's guidelines. Common rejections: missing privacy policy, unclear account deletion, broken demo account."),
+    T("Implement in-app account deletion (required by Apple/Google since 2023)","Both stores mandate this — it's a hard rejection without it",["mobile","critical"]),
+  ]}
+]},
+{id:"prelaunch",label:"05 Pre-Launch",icon:"🚀",color:"#45c864",title:"Pre-Launch Preparation",desc:"Your launch ROI is determined before launch day. Build the list. Warm the audience. Create anticipation.",categories:[
+  {title:"Email List & Community",items:[
+    T("Set up email: Brevo (300/day free) or Listmonk (self-hosted, unlimited, free)","Listmonk = open-source, runs on your server",["tool","free","marketing"]),
+    T("Build pre-launch email sequence: 3–5 emails over 2 weeks","Tease → educate → build anticipation → launch reveal",["marketing","revenue"]),
+    T("Write automated onboarding sequence: Day 0, 3, 7, 14 emails","Onboarding emails are your highest-ROI emails — write them first",["revenue","critical"]),
+    E("<strong>Target 500+ email subscribers before launch day.</strong> 500 warm subscribers will outperform 5,000 cold Product Hunt visitors for day-one conversions. Build the list for 4–6 weeks before launch."),
+    T("Become genuinely helpful in 3–5 ICP communities before mentioning your product","Give value for 4+ weeks first. No spamming.",["marketing"]),
+    H("<strong>Build in Public:</strong> Post weekly progress updates on Twitter/X or Indie Hackers. Share your MRR, struggles, wins. Build-in-public founders with 2k+ followers convert their audience to customers at 10–15%. It also creates accountability that keeps you shipping."),
+  ]},
+  {title:"Beta Users & Social Proof",items:[
+    T("Onboard 5–15 beta users (free or heavily discounted)","Real users, not friends who say 'looks great!'",["revenue","critical"]),
+    T("Collect testimonials with specific results, not adjectives","'Saved 3 hours/week' beats 'Really great software'",["revenue"]),
+    T("Add privacy policy + terms of service (Termly or Iubenda free tier)","Legal pages are trust signals AND compliance",["critical","tool","free"]),
+    T("Add founder photo, real name, brief backstory to landing page","People buy from people. Founder-led products convert better.",["revenue"]),
+    E("<strong>The Beta Playbook:</strong> Don't just give free access — onboard each beta user on a personal call. Take notes. Ask: 'What almost made you stop using it?' not 'what do you like?' These sessions are worth $10k each in product insight."),
+  ]},
+  {title:"SEO & Content Foundation",items:[
+    T("Set up Google Search Console + Bing Webmaster Tools","Index your site. Catch crawl errors early.",["tool","free","marketing"]),
+    T("Write 3–5 SEO posts targeting high-intent keywords","'[competitor] alternative', '[problem] solution', 'how to [job to be done]'",["marketing"]),
+    H("<strong>SEO shortcut:</strong> Write '[Competitor] vs [Your Product]' and '[Competitor] Alternatives' pages. These rank fast because competitor names have search volume and people searching them are in buying mode."),
+    T("Set up self-hosted analytics: Umami or Plausible (both free, open-source)","Privacy-first. No ad blockers distorting your data.",["tool","free"]),
+  ]},
+  {title:"QA & Testing",items:[
+    T("Test on: Chrome, Firefox, Safari, Edge desktop","Safari bugs are real and Mac users buy SaaS",["critical"]),
+    T("Test on iOS Safari + Android Chrome (mobile browsers)","50%+ of your landing page traffic is mobile",["critical"]),
+    T("Test entire payment flow: purchase → webhook → access → receipt email","Nothing breaks trust like a charge with no access",["critical","revenue"]),
+    T("Run Lighthouse audit — target 90+ on all metrics","Slow sites lose 7% conversion per extra second of load time",["critical"]),
+    T("Test email deliverability with mail-tester.com — target 9+/10","Low score = onboarding emails in spam",["tool","free","revenue"]),
+    T("Usability test with 5 real strangers (not colleagues)","5 users reveal 85% of usability issues",["critical"]),
+    W("<strong>Most founders skip real-user testing.</strong> This is where you discover your 'obvious' onboarding step confuses everyone. Watch someone use your product without helping them. It's painful. It's priceless."),
+  ]}
+]},
+{id:"launch",label:"06 Launch",icon:"🎯",color:"#ff6b47",title:"Launch Day Execution",desc:"Launch is a campaign, not a moment. Execute across every channel simultaneously. Respond to everything.",categories:[
+  {title:"Launch Channels",items:[
+    T("Product Hunt: 12:01 AM PST, Tues–Thurs, line up 10+ genuine supporters","Engage every comment. Response rate is your ranking signal.",["marketing","critical"]),
+    E("<strong>Product Hunt reality check:</strong> A top-5 PH launch rarely drives more than $2–5k first-week revenue unless you already have an audience. It's valuable for backlinks, press, and credibility — not a revenue shortcut. Don't neglect your other channels for it."),
+    T("Hacker News 'Show HN' post","Honest, technical, no marketing fluff. Engage every comment.",["marketing"]),
+    T("Post authentically in communities you've built relationships in","Share the journey + what you learned, not just 'buy my product'",["marketing","revenue"]),
+    T("Email your entire waitlist on launch morning","Personalize the first line if possible",["marketing","revenue","critical"]),
+    T("Submit to 10+ SaaS directories: AlternativeTo, SaaSHub, GetApp, Capterra","Long-tail SEO that compounds over months",["marketing","free"]),
+    H("<strong>'Don't just launch once' rule:</strong> Every major feature, milestone, or customer story is a mini-launch. Product Hunt lets you re-launch with new features. Indie Hackers loves milestone posts. Twitter loves monthly revenue updates. Stay in the news cycle."),
+  ]},
+  {title:"Launch Day Ops",items:[
+    T("Clear your calendar for 48 hours — this is your only job","",["critical"]),
+    T("Monitor error logs, uptime, and metrics in real-time","Have dashboards open all day",["critical"]),
+    T("Have a rollback plan — know how to revert in under 5 minutes","",["critical"]),
+    T("Respond to every comment, DM, tweet, and email within 1–2 hours","Founder responsiveness on launch day is a superpower",["revenue","critical"]),
+    E("<strong>Respond to everything personally.</strong> One personal reply from the founder converts cold leads at a rate no marketing copy can match. 'I just replied to a founder's email and bought immediately' is the most common first-purchase story."),
+    T("Offer launch-day discount or bonus for first 24–48 hours","Creates genuine urgency without being manipulative",["revenue","marketing"]),
+  ]},
+  {title:"Day-1 Customer Success",items:[
+    T("Personally email every new signup within 12 hours","Subject: 'Quick question from [Founder Name]' — open rates are 60–80%",["revenue","critical"]),
+    E("<strong>The Founder Email:</strong> 'Hi [Name], I'm [Founder], the person who built [Product]. What's the main thing you're hoping to solve?' This converts cold signups into paying customers and product advisors simultaneously."),
+    T("Offer free onboarding calls for first 20–50 customers","These calls are worth $10k each in product intelligence",["revenue"]),
+    T("Set up live chat: Crisp (free 2 agents) or Chatwoot (self-hosted)","Live chat on launch day = direct line to wavering visitors",["tool","free","revenue"]),
+    T("Ask every paying customer: 'What almost stopped you from buying?'","Objections you didn't know existed — gold for future copy and pricing",["revenue"]),
+    W("Don't automate away the founder touch during launch week. <strong>This is your one chance to have direct conversations at scale.</strong> After $10k MRR, customers expect polished support. Right now, they expect and appreciate a real human."),
+  ]}
+]},
+{id:"growth",label:"07 Growth",icon:"📈",color:"#b047ff",title:"Post-Launch Growth & Retention",desc:"Retention is the foundation. Without it, growth is a leaky bucket. Fix retention first, then pour water in.",categories:[
+  {title:"Retention First",items:[
+    T("Measure activation rate: % of signups completing core action in first session","Baseline: 20–40%. Target: 50%+",["revenue","critical"]),
+    E("<strong>The retention-first rule:</strong> Don't spend on paid acquisition until Day-7 retention is above 30% (consumer) or trial-to-paid conversion is above 15% (SaaS). Adding users to a leaky product just costs more money."),
+    T("Set up churn surveys — ask WHY every cancelled user left","Formbricks (open-source), Typeform (free tier)",["revenue","tool","free"]),
+    T("Conduct JTBD exit interviews with churned users — call them","Ask: 'What was happening when you decided to cancel?' More valuable than 100 NPS scores.",["revenue"]),
+    T("Build win-back email sequence for churned users (30 days post-cancel)","15–20% of churned users come back if you re-engage thoughtfully",["revenue","marketing"]),
+    T("Implement pause option before cancellation (pause 1–3 months)","Prevents cancellation for 20–30% of users who would otherwise churn",["revenue","critical"]),
+    H("<strong>Cancellation Flow Hack:</strong> Before showing Cancel, show: what they'll lose, option to Pause, option to Downgrade, option to speak to support. Only then — Cancel. Saves 20–40% of cancellations."),
+    T("Send weekly product digest showing users' own activity/value generated","Reminds users of value during low-engagement periods",["revenue","marketing"]),
+  ]},
+  {title:"Founder-Led Sales (First $50k ARR)",items:[
+    T("Do ALL sales calls yourself for first $50k ARR — don't hire sales yet","",["revenue","critical","b2b"]),
+    E("<strong>Founder-led sales is irreplaceable at the early stage.</strong> Only you have the authority to offer custom deals, the product knowledge to handle objections, and the insight to hear what the market is telling you. Every sales call is a product research session. Hire sales only after you've codified what works."),
+    T("Document every sales call: objections, questions, deal outcome","This becomes your sales playbook",["revenue","b2b"]),
+    T("Follow up with non-converted trial users personally on day 7 and 14","Most conversions happen after 3+ touchpoints",["revenue","b2b"]),
+    H("<strong>The 'Let Me Help You' Email:</strong> On day 7 of trial, email non-activated users: 'I noticed you haven't [done core action] yet — can I jump on 15 mins to help you get set up?' This drives 30–40% of all B2B conversions."),
+    T("Create case studies with first 5 paying customers (with permission)","Specific results + named customers = best B2B sales collateral",["revenue","b2b","marketing"]),
+  ]},
+  {title:"Acquisition Channels",items:[
+    T("Identify which 1–2 channels drove paying customers — not just signups","Double down on those ONLY. Ignore everything else.",["revenue","critical"]),
+    W("<strong>Channel discipline is everything.</strong> Most founders spray across 5–10 channels and master none. Every channel takes 3–6 months to compound. Pick 2 max. The grass is always greener on the channel you're not focused on."),
+    T("Start content flywheel: 1 high-quality SEO post per week targeting ICP keywords","Consistency beats viral one-offs every time",["marketing"]),
+    T("Build referral program: 1 month free for referrer + referee (symmetric)","Both sides getting value doubles referral rates",["revenue","marketing"]),
+    H("<strong>Integration Partnership Hack:</strong> Find 3 complementary tools your ICP uses. Propose: 'I'll write a blog post about integrating our tools + promote it to my list if you do the same.' Zero cost. High-quality backlinks. Warm audiences."),
+    T("Reach out to 10–20 niche newsletters for sponsorship or editorial features","Niche newsletters are massively underpriced vs Google/Meta ads",["marketing"]),
+    T("Build a public metrics / open startup page after first revenue","Social proof + accountability + PR magnet for indie hacker community",["marketing","revenue"]),
+  ]},
+  {title:"Expansion Revenue",items:[
+    T("Design expansion revenue: how do existing customers spend more over time?","Usage tiers, seat expansion, add-ons, plan upgrades",["revenue","critical"]),
+    E("<strong>Expansion revenue is the secret weapon of $1M+ ARR SaaS.</strong> If existing customers grow spend by 10%/year (NRR of 110%), your ARR grows even with zero new customers. Design pricing to grow with customer success."),
+    T("Identify power users — top 10% most engaged customers","Clone them. What industry? Channel? What made them stick?",["revenue"]),
+    T("Build annual upsell campaign for monthly subscribers at month 10–11","Offer annual plan with 2 months free before their renewal",["revenue"]),
+    T("Calculate Net Revenue Retention monthly","(Start MRR + expansion - contraction - churn) / Start MRR. Target: >100%",["revenue","critical"]),
+    E("<strong>NRR is the one metric that predicts everything.</strong> NRR > 100% = ARR grows even with no new sales. NRR < 90% = fundamental retention problem. Calculate it monthly, obsess over it weekly."),
+  ]}
+]},
+{id:"operations",label:"08 Ops",icon:"🏗️",color:"#47d4ff",title:"Operations & Scaling",desc:"The unsexy stuff that separates products that survive from those that collapse under their own weight.",categories:[
+  {title:"Legal & Financial",items:[
+    T("Form a legal entity (LLC in US, Ltd in UK) before processing payments","Protects personal liability",["critical"]),
+    T("Open a dedicated business bank account","Never mix personal and business finances",["critical"]),
+    T("Set up bookkeeping from day 1: Wave (free) or Hledger (self-hosted)","Monthly reconciliation. Know your numbers.",["tool","free"]),
+    T("Understand tax obligations: sales tax (US), VAT (EU), GST (AU)","Lemon Squeezy/Paddle as MoR handles this automatically",["critical","revenue"]),
+    E("<strong>The bookkeeping trap:</strong> Most founders ignore finances for 6–12 months, then face a $20–40k tax bill. <strong>Set aside 25–30% of revenue for taxes from day one.</strong> Talk to an accountant before $5k MRR."),
+    T("Set up GDPR/CCPA compliance if targeting EU/California users","Privacy policy, cookie consent, data deletion process",["critical"]),
+  ]},
+  {title:"Customer Support",items:[
+    T("Set up support: Crisp (free, 2 agents) or Chatwoot (self-hosted, free)","Chatwoot = open-source Intercom: email + chat + social in one inbox",["tool","free"]),
+    T("Build public knowledge base / FAQ: Mintlify (free) or GitBook","Good docs reduce support tickets 40–60%",["tool","free"]),
+    T("Create canned responses for top 10 support questions","Speed + consistency",["tool"]),
+    E("<strong>Support is product research.</strong> Every support ticket is a UX failure or a documentation gap. Review tickets weekly and fix root causes. The best support is the ticket that never had to be sent."),
+  ]},
+  {title:"Security & Reliability",items:[
+    T("Implement rate limiting on auth endpoints and APIs","Prevents brute force and abuse",["critical"]),
+    T("Set up automated database backups with tested restore procedure","Test restores on staging monthly — backups that aren't tested don't exist",["critical"]),
+    T("Add HTTPS everywhere via Let's Encrypt (free)","Non-negotiable",["critical","free"]),
+    T("Run dependency vulnerability scan: npm audit or Snyk (free tier)","Outdated dependencies are the most common attack vector",["tool","free"]),
+    W("Don't store passwords. Don't log sensitive data. Don't retain PII beyond what you need. A breach before you have customer trust is existential for an early-stage product."),
+  ]}
+]},
+{id:"tools",label:"09 Toolstack",icon:"🧰",color:"#ffb347",title:"Free & Self-Hosted Tool Recommendations",desc:"Start free. Scale smart. Every tool below has a generous free tier or is fully self-hostable.",categories:[
+  {title:"Frontend & UI",items:[
+    T("Next.js — React framework for web apps (free, open-source)","Best ecosystem, SEO, edge functions. Most popular choice.",["tool","free"]),
+    T("SvelteKit — Lighter Next.js alternative, faster builds","Great for simpler apps or performance-critical products",["tool","free"]),
+    T("Expo — React Native for iOS/Android/Web","One codebase for all platforms",["tool","free","mobile"]),
+    T("shadcn/ui — Copy-paste components built on Radix (free)","Zero lock-in, fully customizable, beautiful defaults",["tool","free"]),
+    T("Tailwind CSS — Utility-first CSS (free, open-source)","Industry standard. Fastest way to build production UI.",["tool","free"]),
+    T("Penpot — Open-source Figma alternative (self-hostable, free)","Best fully free design tool",["tool","free"]),
+  ]},
+  {title:"Backend, Database & Hosting",items:[
+    T("Supabase — Postgres + Auth + Storage + Realtime (free: 500MB, 2 projects)","Best all-in-one free backend for early-stage",["tool","free"]),
+    T("PocketBase — Single Go binary backend with admin UI (self-hostable, free)","Incredible for solo founders. Runs on $5/mo VPS.",["tool","free"]),
+    T("Neon — Serverless Postgres with branching (free tier)","Best for Next.js + serverless stacks",["tool","free"]),
+    T("Coolify — Self-hosted Heroku/Vercel alternative (free, open-source)","Deploy anything on your own Hetzner VPS. ~$6/mo total.",["tool","free"]),
+    T("Fly.io — Affordable container hosting globally (free tier)","Best for full-stack apps needing edge or multi-region",["tool","free"]),
+    T("Cloudflare R2 — S3-compatible file storage (free: 10GB/mo, zero egress fees)","Best free object storage option",["tool","free"]),
+  ]},
+  {title:"Auth",items:[
+    T("Clerk — Beautiful pre-built auth UI, free to 10k MAU","Best DX. Social + magic link + MFA out of box.",["tool","free"]),
+    T("Supabase Auth — Built-in with Supabase, supports OAuth + magic link","Free with Supabase. Best if already in that ecosystem.",["tool","free"]),
+    T("Auth.js (NextAuth v5) — Open-source, 100% free, fully self-managed","Most flexible. More setup required.",["tool","free"]),
+  ]},
+  {title:"Payments & Billing",items:[
+    T("Stripe — Industry standard, best DX, 2.9%+30¢ per transaction","Best for US/EU. Not MoR (you handle tax). Best ecosystem.",["tool","revenue"]),
+    T("Lemon Squeezy — Merchant of Record, handles global VAT, 5%+50¢","Best for solo founders selling globally. Set-and-forget taxes.",["tool","revenue"]),
+    T("Paddle — MoR like Lemon Squeezy, better for higher volume (>$50k MRR)","More features, better pricing at scale",["tool","revenue"]),
+    T("RevenueCat — Mobile IAP management for iOS + Android (free tier)","Single API for all mobile payment complexity",["tool","free","mobile","revenue"]),
+  ]},
+  {title:"Email",items:[
+    T("Resend — Transactional email, 3k/mo free, best developer experience","React Email integration is the best in class",["tool","free"]),
+    T("Brevo — 300 emails/day free, marketing + transactional combined","Good free tier for early-stage marketing emails",["tool","free"]),
+    T("Listmonk — Self-hosted newsletter + transactional (free, open-source)","Unlimited sends on your own server. Best free option at scale.",["tool","free"]),
+    T("React Email — Build email templates in React (free, open-source)","Beautiful emails without wrestling with HTML tables",["tool","free"]),
+  ]},
+  {title:"Analytics & Monitoring",items:[
+    T("PostHog — Open-source product analytics + feature flags (1M events/mo free)","Replaces Mixpanel + LaunchDarkly. Best free option.",["tool","free"]),
+    T("Plausible — Privacy-first web analytics (self-hostable, free)","GA alternative. No cookie banners needed. 2kb script.",["tool","free"]),
+    T("Umami — Simplest self-hosted GA alternative (free, open-source)","Easiest to self-host. Good for landing page analytics.",["tool","free"]),
+    T("Sentry — Error tracking, 5k errors/mo free","Industry standard. Free tier sufficient for early stage.",["tool","free"]),
+    T("UptimeRobot — 50 monitors free, 5-min checks","SMS + email when your site goes down",["tool","free"]),
+    T("GrowthBook — Open-source A/B testing + feature flags (self-hostable, free)","Free Optimizely/LaunchDarkly alternative",["tool","free"]),
+  ]},
+  {title:"Support & Customer Success",items:[
+    T("Crisp — Live chat + helpdesk + email, free for 2 agents","Best free live chat for early-stage products",["tool","free"]),
+    T("Chatwoot — Self-hosted Intercom alternative (free, open-source)","Email + live chat + social in one inbox",["tool","free"]),
+    T("Formbricks — Self-hosted survey + in-product feedback (free, open-source)","Typeform alternative. Excellent for churn + NPS surveys.",["tool","free"]),
+    T("Cal.com — Open-source Calendly (free, self-hostable)","For booking onboarding calls and sales demos",["tool","free"]),
+  ]},
+  {title:"Internal Tools & Content",items:[
+    T("Appsmith — Self-hosted internal tool builder (free, open-source)","Build admin panels without custom code",["tool","free"]),
+    T("Ghost — Self-hosted blog + newsletter (free, open-source)","Best blog + email combo. Runs on $5/mo VPS.",["tool","free","marketing"]),
+    T("Payload CMS — TypeScript headless CMS, self-hostable (free)","For content-heavy products with custom data models",["tool","free"]),
+    T("Dub.co — Open-source link shortener with analytics (self-hostable)","Track every link you share, everywhere",["tool","free","marketing"]),
+    T("Hoppscotch — Open-source Postman alternative for API testing (free)","Test your APIs without leaving the browser",["tool","free"]),
+  ]}
+]}
+];
+
+// ── State (in-memory) ──
+let checked={};
+let totalItems=0;
+let revenueItems=0;
+let expertCount=0;
+
+function getId(ph,ci,ii){return `${ph}_${ci}_${ii}`;}
+
+function updateStats(){
+  const done=Object.values(checked).filter(Boolean).length;
+  const pct=totalItems>0?Math.round(done/totalItems*100):0;
+  document.getElementById('total-count').textContent=totalItems;
+  document.getElementById('done-count').textContent=done;
+  document.getElementById('revenue-count').textContent=revenueItems;
+  document.getElementById('expert-count').textContent=expertCount;
+  document.getElementById('progress-fill').style.width=pct+'%';
+  document.getElementById('progress-pct').textContent=pct+'%';
+  phases.forEach(phase=>{
+    phase.categories.forEach((cat,ci)=>{
+      const tasks=cat.items.filter(i=>i.type==='item');
+      const catDone=tasks.filter((_,idx)=>checked[getId(phase.id,ci,cat.items.indexOf(tasks[idx]))]).length;
+      const el=document.getElementById(`mini-${phase.id}-${ci}`);
+      if(el)el.textContent=`${catDone}/${tasks.length}`;
+    });
+  });
+}
+
+function toggleItem(ph,ci,ii){
+  const id=getId(ph,ci,ii);
+  checked[id]=!checked[id];
+  const el=document.getElementById('item-'+id);
+  if(el){el.classList.toggle('checked',checked[id]);const cb=el.querySelector('.checkbox');if(cb)cb.textContent=checked[id]?'✓':'';}
+  updateStats();
+}
+
+function toggleCat(ph,ci){
+  const b=document.getElementById(`cb-${ph}-${ci}`);
+  const t=document.getElementById(`ct-${ph}-${ci}`);
+  const open=b.style.display!=='none';
+  b.style.display=open?'none':'block';
+  t.textContent=open?'▼':'▲';
+}
+
+function showPhase(id){
+  document.querySelectorAll('.phase-section').forEach(e=>e.classList.remove('visible'));
+  document.querySelectorAll('.phase-btn').forEach(e=>e.classList.remove('active'));
+  const s=document.getElementById('phase-'+id);if(s)s.classList.add('visible');
+  const b=document.getElementById('btn-'+id);if(b)b.classList.add('active');
+}
+
+function resetAll(){
+  if(!confirm('Reset all checkboxes? This cannot be undone.'))return;
+  checked={};
+  document.querySelectorAll('.item').forEach(el=>{
+    el.classList.remove('checked');
+    const cb=el.querySelector('.checkbox');
+    if(cb)cb.textContent='';
+  });
+  updateStats();
+}
+
+function exportProgress(){
+  const done=Object.values(checked).filter(Boolean).length;
+  const pct=Math.round(done/totalItems*100);
+  let out=`Build & Ship Framework — Progress Export\n${new Date().toLocaleDateString()} | ${done}/${totalItems} tasks (${pct}%)\n`;
+  phases.forEach(phase=>{
+    let pd=0,pt=0,txt='';
+    phase.categories.forEach((cat,ci)=>{
+      txt+=`\n  ${cat.title}:\n`;
+      cat.items.forEach((item,ii)=>{
+        if(item.type!=='item')return;
+        const d=!!checked[getId(phase.id,ci,ii)];
+        txt+=`    [${d?'x':' '}] ${item.text}\n`;
+        pt++;if(d)pd++;
+      });
+    });
+    out+=`\n== ${phase.title.toUpperCase()} (${pd}/${pt}) ==\n${txt}`;
+  });
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([out],{type:'text/plain'}));
+  a.download=`build-ship-${new Date().toISOString().split('T')[0]}.txt`;
+  a.click();
+}
+
+const TM={revenue:'tag-revenue',critical:'tag-critical',tool:'tag-tool',marketing:'tag-marketing',free:'tag-free',b2b:'tag-b2b',b2c:'tag-b2c',mobile:'tag-mobile'};
+const TL={revenue:'💰 revenue',critical:'🔴 critical',tool:'🔧 tool',marketing:'📣 marketing',free:'🆓 free',b2b:'🏢 b2b',b2c:'👤 b2c',mobile:'📱 mobile'};
+
+function calloutHTML(item){
+  expertCount++;
+  const cls={expert:'expert-callout',hack:'hack-callout',warning:'warning-callout'};
+  const tcls={expert:'expert-text',hack:'hack-text',warning:'warning-text'};
+  return `<div class="${cls[item.type]}"><div class="${tcls[item.type]}">${item.text}</div></div>`;
+}
+
+function buildUI(){
+  const nav=document.getElementById('phase-nav');
+  const cont=document.getElementById('phases-container');
+  phases.forEach((phase,pi)=>{
+    const btn=document.createElement('button');
+    btn.className='phase-btn'+(pi===0?' active':'');
+    btn.id='btn-'+phase.id;
+    btn.textContent=phase.label;
+    btn.onclick=()=>showPhase(phase.id);
+    nav.appendChild(btn);
+    let phaseTC=0;
+    phase.categories.forEach(cat=>cat.items.forEach(i=>{if(i.type==='item')phaseTC++;}));
+    const sec=document.createElement('div');
+    sec.className='phase-section'+(pi===0?' visible':'');
+    sec.id='phase-'+phase.id;
+    sec.innerHTML=`<div class="phase-header" style="--phase-color:${phase.color}"><div class="phase-icon">${phase.icon}</div><div><div class="phase-title">${phase.title}</div><div class="phase-desc">${phase.desc}</div></div><div class="phase-meta"><div class="phase-count" style="color:${phase.color}">${phaseTC}</div><div class="phase-count-label">tasks</div></div></div>`;
+    phase.categories.forEach((cat,ci)=>{
+      const tasks=cat.items.filter(i=>i.type==='item');
+      totalItems+=tasks.length;
+      tasks.forEach(i=>{if(i.tags&&i.tags.includes('revenue'))revenueItems++;});
+      let html='';
+      cat.items.forEach((item,ii)=>{
+        if(item.type!=='item'){html+=calloutHTML(item);return;}
+        const id=getId(phase.id,ci,ii);
+        const ck=!!checked[id];
+        const tags=(item.tags||[]).map(t=>`<span class="item-tag ${TM[t]||''}">${TL[t]||t}</span>`).join('');
+        html+=`<div class="item${ck?' checked':''}" id="item-${id}" onclick="toggleItem('${phase.id}',${ci},${ii})"><div class="checkbox">${ck?'✓':''}</div><div class="item-content"><div class="item-text">${item.text}</div>${item.note?`<div class="item-note">→ ${item.note}</div>`:''} ${tags?`<div class="item-tags">${tags}</div>`:''}</div></div>`;
+      });
+      const catEl=document.createElement('div');
+      catEl.className='category';
+      catEl.innerHTML=`<div class="cat-header" onclick="toggleCat('${phase.id}',${ci})"><span class="cat-title">${cat.title}</span><div class="cat-right"><span class="cat-progress-mini" id="mini-${phase.id}-${ci}">0/${tasks.length}</span><span class="cat-toggle" id="ct-${phase.id}-${ci}">▲</span></div></div><div class="cat-body" id="cb-${phase.id}-${ci}">${html}</div>`;
+      sec.appendChild(catEl);
+    });
+    cont.appendChild(sec);
+  });
+  updateStats();
+}
+buildUI();
+</script>
+</body>
+</html>
